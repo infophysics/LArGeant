@@ -3,7 +3,7 @@
 NUM_CORES=16
 
 # check if certain packages are installed
-for DEP in "cmake" "gcc" "g++" "libexpat1-dev" "qt5-default" "libxmu-dev" "libmotif-dev"
+for DEP in "cmake" "gcc" "g++" "libexpat1-dev" "qtbase5-dev" "qtchooser" "qt5-qmake" "qtbase5-dev-tools" "libxmu-dev" "libmotif-dev" "libxerces-c-dev"
 do
     echo "Checking for $DEP package..."
     if [ $(dpkg-query -W -f='${Status}' $DEP 2>/dev/null | grep -c "ok installed") -eq 0 ];
@@ -23,8 +23,8 @@ done
 LARGEANT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )/../"
 
 # directory for the installation
-VERSION="10.07.p02"
-DL_DIRECTORY="/home/$USER/physics/geant4/geant4."$VERSION
+VERSION="11.0.1"
+DL_DIRECTORY="/home/$USER/physics/geant4/geant4-"$VERSION
 BUILD_DIRECTORY=$DL_DIRECTORY"/build"
 INSTALL_DIRECTORY=$DL_DIRECTORY"-install"
 

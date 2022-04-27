@@ -14,8 +14,8 @@ done
 LARGEANT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )/../"
 
 # directory for the geant4 installation
-VERSION="10.07.p02"
-DL_DIRECTORY="/home/$USER/physics/geant4/geant4."$VERSION
+VERSION="11.0.1"
+DL_DIRECTORY="/home/$USER/physics/geant4/geant4-"$VERSION
 INSTALL_DIRECTORY=$DL_DIRECTORY"-install"
 # source the geant4 install script
 INSTALL_SCRIPT=$INSTALL_DIRECTORY"/share/Geant4*/geant4make/"

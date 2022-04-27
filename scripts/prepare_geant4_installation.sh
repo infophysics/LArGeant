@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # check if certain packages are installed
-LIST_OF_APPS="cmake gcc g++ libexpat1-dev qt5-default libxmu-dev libmotif-dev"
+LIST_OF_APPS="cmake gcc g++ libexpat1-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libxmu-dev libmotif-dev libxerces-c-dev"
 sudo apt-get install $LIST_OF_APPS -y
 
 # get the directory where this script is stored
@@ -14,9 +14,9 @@ done
 LARGEANT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )/../"
 
 INSTALL_DIRECTORY="/home/$USER/physics/geant4/"
-DOWNLOAD_PAGE="http://cern.ch/geant4-data/releases/"
-VERSION="10.07.p02"
-DL_FILE="geant4."$VERSION".tar.gz"
+DOWNLOAD_PAGE="https://github.com/Geant4/geant4/archive/refs/tags/"
+VERSION="11.0.1"
+DL_FILE="v"$VERSION".tar.gz"
 DL_LINK=$DOWNLOAD_PAGE$DL_FILE
 
 mkdir -p $INSTALL_DIRECTORY

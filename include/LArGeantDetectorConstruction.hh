@@ -22,7 +22,7 @@
 
 namespace largeant
 {
-    class LArGeantDetectorConstruction : public G4UserDetectorConstruction
+    class LArGeantDetectorConstruction : public G4VUserDetectorConstruction
     {
     public:
         LArGeantDetectorConstruction();

@@ -35,6 +35,8 @@ namespace largeant
 
         fAverageDensity = 1.406*g/cm3;
         fNaturalArDensity = 1.3973*g/cm3;
+
+        DefineMaterials();
     }
 
     LArGeantDetectorConstruction::~LArGeantDetectorConstruction()
@@ -88,28 +90,30 @@ namespace largeant
     {
         DefineMaterials();
         // create the world volume
-        fSolidWorld  = new G4Box("Solid World", fWorldX, fWorldY, fWorldZ);
-        fLogicalWorld  = new G4LogicalVolume(fSolidWorld, fWorldMat, "Logical World");
+        fSolidWorld  = new G4Box("SolidWorld", fWorldX, fWorldY, fWorldZ);
+        fLogicalWorld  = new G4LogicalVolume(fSolidWorld, fWorldMat, "LogicalWorld");
         fPhysicalWorld   = new G4PVPlacement(
             0, 
             G4ThreeVector(0., 0., 0.),
             fLogicalWorld,
-            "Physical World",
+            "PhysicalWorld",
             0, 
             false,
-            0);
+            0
+        );
         // create the envelope volume
-        fSolidEnv    = new G4Box("envWorld", fEnvX, fEnvY, fEnvZ);
-        fLogicalEnv    = new G4LogicalVolume(fSolidEnv, fEnvMat, "Logical Env");
-        fPhysicalEnv     = new G4PVPlacement(
+        fSolidEnv    = new G4Box("SolidEnv", fEnvX, fEnvY, fEnvZ);
+        fLogicalEnv  = new G4LogicalVolume(fSolidEnv, fEnvMat, "LogicalEnv");
+        fPhysicalEnv = new G4PVPlacement(
             0,
             G4ThreeVector(0., 0., 0.),
             fLogicalEnv,
-            "Physical Env",
+            "PhysicalEnv",
             fLogicalWorld,
             false,
             0,
-            true);
+            true
+        );
         // create the argon sphere volume
         fSolidSphere = new G4Sphere(
             "LArGeant", 
@@ -118,18 +122,20 @@ namespace largeant
             0, 
             2*CLHEP::pi, 
             0, 
-            2*CLHEP::pi);
+            2*CLHEP::pi
+        );
         
-        fLogicalSphere = new G4LogicalVolume(fSolidSphere, fLAr, "Logical Sphere");
+        fLogicalSphere = new G4LogicalVolume(fSolidSphere, fLAr, "LogicalSphere");
         fPhysicalSphere  = new G4PVPlacement(
             0, 
             G4ThreeVector(0., 0., 0.), 
             fLogicalSphere, 
-            "Physical Sphere", 
+            "PhysicalSphere", 
             fLogicalEnv, 
             false, 
             0, 
-            true);
+            true
+        );
         
         fScoringVolume = fLogicalSphere;
 
@@ -143,5 +149,11 @@ namespace largeant
 
         return fPhysicalWorld;
     }
+    void LArGeantDetectorConstruction::ConstructSDandField()
+    {
+        // MySensitiveDetector *sensDet = new MySensitiveDetector("SensitiveDetector");
 
+        // if(logicDetector != NULL)
+        //     logicDetector->SetSensitiveDetector(sensDet);
+    }
 }

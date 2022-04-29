@@ -8,7 +8,7 @@ include(${Geant4_USE_FILE})
 
 include_directories(LArGeant PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
 add_executable(largeant src/main.cc ${sources} ${headers})

@@ -9,5 +9,17 @@
 
 namespace largeant
 {
+    LArGeantActionInitialization::LArGeantActionInitialization()
+    {
+        fGenerator = new LArGeantPrimaryGeneratorAction(50, "proton");
+    }
 
+    LArGeantActionInitialization::~LArGeantActionInitialization()
+    {
+    }
+
+    void LArGeantActionInitialization::Build() const
+    {
+        SetUserAction(fGenerator);
+    }
 }

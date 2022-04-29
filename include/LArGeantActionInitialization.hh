@@ -9,6 +9,11 @@
 #include "G4VUserActionInitialization.hh"
 
 #include "LArGeantPrimaryGeneratorAction.hh"
+#include "LArGeantGenerator.hh"
+#include "LArGeantRunAction.hh"
+#include "LArGeantEventAction.hh"
+#include "LArGeantSteppingAction.hh"
+
 namespace largeant
 {
     class LArGeantActionInitialization : public G4VUserActionInitialization

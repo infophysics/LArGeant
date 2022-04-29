@@ -29,12 +29,13 @@ using namespace largeant;
 
 int main(int argc, char** argv)
 {
+    G4UIExecutive* uiExecutive = 0;
+
     // create the run manager
     G4RunManager* runManager = new G4RunManager();
     runManager->SetUserInitialization(new LArGeantDetectorConstruction());
     runManager->SetUserInitialization(new LArGeantPhysicsList());
     runManager->SetUserInitialization(new LArGeantActionInitialization());
-    runManager->Initialize();
 
     // Replaced HP environmental variables with C++ calls                                                                                     
     G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );
@@ -44,6 +45,8 @@ int main(int argc, char** argv)
     G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( true );
     G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
     G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
+
+    runManager->Initialize();
 
     // print out available physics lists
     G4PhysListFactory *physListFactory = new G4PhysListFactory();
@@ -63,23 +66,24 @@ int main(int argc, char** argv)
         std::cout << "\t[" << i << "]: " << (*processes)[i]->GetProcessName() << std::endl;
     }
 
-    // UI manager and executive
-    G4UImanager* uiManager = G4UImanager::GetUIpointer();
-    G4UIExecutive* uiExecutive = 0;
-
-    // visualization manager
-    G4VisManager* visManager = new G4VisExecutive();
-    visManager->Initialize();
-
     // start the session
     if (argc == 1)
     {
         uiExecutive = new G4UIExecutive(argc, argv);
-        uiManager->ApplyCommand("/vis/open OGL");
-        uiManager->ApplyCommand("/vis/viewer/set/viewpointVector 1 1 1");
-        uiManager->ApplyCommand("/vis/drawVolume");
-        uiManager->ApplyCommand("/vis/viewer/set/autoRefresh true");
-        uiManager->ApplyCommand("/vis/scene/add/tracjectories rich");
+    }
+    // visualization manager
+    G4VisManager* visManager = new G4VisExecutive();
+    visManager->Initialize();
+    
+    // UI manager and executive
+    G4UImanager* uiManager = G4UImanager::GetUIpointer();
+
+    // start the session
+    if (argc == 1)
+    {
+        uiManager->ApplyCommand("/control/execute vis.mac");
+        uiManager->ApplyCommand("/run/verbose 1");
+        uiManager->ApplyCommand("/event/verbose 0");
         uiExecutive->SessionStart();
     }
     else

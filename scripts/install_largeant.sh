@@ -1,5 +1,3 @@
-
-  
 #! /bin/bash
 # number of cores to use for installing
 NUM_CORES=16

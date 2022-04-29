@@ -12,6 +12,8 @@
 #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4HadronElasticProcess.hh"
+//#include "G4HadronCaptureProcess.hh"
+//#include "G4HadronFissionProcess.hh"
 
 #include "G4ParticleHPThermalScattering.hh"
 #include "G4ParticleHPElasticData.hh"
@@ -34,6 +36,8 @@
 
 #include "G4ProcessTable.hh"
 #include "G4SystemOfUnits.hh"
+
+#include "LArGeantNeutronHPPhysics.hh"
 
 namespace largeant
 {

@@ -36,6 +36,33 @@ int main(int argc, char** argv)
     runManager->SetUserInitialization(new LArGeantActionInitialization());
     runManager->Initialize();
 
+    // Replaced HP environmental variables with C++ calls                                                                                     
+    G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );
+    G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
+    G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
+    G4ParticleHPManager::GetInstance()->SetNeglectDoppler( true );
+    G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( true );
+    G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
+    G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
+
+    // print out available physics lists
+    G4PhysListFactory *physListFactory = new G4PhysListFactory();
+    const std::vector<G4String> physicsLists = physListFactory->AvailablePhysLists();
+    std::cout << "Enabled Physics Lists:" << std::endl;
+    for(size_t i = 0; i < physicsLists.size(); i++)
+    {
+        std::cout << "\t[" << i << "]: " << physicsLists[i] << std::endl;
+    }
+    // print out all processes for neutrons
+    G4ParticleDefinition* neutron = G4Neutron::Neutron();
+    G4ProcessManager* pManager = neutron->GetProcessManager();
+    G4ProcessVector* processes = pManager->GetProcessList();
+    std::cout << "Enabled Neutron HP Physics Processes:" << std::endl;
+    for(size_t i = 0; i < processes->size(); i++)
+    {
+        std::cout << "\t[" << i << "]: " << (*processes)[i]->GetProcessName() << std::endl;
+    }
+
     // UI manager and executive
     G4UImanager* uiManager = G4UImanager::GetUIpointer();
     G4UIExecutive* uiExecutive = 0;

@@ -16,7 +16,7 @@ namespace largeant
         RegisterPhysics(new G4OpticalPhysics());
         RegisterPhysics(new G4DecayPhysics());
         RegisterPhysics(new G4RadioactiveDecayPhysics());
-        //RegisterPhysics(new G4NeutronHPPhysics("neutronHP"));
+        RegisterPhysics(new LArGeantNeutronHPPhysics("neutronHP"));
     }
 
     LArGeantPhysicsList::~LArGeantPhysicsList()

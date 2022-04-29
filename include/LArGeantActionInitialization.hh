@@ -26,5 +26,8 @@ namespace largeant
 
     private:
         LArGeantPrimaryGeneratorAction* fGenerator;
+        LArGeantRunAction* fRunAction;
+        LArGeantEventAction* fEventAction;
+        LArGeantSteppingAction* fSteppingAction;
     };
 }

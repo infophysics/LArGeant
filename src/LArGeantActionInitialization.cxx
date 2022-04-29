@@ -12,8 +12,10 @@ namespace largeant
     LArGeantActionInitialization::LArGeantActionInitialization()
     {
         fGenerator = new LArGeantPrimaryGeneratorAction(
-             50, "neutron"
+             1, "neutron"
         );
+        fRunAction = new LArGeantRunAction();
+        fEventAction = new LArGeantEventAction(fRunAction);
     }
 
     LArGeantActionInitialization::~LArGeantActionInitialization()
@@ -22,15 +24,8 @@ namespace largeant
 
     void LArGeantActionInitialization::Build() const
     {
-        // LArGeantPrimaryGeneratorAction* generator = new LArGeantPrimaryGeneratorAction(
-        //     50, "neutron"
-        // );
         SetUserAction(fGenerator);
-
-        LArGeantRunAction *runAction = new LArGeantRunAction();
-        SetUserAction(runAction);
-        
-        LArGeantEventAction *eventAction = new LArGeantEventAction(runAction);
-        SetUserAction(eventAction);
+        SetUserAction(fRunAction);
+        SetUserAction(fEventAction);
     }
 }

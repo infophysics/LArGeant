@@ -25,6 +25,7 @@
 #include "LArGeantArgon.hh"
 #include "LArGeantActionInitialization.hh"
 #include "LArGeantArgonCube.hh"
+#include "LArGeantArgonCubeDetector.hh"
 #include "LArGeantPhysicsList.hh"
 
 using namespace largeant;
@@ -35,15 +36,14 @@ int main(int argc, char** argv)
 
     // create argon cube object
     LArGeantArgon Argon;
-
     // create the run manager
     G4RunManager* runManager = new G4RunManager();
     runManager->SetUserInitialization(
-        new LArGeantArgonCube(
-            Argon, 
-            50000,
-            50000,
-            50000
+        new LArGeantArgonCubeDetector(
+            Argon,
+            50000, 50000, 50000, 
+            25, 25, 
+            2000
         )
     );
     runManager->SetUserInitialization(new LArGeantPhysicsList());
@@ -57,9 +57,9 @@ int main(int argc, char** argv)
     G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( true );
     G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
     G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
-
+    
     runManager->Initialize();
-
+    
     // print out available physics lists
     G4PhysListFactory *physListFactory = new G4PhysListFactory();
     const std::vector<G4String> physicsLists = physListFactory->AvailablePhysLists();

@@ -14,8 +14,13 @@ include_directories(LArGeant PUBLIC
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
-add_executable(largeant src/main.cc ${sources} ${headers})
-target_link_libraries(largeant ${Geant4_LIBRARIES})
+#-----------create programs-----------#
+# argon sphere
+add_executable(argon_sphere src/programs/ArgonSphere.cc ${sources} ${headers})
+target_link_libraries(argon_sphere ${Geant4_LIBRARIES})
+# argon cube
+add_executable(argon_cube src/programs/ArgonCube.cc ${sources} ${headers})
+target_link_libraries(argon_cube ${Geant4_LIBRARIES})
 
 # copy macro and data files
 file(GLOB MACRO_FILES

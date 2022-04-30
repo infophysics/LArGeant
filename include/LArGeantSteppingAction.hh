@@ -12,7 +12,7 @@
 #include "G4Gamma.hh"
 #include "G4Electron.hh"
 
-#include "LArGeantDetectorConstruction.hh"
+#include "LArGeantArgonSphere.hh"
 #include "LArGeantEventAction.hh"
 
 namespace largeant

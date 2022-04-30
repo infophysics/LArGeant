@@ -1,7 +1,8 @@
 /**
- * @file main.cc
+ * @file ArgonSphere.cc
  * @author Nicholas Carrara [nmcarrara@ucdavis.edu]
- * @brief 
+ * @brief Small program for simulating physics in a
+ * sphere of natural argon.  
  * @version 0.1
  * @date 2022-04-27
  */
@@ -21,8 +22,9 @@
 #include "G4ParticleHPManager.hh"
 #include "G4Types.hh"
 
+#include "LArGeantArgon.hh"
 #include "LArGeantActionInitialization.hh"
-#include "LArGeantDetectorConstruction.hh"
+#include "LArGeantArgonCube.hh"
 #include "LArGeantPhysicsList.hh"
 
 using namespace largeant;
@@ -31,9 +33,19 @@ int main(int argc, char** argv)
 {
     G4UIExecutive* uiExecutive = 0;
 
+    // create argon cube object
+    LArGeantArgon Argon;
+
     // create the run manager
     G4RunManager* runManager = new G4RunManager();
-    runManager->SetUserInitialization(new LArGeantDetectorConstruction());
+    runManager->SetUserInitialization(
+        new LArGeantArgonCube(
+            Argon, 
+            50000,
+            50000,
+            50000
+        )
+    );
     runManager->SetUserInitialization(new LArGeantPhysicsList());
     runManager->SetUserInitialization(new LArGeantActionInitialization());
 

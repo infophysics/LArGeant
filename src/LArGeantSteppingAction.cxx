@@ -23,8 +23,8 @@ namespace largeant
         G4LogicalVolume *volume 
             = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
         
-        const LArGeantDetectorConstruction *detectorConstruction 
-            = static_cast<const LArGeantDetectorConstruction*> 
+        const LArGeantArgonSphere *detectorConstruction 
+            = static_cast<const LArGeantArgonSphere*> 
             (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
     }
 }

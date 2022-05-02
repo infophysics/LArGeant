@@ -22,6 +22,8 @@
 #include "G4ParticleHPManager.hh"
 #include "G4Types.hh"
 
+#include "FTFP_BERT.hh"
+
 #include "LArGeantArgon.hh"
 #include "LArGeantActionInitialization.hh"
 #include "LArGeantArgonCube.hh"
@@ -47,16 +49,20 @@ int main(int argc, char** argv)
         )
     );
     runManager->SetUserInitialization(new LArGeantPhysicsList());
+    // Set the physics list.
+    // G4VModularPhysicsList* PhysicsList = new FTFP_BERT;
+    // PhysicsList->SetVerboseLevel(1);
+    // runManager->SetUserInitialization(PhysicsList);
     runManager->SetUserInitialization(new LArGeantActionInitialization());
 
-    // Replaced HP environmental variables with C++ calls                                                                                     
-    G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );
-    G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
-    G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
-    G4ParticleHPManager::GetInstance()->SetNeglectDoppler( true );
-    G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( true );
-    G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
-    G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
+    // // Replaced HP environmental variables with C++ calls                                                                                     
+    // G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );
+    // G4ParticleHPManager::GetInstance()->SetDoNotAdjustFinalState( true );
+    // G4ParticleHPManager::GetInstance()->SetUseOnlyPhotoEvaporation( true );
+    // G4ParticleHPManager::GetInstance()->SetNeglectDoppler( true );
+    // G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( true );
+    // G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
+    // G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
     
     runManager->Initialize();
     

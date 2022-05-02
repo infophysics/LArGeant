@@ -63,7 +63,6 @@ namespace largeant
 
     void LArGeantPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
-        std::cout << fParticleGun->GetParticleMomentum() << std::endl;
         fParticleGun->GeneratePrimaryVertex(event);
     }
 }

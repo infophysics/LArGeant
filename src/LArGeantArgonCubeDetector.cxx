@@ -118,19 +118,21 @@ namespace largeant
         {
             for (G4int jj = 0; jj < fNumberY; jj++)
             {
-                G4VPhysicalVolume* physicalDetector = new G4PVPlacement(
-                    0,
-                    G4ThreeVector(
-                        -(fWorldX) + (fWorldX)/fNumberX + ii * (2 * fWorldX)/fNumberX,
-                        -(fWorldY) + (fWorldY)/fNumberY + jj * (2 * fWorldY)/fNumberY,
-                        fWorldZ+fThickness/2.0
-                    ),
-                    fLogicalDetector.get(),
-                    "PhysicalDetector",
-                    fLogicalWorld.get(),
-                    false,
-                    ii + jj * fNumberX,
-                    true
+                fFrontFacePhysicalDetector.emplace_back(
+                    new G4PVPlacement(
+                        0,
+                        G4ThreeVector(
+                            -(fWorldX) + (fWorldX)/fNumberX + ii * (2 * fWorldX)/fNumberX,
+                            -(fWorldY) + (fWorldY)/fNumberY + jj * (2 * fWorldY)/fNumberY,
+                            fWorldZ+fThickness/2.0
+                        ),
+                        fLogicalDetector.get(),
+                        "PhysicalDetector",
+                        fLogicalWorld.get(),
+                        false,
+                        ii + jj * fNumberX,
+                        true
+                    )
                 );
             }
         }
@@ -146,5 +148,11 @@ namespace largeant
         std::cout << "  [pressure]: " << material->GetPressure() << std::endl;
 
         return fPhysicalWorld.get();
+    }
+
+    void LArGeantArgonCubeDetector::ConstructSDandField()
+    {
+        fSensitiveDetector = std::make_shared<LArGeantArgonCubeSensitiveDetector>("SensitiveDetector");
+        fLogicalDetector->SetSensitiveDetector(fSensitiveDetector.get());
     }
 }

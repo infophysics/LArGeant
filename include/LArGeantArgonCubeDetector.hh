@@ -20,6 +20,7 @@
 #include "G4LogicalSkinSurface.hh"
 
 #include "LArGeantArgonCube.hh"
+#include "LArGeantArgonCubeSensitiveDetector.hh"
 
 namespace largeant
 {
@@ -74,6 +75,8 @@ namespace largeant
         std::shared_ptr<G4VPhysicalVolume> fPhysicalCube = {nullptr};   
         std::shared_ptr<G4VPhysicalVolume> fPhysicalDetector = {nullptr}; 
 
+        std::vector<std::shared_ptr<G4VPhysicalVolume>> fFrontFacePhysicalDetector;
+
         LArGeantArgon fArgon;
         std::shared_ptr<G4Material> fWorldMat = {nullptr};
         std::shared_ptr<G4Material> fEnvMat = {nullptr};
@@ -81,6 +84,10 @@ namespace largeant
         void DefineMaterials();
         
         G4GenericMessenger *fMessenger;
+
+        /// sensitive detector
+        std::shared_ptr<LArGeantArgonCubeSensitiveDetector> fSensitiveDetector;
+        virtual void ConstructSDandField();
 
     protected:
         std::shared_ptr<G4LogicalVolume> fScoringVolume;

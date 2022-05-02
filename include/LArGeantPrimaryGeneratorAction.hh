@@ -32,13 +32,13 @@ namespace largeant
         void setParticleMomentum(G4double momentum);
 
         // method to access particle gun
-        const G4int getNumberOfParticles() const { return fNumberOfParticles; }
-        const G4ParticleDefinition* getParticle() const { return fParticle; }
-        const G4String getParticleName() const { return fParticleName; }
-        const G4ThreeVector getParticlePosition() const { return fParticlePosition; }
-        const G4ThreeVector getParticleMomentumDirection() const { return fParticleMomentumDirection; }
-        const G4double getParticleMomentum() const { return fParticleMomentum; }
-        const G4ParticleGun* getParticleGun() const { return fParticleGun; }
+        G4int getNumberOfParticles() const { return fNumberOfParticles; }
+        G4ParticleDefinition* getParticle() const { return fParticle; }
+        G4String getParticleName() const { return fParticleName; }
+        G4ThreeVector getParticlePosition() const { return fParticlePosition; }
+        G4ThreeVector getParticleMomentumDirection() const { return fParticleMomentumDirection; }
+        G4double getParticleMomentum() const { return fParticleMomentum; }
+        G4ParticleGun* getParticleGun() const { return fParticleGun; }
 
         virtual void GeneratePrimaries(G4Event* event);
 

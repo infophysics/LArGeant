@@ -11,41 +11,63 @@ namespace largeant
 {
     LArGeantPhysicsList::LArGeantPhysicsList()
     : G4VModularPhysicsList()
-    {
+    {   
+        // Standard EM Physics
         RegisterPhysics(new G4EmStandardPhysics());
+
+        // Synchroton Radiation & GN Physics
+        RegisterPhysics(new G4EmExtraPhysics());
+
+        // Optical Physics
         RegisterPhysics(new G4OpticalPhysics());
+
+        // Decay Physics
         RegisterPhysics(new G4DecayPhysics());
         RegisterPhysics(new G4RadioactiveDecayPhysics());
-        RegisterPhysics(new LArGeantNeutronHPPhysics("neutronHP"));
+
+        // Stopping Physics
+        RegisterPhysics(new G4StoppingPhysics());
+
+        // Ion Physics
+        RegisterPhysics(new G4IonPhysics());
+
+        // Hadron Elastic scattering
+        RegisterPhysics(new G4HadronElasticPhysicsHP());
+
+        // Hadron Physics
+        RegisterPhysics(new G4HadronPhysicsQGSP_BERT_HP());
+
+        // Neutron Physics
+        //RegisterPhysics(new LArGeantNeutronHPPhysics("neutronHP"));
     }
 
     LArGeantPhysicsList::~LArGeantPhysicsList()
     {
     }
 
-    void LArGeantPhysicsList::ConstructParticle()
-    {
-        G4BosonConstructor pBosonConstructor;
-        pBosonConstructor.ConstructParticle();
+    // void LArGeantPhysicsList::ConstructParticle()
+    // {
+    //     G4BosonConstructor pBosonConstructor;
+    //     pBosonConstructor.ConstructParticle();
 
-        G4LeptonConstructor pLeptonConstructor;
-        pLeptonConstructor.ConstructParticle();
+    //     G4LeptonConstructor pLeptonConstructor;
+    //     pLeptonConstructor.ConstructParticle();
 
-        G4MesonConstructor pMesonConstructor;
-        pMesonConstructor.ConstructParticle();
+    //     G4MesonConstructor pMesonConstructor;
+    //     pMesonConstructor.ConstructParticle();
 
-        G4BaryonConstructor pBaryonConstructor;
-        pBaryonConstructor.ConstructParticle();
+    //     G4BaryonConstructor pBaryonConstructor;
+    //     pBaryonConstructor.ConstructParticle();
 
-        G4IonConstructor pIonConstructor;
-        pIonConstructor.ConstructParticle();
+    //     G4IonConstructor pIonConstructor;
+    //     pIonConstructor.ConstructParticle();
 
-        G4ShortLivedConstructor pShortLivedConstructor;
-        pShortLivedConstructor.ConstructParticle();
-    }
+    //     G4ShortLivedConstructor pShortLivedConstructor;
+    //     pShortLivedConstructor.ConstructParticle();
+    // }
 
-    void LArGeantPhysicsList::SetCuts()
-    {
-        SetCutValue(0 * mm, "proton");
-    }
+    // void LArGeantPhysicsList::SetCuts()
+    // {
+    //     SetCutValue(0 * mm, "proton");
+    // }
 }

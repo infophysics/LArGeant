@@ -8,12 +8,15 @@
 #pragma once
 #include "G4VModularPhysicsList.hh"
 #include "G4EmStandardPhysics.hh"
+#include "G4EmExtraPhysics.hh"
 #include "G4OpticalPhysics.hh"
 #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4HadronElasticProcess.hh"
-//#include "G4HadronCaptureProcess.hh"
-//#include "G4HadronFissionProcess.hh"
+#include "G4StoppingPhysics.hh"
+#include "G4IonPhysics.hh"
+#include "G4HadronElasticPhysicsHP.hh"
+#include "G4HadronPhysicsQGSP_BERT_HP.hh"
 
 #include "G4ParticleHPThermalScattering.hh"
 #include "G4ParticleHPElasticData.hh"
@@ -47,8 +50,8 @@ namespace largeant
         LArGeantPhysicsList();
         ~LArGeantPhysicsList();
 
-        virtual void ConstructParticle();
-        virtual void SetCuts();
+        //virtual void ConstructParticle();
+        //virtual void SetCuts();
 
     private:
 

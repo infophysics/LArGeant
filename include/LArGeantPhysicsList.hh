@@ -51,7 +51,7 @@ namespace largeant
         ~LArGeantPhysicsList();
 
         //virtual void ConstructParticle();
-        //virtual void SetCuts();
+        virtual void SetCuts();
 
     private:
 

@@ -62,26 +62,6 @@ namespace largeant
                 0
             )
         );
-        // create the envelope volume
-        fSolidEnv = std::make_shared<G4Box>(
-            "SolidEnv", 
-            fEnvX+fThickness, 
-            fEnvY+fThickness, 
-            fEnvZ+fThickness
-        );
-        fLogicalEnv = std::make_shared<G4LogicalVolume>(fSolidEnv.get(), fEnvMat.get(), "LogicalEnv");
-        fPhysicalEnv.reset(
-            new G4PVPlacement(
-                0,
-                G4ThreeVector(0., 0., 0.),
-                fLogicalEnv.get(),
-                "PhysicalEnv",
-                fLogicalWorld.get(),
-                false,
-                0,
-                true
-            )
-        );
         // create the argon Cube volume
         fSolidCube = std::make_shared<G4Box>(
             "LArCube", 
@@ -96,7 +76,7 @@ namespace largeant
                 G4ThreeVector(0., 0., 0.), 
                 fLogicalCube.get(), 
                 "PhysicalCube", 
-                fLogicalEnv.get(), 
+                fLogicalWorld.get(), 
                 false, 
                 0, 
                 true

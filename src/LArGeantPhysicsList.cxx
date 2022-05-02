@@ -66,8 +66,11 @@ namespace largeant
     //     pShortLivedConstructor.ConstructParticle();
     // }
 
-    // void LArGeantPhysicsList::SetCuts()
-    // {
-    //     SetCutValue(0 * mm, "proton");
-    // }
+    void LArGeantPhysicsList::SetCuts()
+    {
+        SetCutValue(1 * mm, "proton");
+        SetCutValue(1 * mm, "gamma");
+        SetCutValue(1 * mm, "e-");
+        SetCutValue(1 * mm, "e+");
+    }
 }

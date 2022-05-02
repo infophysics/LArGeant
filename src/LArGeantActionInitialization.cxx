@@ -12,7 +12,7 @@ namespace largeant
     LArGeantActionInitialization::LArGeantActionInitialization()
     {
         fGenerator = new LArGeantPrimaryGeneratorAction(
-             1, "neutron"
+            1, "mu-", {0,0,0}, {0,0,1}, 200000
         );
         fRunAction = new LArGeantRunAction();
         fEventAction = new LArGeantEventAction(fRunAction);

@@ -41,11 +41,9 @@ namespace largeant
         virtual G4VPhysicalVolume* Construct();
 
         std::shared_ptr<G4LogicalVolume> getLogicalWorldVolume()    { return fLogicalWorld; }
-        std::shared_ptr<G4LogicalVolume> getLogicalEnvVolume()      { return fLogicalEnv; }
         std::shared_ptr<G4LogicalVolume> getLogicalCubeVolume()     { return fLogicalCube; }
 
         std::shared_ptr<G4VPhysicalVolume> getPhysicalWorldVolume() { return fPhysicalWorld; }
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalEnvVolume()   { return fPhysicalEnv; }
         std::shared_ptr<G4VPhysicalVolume> getPhysicalCubeVolume()  { return fPhysicalCube; }
 
         std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return fScoringVolume; }
@@ -61,17 +59,16 @@ namespace largeant
         G4int fNumberX, fNumberY;
         G4double fThickness;
         // G4 volumes for the Cube
-        std::shared_ptr<G4Box> fSolidWorld, fSolidEnv;
+        std::shared_ptr<G4Box> fSolidWorld;
         /// Cube
         std::shared_ptr<G4Box> fSolidCube;
         /// detector
         std::shared_ptr<G4Box> fSolidDetector;                 
         /// logical volume for the Cube
-        std::shared_ptr<G4LogicalVolume> fLogicalWorld, fLogicalEnv;
+        std::shared_ptr<G4LogicalVolume> fLogicalWorld;
         std::shared_ptr<G4LogicalVolume> fLogicalCube, fLogicalDetector;   
         /// physical volume for the Cube
         std::shared_ptr<G4VPhysicalVolume> fPhysicalWorld = {nullptr};
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalEnv = {nullptr};
         std::shared_ptr<G4VPhysicalVolume> fPhysicalCube = {nullptr};   
         std::shared_ptr<G4VPhysicalVolume> fPhysicalDetector = {nullptr}; 
 

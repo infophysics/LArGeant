@@ -44,15 +44,11 @@ int main(int argc, char** argv)
         new LArGeantArgonCubeDetector(
             Argon,
             50000, 50000, 50000, 
-            25, 25, 
+            100, 100, 
             2000
         )
     );
     runManager->SetUserInitialization(new LArGeantPhysicsList());
-    // Set the physics list.
-    // G4VModularPhysicsList* PhysicsList = new FTFP_BERT;
-    // PhysicsList->SetVerboseLevel(1);
-    // runManager->SetUserInitialization(PhysicsList);
     runManager->SetUserInitialization(new LArGeantActionInitialization());
 
     // // Replaced HP environmental variables with C++ calls                                                                                     
@@ -110,6 +106,8 @@ int main(int argc, char** argv)
         G4String fileName = argv[1];
         uiManager->ApplyCommand(command+fileName);
     }
+
+    
 
     return 0;
 }

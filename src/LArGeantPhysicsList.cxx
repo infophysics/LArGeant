@@ -39,6 +39,10 @@ namespace largeant
 
         // Neutron Physics
         //RegisterPhysics(new LArGeantNeutronHPPhysics("neutronHP"));
+
+        // Get the list of physics lists
+        fPhysListFactory = std::make_shared<G4PhysListFactory>();
+        fPhysicsLists = fPhysListFactory->AvailablePhysLists();
     }
 
     LArGeantPhysicsList::~LArGeantPhysicsList()
@@ -72,5 +76,14 @@ namespace largeant
         SetCutValue(1 * mm, "gamma");
         SetCutValue(1 * mm, "e-");
         SetCutValue(1 * mm, "e+");
+    }
+
+    void LArGeantPhysicsList::PrintPhysicsLists()
+    {
+        G4cout << "Enabled Physics Lists:" << G4endl;
+        for(size_t ii = 0; ii < fPhysicsLists.size(); ii++)
+        {
+            G4cout << "\t[" << ii << "]: " << fPhysicsLists[ii] << G4endl;
+        }
     }
 }

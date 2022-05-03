@@ -42,14 +42,17 @@ namespace largeant
         LArGeantNeutronHPPhysics(const G4String& name="neutron");
         ~LArGeantNeutronHPPhysics();
 
-    public:
-        virtual void ConstructParticle() { };
+        virtual void ConstructParticle() {};
         virtual void ConstructProcess();
+
+        void PrintNeutronPhysicsLists();
         
     public:
         void SetThermalPhysics(G4bool flag) {fThermal = flag;};  
         
     private:
         G4bool  fThermal;
+        std::shared_ptr<G4ProcessManager> fPManager = {nullptr};
+        std::shared_ptr<G4ProcessVector> fProcesses = {nullptr};
     };
 }

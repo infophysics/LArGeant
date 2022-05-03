@@ -67,24 +67,6 @@ int main(int argc, char** argv)
 
     RunManager->Initialize();
 
-    // print out available physics lists
-    G4PhysListFactory *physListFactory = new G4PhysListFactory();
-    const std::vector<G4String> physicsLists = physListFactory->AvailablePhysLists();
-    std::cout << "Enabled Physics Lists:" << std::endl;
-    for(size_t i = 0; i < physicsLists.size(); i++)
-    {
-        std::cout << "\t[" << i << "]: " << physicsLists[i] << std::endl;
-    }
-    // print out all processes for neutrons
-    G4ParticleDefinition* neutron = G4Neutron::Neutron();
-    G4ProcessManager* pManager = neutron->GetProcessManager();
-    G4ProcessVector* processes = pManager->GetProcessList();
-    std::cout << "Enabled Neutron HP Physics Processes:" << std::endl;
-    for(size_t i = 0; i < processes->size(); i++)
-    {
-        std::cout << "\t[" << i << "]: " << (*processes)[i]->GetProcessName() << std::endl;
-    }
-
     // start the session
     if (argc == 1)
     {

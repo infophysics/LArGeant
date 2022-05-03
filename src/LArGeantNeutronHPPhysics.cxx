@@ -21,22 +21,23 @@ namespace largeant
     void LArGeantNeutronHPPhysics::ConstructProcess()
     {
         G4ParticleDefinition* neutron = G4Neutron::Neutron();
-        G4ProcessManager* pManager = neutron->GetProcessManager();
+        fPManager.reset(neutron->GetProcessManager());
+        fProcesses.reset(fPManager->GetProcessList());
         
         // delete all neutron processes if already registered
         G4VProcess* process = 0;
-        process = pManager->GetProcess("hadElastic");
-        if (process) pManager->RemoveProcess(process);
-        process = pManager->GetProcess("neutronInelastic");
-        if (process) pManager->RemoveProcess(process);
-        process = pManager->GetProcess("nCapture");      
-        if (process) pManager->RemoveProcess(process);
-        process = pManager->GetProcess("nFission");      
-        if (process) pManager->RemoveProcess(process);      
+        process = fPManager->GetProcess("hadElastic");
+        if (process) fPManager->RemoveProcess(process);
+        process = fPManager->GetProcess("neutronInelastic");
+        if (process) fPManager->RemoveProcess(process);
+        process = fPManager->GetProcess("nCapture");      
+        if (process) fPManager->RemoveProcess(process);
+        process = fPManager->GetProcess("nFission");      
+        if (process) fPManager->RemoveProcess(process);      
                 
         // (re) create process: elastic
         G4HadronElasticProcess* process1 = new G4HadronElasticProcess();
-        pManager->AddDiscreteProcess(process1);
+        fPManager->AddDiscreteProcess(process1);
 
         // model1a
         G4ParticleHPElastic*  model1a = new G4ParticleHPElastic();
@@ -56,7 +57,7 @@ namespace largeant
         G4HadronInelasticProcess* process2 = new G4HadronInelasticProcess(
             "neutronInelastic"
         );
-        pManager->AddDiscreteProcess(process2);   
+        fPManager->AddDiscreteProcess(process2);   
 
         // cross section data set
         G4ParticleHPInelasticData* dataSet2 = new G4ParticleHPInelasticData();
@@ -68,7 +69,7 @@ namespace largeant
 
         // (re) create process: nCapture   
         G4NeutronCaptureProcess* process3 = new G4NeutronCaptureProcess();
-        pManager->AddDiscreteProcess(process3);  
+        fPManager->AddDiscreteProcess(process3);  
 
         // cross section data set
         G4ParticleHPCaptureData* dataSet3 = new G4ParticleHPCaptureData();
@@ -80,7 +81,7 @@ namespace largeant
         
         // (re) create process: nFission   
         G4NeutronFissionProcess* process4 = new G4NeutronFissionProcess();
-        pManager->AddDiscreteProcess(process4);
+        fPManager->AddDiscreteProcess(process4);
 
         // cross section data set
         G4ParticleHPFissionData* dataSet4 = new G4ParticleHPFissionData();
@@ -89,5 +90,15 @@ namespace largeant
         // models
         G4ParticleHPFission* model4 = new G4ParticleHPFission();
         process4->RegisterMe(model4);
+    }
+
+    void LArGeantNeutronHPPhysics::PrintNeutronPhysicsLists()
+    {
+        // print out all processes for neutrons
+        G4cout << "Enabled Neutron HP Physics Processes:" << G4endl;
+        for(size_t ii = 0; ii < fProcesses->size(); ii++)
+        {
+            G4cout << "\t[" << ii << "]: " << (*fProcesses)[ii]->GetProcessName() << G4endl;
+        }
     }
 }

@@ -6,6 +6,7 @@
  * @date 2022-04-27
  */
 #pragma once
+#include <vector>
 #include "G4VModularPhysicsList.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4EmExtraPhysics.hh"
@@ -39,6 +40,7 @@
 
 #include "G4ProcessTable.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4PhysListFactory.hh"
 
 #include "LArGeantNeutronHPPhysics.hh"
 
@@ -53,7 +55,10 @@ namespace largeant
         //virtual void ConstructParticle();
         virtual void SetCuts();
 
-    private:
+        void PrintPhysicsLists();
 
+    private:
+        std::shared_ptr<G4PhysListFactory> fPhysListFactory;
+        std::vector<G4String> fPhysicsLists;
     };
 }

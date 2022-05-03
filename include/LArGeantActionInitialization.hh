@@ -19,13 +19,13 @@ namespace largeant
     class LArGeantActionInitialization : public G4VUserActionInitialization
     {
     public:
-        LArGeantActionInitialization();
+        LArGeantActionInitialization(LArGeantPrimaryGeneratorAction& primaryGeneratorAction);
         ~LArGeantActionInitialization();
 
         virtual void Build() const;
 
     private:
-        LArGeantPrimaryGeneratorAction* fGenerator;
+        std::shared_ptr<LArGeantPrimaryGeneratorAction> fGenerator;
         LArGeantRunAction* fRunAction;
         LArGeantEventAction* fEventAction;
         LArGeantSteppingAction* fSteppingAction;

@@ -31,16 +31,30 @@ using namespace largeant;
 
 int main(int argc, char** argv)
 {
-    G4UIExecutive* uiExecutive = 0;
+    G4UIExecutive* UIExecutive = 0;
 
-    // create argon sphere object
-    LArGeantArgon Argon;
-
+    /// create argon cube object
+    LArGeantArgon Argon(
+        85.8 * kelvin,      /// temperature
+        0.952 * atmosphere, /// pressure
+        0.334,              /// ratio of Ar36
+        0.063,              /// ratio of Ar38
+        99.603              /// ratio of Ar40
+    );
     // create the run manager
-    G4RunManager* runManager = new G4RunManager();
-    runManager->SetUserInitialization(new LArGeantArgonSphere(Argon, 50000));
-    runManager->SetUserInitialization(new LArGeantPhysicsList());
-    runManager->SetUserInitialization(new LArGeantActionInitialization());
+    G4RunManager* RunManager = new G4RunManager();
+    RunManager->SetUserInitialization(new LArGeantArgonSphere(Argon, 50000));
+    // create the physics list
+    RunManager->SetUserInitialization(new LArGeantPhysicsList());
+    // create the action initialization
+    LArGeantPrimaryGeneratorAction PrimaryGeneratorAction(
+        1,      // number of particles to generate
+        "mu-",  // type of particle to generate
+        {0,0,0},// starting position
+        {0,0,1},// starting momentum direction
+        200000  // starting momentum (MeV)
+    );
+    RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction));
 
     // Replaced HP environmental variables with C++ calls                                                                                     
     G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );
@@ -51,7 +65,7 @@ int main(int argc, char** argv)
     G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
     G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
 
-    runManager->Initialize();
+    RunManager->Initialize();
 
     // print out available physics lists
     G4PhysListFactory *physListFactory = new G4PhysListFactory();
@@ -74,7 +88,7 @@ int main(int argc, char** argv)
     // start the session
     if (argc == 1)
     {
-        uiExecutive = new G4UIExecutive(argc, argv);
+        UIExecutive = new G4UIExecutive(argc, argv);
     }
     // visualization manager
     G4VisManager* visManager = new G4VisExecutive();
@@ -89,7 +103,7 @@ int main(int argc, char** argv)
         uiManager->ApplyCommand("/control/execute vis.mac");
         uiManager->ApplyCommand("/run/verbose 1");
         uiManager->ApplyCommand("/event/verbose 0");
-        uiExecutive->SessionStart();
+        UIExecutive->SessionStart();
     }
     else
     {

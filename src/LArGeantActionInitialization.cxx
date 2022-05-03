@@ -9,11 +9,9 @@
 
 namespace largeant
 {
-    LArGeantActionInitialization::LArGeantActionInitialization()
+    LArGeantActionInitialization::LArGeantActionInitialization(LArGeantPrimaryGeneratorAction& primaryGeneratorAction)
     {
-        fGenerator = new LArGeantPrimaryGeneratorAction(
-            1, "mu-", {0,0,0}, {0,0,1}, 200000
-        );
+        fGenerator = std::make_shared<LArGeantPrimaryGeneratorAction>(primaryGeneratorAction);
         fRunAction = new LArGeantRunAction();
         fEventAction = new LArGeantEventAction(fRunAction);
     }
@@ -24,7 +22,7 @@ namespace largeant
 
     void LArGeantActionInitialization::Build() const
     {
-        SetUserAction(fGenerator);
+        SetUserAction(fGenerator.get());
         SetUserAction(fRunAction);
         SetUserAction(fEventAction);
     }

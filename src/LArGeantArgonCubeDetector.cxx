@@ -28,6 +28,10 @@ namespace largeant
     , fArgon(argon)
     {
         DefineMaterials();
+        // set up messenger
+        fMessenger = new G4GenericMessenger(this ,"/argon_cube/", "ArgonCube");
+        fMessenger->DeclareProperty("numberX", fNumberX, "Number of Rows");
+        fMessenger->DeclareProperty("numberY", fNumberY, "Number of Columns");
     }
 
     LArGeantArgonCubeDetector::~LArGeantArgonCubeDetector()
@@ -44,13 +48,21 @@ namespace largeant
     G4VPhysicalVolume *LArGeantArgonCubeDetector::Construct()
     {
         // create the world volume
-        fSolidWorld  = std::make_shared<G4Box>(
-            "SolidWorld", 
-            fWorldX+fThickness, 
-            fWorldY+fThickness, 
-            fWorldZ+fThickness
+        fSolidWorld.reset(
+            new G4Box(
+                "SolidWorld", 
+                fWorldX+fThickness, 
+                fWorldY+fThickness, 
+                fWorldZ+fThickness
+            )
         );
-        fLogicalWorld = std::make_shared<G4LogicalVolume>(fSolidWorld.get(), fWorldMat.get(), "LogicalWorld");
+        fLogicalWorld.reset(
+            new G4LogicalVolume(
+                fSolidWorld.get(), 
+                fWorldMat.get(), 
+                "LogicalWorld"
+            )
+        );
         fPhysicalWorld.reset(
             new G4PVPlacement(
                 0, 
@@ -63,13 +75,21 @@ namespace largeant
             )
         );
         // create the argon Cube volume
-        fSolidCube = std::make_shared<G4Box>(
-            "LArCube", 
-            fWorldX, 
-            fWorldY, 
-            fWorldZ
+        fSolidCube.reset(
+            new G4Box(
+                "LArCube", 
+                fWorldX, 
+                fWorldY, 
+                fWorldZ
+            )
         );
-        fLogicalCube = std::make_shared<G4LogicalVolume>(fSolidCube.get(), fArgon.getLAr().get(), "LogicalCube");
+        fLogicalCube.reset(
+            new G4LogicalVolume(
+                fSolidCube.get(), 
+                fArgon.getLAr().get(), 
+                "LogicalCube"
+            )
+        );
         fPhysicalCube.reset(
             new G4PVPlacement(
                 0, 
@@ -83,17 +103,22 @@ namespace largeant
             )
         );
 
-        fSolidDetector = std::make_shared<G4Box>(
-            "SolidDetector",
-            (fWorldX)/fNumberX,
-            (fWorldY)/fNumberY,
-            fThickness/2.0      // half-height
+        fSolidDetector.reset(
+            new G4Box(
+                "SolidDetector",
+                (fWorldX)/fNumberX,
+                (fWorldY)/fNumberY,
+                fThickness/2.0      // half-height
+            )
         ); 
-        fLogicalDetector = std::make_shared<G4LogicalVolume>(
-            fSolidDetector.get(),
-            fWorldMat.get(),
-            "LogicalDetector"
+        fLogicalDetector.reset(
+            new G4LogicalVolume(
+                fSolidDetector.get(),
+                fWorldMat.get(),
+                "LogicalDetector"
+            )
         );      
+        fFrontFacePhysicalDetector.clear();
         for (G4int ii = 0; ii < fNumberX; ii++)
         {
             for (G4int jj = 0; jj < fNumberY; jj++)
@@ -110,7 +135,7 @@ namespace largeant
                         "PhysicalDetector",
                         fLogicalWorld.get(),
                         false,
-                        ii + jj * fNumberX,
+                        ii + jj * fNumberY,
                         true
                     )
                 );

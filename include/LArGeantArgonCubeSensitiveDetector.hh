@@ -8,6 +8,8 @@
 #pragma once
 #include "G4VSensitiveDetector.hh"
 #include "G4StepPoint.hh"
+#include "G4RunManager.hh"
+#include "G4AnalysisManager.hh"
 
 namespace largeant
 {

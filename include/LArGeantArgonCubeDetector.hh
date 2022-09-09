@@ -56,17 +56,19 @@ namespace largeant
         // parameters for the geometry of the Cube
         G4double fWorldX, fWorldY, fWorldZ;
         G4double fEnvX, fEnvY, fEnvZ;
-        G4int fNumberX, fNumberY;
+        G4int fNumberX = {10};
+        G4int fNumberY = {10};
         G4double fThickness;
         // G4 volumes for the Cube
-        std::shared_ptr<G4Box> fSolidWorld;
+        std::shared_ptr<G4Box> fSolidWorld = {nullptr};
         /// Cube
-        std::shared_ptr<G4Box> fSolidCube;
+        std::shared_ptr<G4Box> fSolidCube = {nullptr};
         /// detector
-        std::shared_ptr<G4Box> fSolidDetector;                 
+        std::shared_ptr<G4Box> fSolidDetector = {nullptr};                 
         /// logical volume for the Cube
-        std::shared_ptr<G4LogicalVolume> fLogicalWorld;
-        std::shared_ptr<G4LogicalVolume> fLogicalCube, fLogicalDetector;   
+        std::shared_ptr<G4LogicalVolume> fLogicalWorld = {nullptr};
+        std::shared_ptr<G4LogicalVolume> fLogicalCube = {nullptr};
+        std::shared_ptr<G4LogicalVolume> fLogicalDetector = {nullptr};   
         /// physical volume for the Cube
         std::shared_ptr<G4VPhysicalVolume> fPhysicalWorld = {nullptr};
         std::shared_ptr<G4VPhysicalVolume> fPhysicalCube = {nullptr};   

@@ -13,6 +13,13 @@ namespace largeant
     : G4UserRunAction()
     {
         G4AnalysisManager *man = G4AnalysisManager::Instance();
+
+        man->CreateNtuple("Hits", "Hits");
+        man->CreateNtupleIColumn("fEvent");
+        man->CreateNtupleDColumn("fX");
+        man->CreateNtupleDColumn("fY");
+        man->CreateNtupleDColumn("fZ");
+        man->FinishNtuple(0);
     }
 
     LArGeantRunAction::~LArGeantRunAction()
@@ -23,17 +30,20 @@ namespace largeant
         G4AnalysisManager *man = G4AnalysisManager::Instance();
 
         G4int runID = run->GetRunID();
-
         std::stringstream strRunID;
         strRunID << runID;
 
-        man->OpenFile("output"+strRunID.str()+".root");
+        G4bool fileopen = man->OpenFile("output"+strRunID.str()+".root");
+        if (!fileopen)
+        {
+            std::cout << "File not opened!" << std::endl;
+        }
+       
     }
 
     void LArGeantRunAction::EndOfRunAction(const G4Run*)
     {
         G4AnalysisManager *man = G4AnalysisManager::Instance();
-
         man->Write();
         man->CloseFile();
     }

@@ -15,13 +15,17 @@
 
 # Decorations
 # Name
+
 /vis/set/textColour green
 /vis/set/textLayout right
 /vis/scene/add/text2D 0.9 -.9 24 ! ! LArMain
+
 # or, if your system does not support right-adjustment
 #/vis/scene/add/text2D 0 -.9 24 ! ! LArMain
+
 /vis/set/textLayout    # Revert to normal (left adjusted) layout
 /vis/set/textColour    # Revert to default text colour (blue)
+
 #
 # Axes, scale, etc.
 /vis/scene/add/scale   # Simple scale line

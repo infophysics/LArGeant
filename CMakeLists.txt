@@ -44,6 +44,7 @@ set(NEST_SOURCES
     "${NEST_SOURCE_DIR}/LArNEST.cpp" 
     "${NEST_SOURCE_DIR}/RandomGen.cpp"  
     "${NEST_SOURCE_DIR}/VDetector.cpp"
+    "${NEST_SOURCE_DIR}/LArDetector.cpp"
     "${NEST_SOURCE_DIR}/TestSpectra.cpp" 
     "${NEST_SOURCE_DIR}/GammaHandler.cpp" 
     "${NEST_SOURCE_DIR}/ValidityTests.cpp"

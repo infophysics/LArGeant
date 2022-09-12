@@ -6,26 +6,32 @@
  * @date 2022-04-27
  */
 #pragma once
+#include <memory>
 #include "G4UserSteppingAction.hh"
 #include "G4RunManager.hh"
 #include "G4Step.hh"
 #include "G4Gamma.hh"
 #include "G4Electron.hh"
 
-#include "LArGeantArgonSphere.hh"
+#include "LArDetector.hh"
+#include "LArNEST.hh"
+
+#include "LArGeantArgonCubeDetector.hh"
 #include "LArGeantEventAction.hh"
+#include "LArGeantCore.hh"
 
 namespace largeant
 {
     class LArGeantSteppingAction : public G4UserSteppingAction
     {
     public:
-        LArGeantSteppingAction(LArGeantEventAction* eventAction);
+        LArGeantSteppingAction(std::shared_ptr<LArGeantEventAction> eventAction);
         ~LArGeantSteppingAction();
         
         virtual void UserSteppingAction(const G4Step*);
         
     private:
-        LArGeantEventAction *fEventAction;
+        std::shared_ptr<LArGeantEventAction> fEventAction;
+        std::shared_ptr<NEST::LArNEST> fLArNEST;
     };
 }

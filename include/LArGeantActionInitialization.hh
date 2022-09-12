@@ -23,11 +23,12 @@ namespace largeant
         ~LArGeantActionInitialization();
 
         virtual void Build() const;
+        virtual void BuildForMaster() const;
 
     private:
         std::shared_ptr<LArGeantPrimaryGeneratorAction> fGenerator;
-        LArGeantRunAction* fRunAction;
-        LArGeantEventAction* fEventAction;
-        LArGeantSteppingAction* fSteppingAction;
+        std::shared_ptr<LArGeantRunAction> fRunAction;
+        std::shared_ptr<LArGeantEventAction> fEventAction;
+        std::shared_ptr<LArGeantSteppingAction> fSteppingAction;
     };
 }

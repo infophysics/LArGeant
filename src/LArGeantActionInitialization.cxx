@@ -12,8 +12,9 @@ namespace largeant
     LArGeantActionInitialization::LArGeantActionInitialization(LArGeantPrimaryGeneratorAction& primaryGeneratorAction)
     {
         fGenerator = std::make_shared<LArGeantPrimaryGeneratorAction>(primaryGeneratorAction);
-        fRunAction = new LArGeantRunAction();
-        fEventAction = new LArGeantEventAction(fRunAction);
+        fRunAction = std::make_shared<LArGeantRunAction>();
+        fEventAction = std::make_shared<LArGeantEventAction>(fRunAction);
+        fSteppingAction = std::make_shared<LArGeantSteppingAction>(fEventAction);
     }
 
     LArGeantActionInitialization::~LArGeantActionInitialization()
@@ -23,7 +24,13 @@ namespace largeant
     void LArGeantActionInitialization::Build() const
     {
         SetUserAction(fGenerator.get());
-        SetUserAction(fRunAction);
-        SetUserAction(fEventAction);
+        SetUserAction(fRunAction.get());
+        SetUserAction(fEventAction.get());
+        SetUserAction(fSteppingAction.get());
+    }
+
+    void LArGeantActionInitialization::BuildForMaster() const
+    {
+        SetUserAction(fRunAction.get());
     }
 }

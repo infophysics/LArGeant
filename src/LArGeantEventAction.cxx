@@ -9,9 +9,10 @@
 
 namespace largeant
 {
-    LArGeantEventAction::LArGeantEventAction(LArGeantRunAction*)
+    LArGeantEventAction::LArGeantEventAction(std::shared_ptr<LArGeantRunAction> runAction)
     : G4UserEventAction()
     {
+        fEdep = 0.0;
     }
 
     LArGeantEventAction::~LArGeantEventAction()
@@ -19,10 +20,10 @@ namespace largeant
 
     void LArGeantEventAction::BeginOfEventAction(const G4Event*)
     {
+        fEdep = 0.0;
     }
 
     void LArGeantEventAction::EndOfEventAction(const G4Event*)
     {
-        G4AnalysisManager *man = G4AnalysisManager::Instance();
     }
 }

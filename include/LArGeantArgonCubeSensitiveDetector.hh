@@ -6,6 +6,7 @@
  * @date 2022-05-01
  */
 #pragma once
+#include "G4SystemOfUnits.hh"
 #include "G4VSensitiveDetector.hh"
 #include "G4StepPoint.hh"
 #include "G4RunManager.hh"

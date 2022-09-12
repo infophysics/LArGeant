@@ -13,13 +13,34 @@ namespace largeant
     : G4UserRunAction()
     {
         G4AnalysisManager *man = G4AnalysisManager::Instance();
+        man->SetVerboseLevel(1);
+        man->SetNtupleMerging(true);
+
+        man->CreateNtuple("Photons", "Photons");
+        man->CreateNtupleIColumn("fEvent");
+        man->CreateNtupleDColumn("fX");
+        man->CreateNtupleDColumn("fY");
+        man->CreateNtupleDColumn("fZ");
+        man->CreateNtupleDColumn("fWavelength");
+        man->FinishNtuple(0);
 
         man->CreateNtuple("Hits", "Hits");
         man->CreateNtupleIColumn("fEvent");
         man->CreateNtupleDColumn("fX");
         man->CreateNtupleDColumn("fY");
         man->CreateNtupleDColumn("fZ");
-        man->FinishNtuple(0);
+        man->FinishNtuple(1);
+
+        man->CreateNtuple("NEST", "NEST");
+        man->CreateNtupleIColumn("fEvent");
+        man->CreateNtupleSColumn("fParticle");
+        man->CreateNtupleDColumn("fEdep");
+        man->CreateNtupleDColumn("fX");
+        man->CreateNtupleDColumn("fY");
+        man->CreateNtupleDColumn("fZ");
+        man->CreateNtupleDColumn("fNumberOfPhotons");
+        man->CreateNtupleDColumn("fNumberOfElectrons");
+        man->FinishNtuple(2);
     }
 
     LArGeantRunAction::~LArGeantRunAction()
@@ -33,12 +54,15 @@ namespace largeant
         std::stringstream strRunID;
         strRunID << runID;
 
-        G4bool fileopen = man->OpenFile("output"+strRunID.str()+".root");
+        G4bool fileopen = man->OpenFile("output_"+strRunID.str()+".root");
         if (!fileopen)
         {
-            std::cout << "File not opened!" << std::endl;
+             G4cout << "File - output_" + strRunID.str() + ".root - not opened!" << G4endl;
         }
-       
+        else
+        {
+            G4cout << "File - output_" + strRunID.str() + ".root - opened successfully." << G4endl;
+        }
     }
 
     void LArGeantRunAction::EndOfRunAction(const G4Run*)

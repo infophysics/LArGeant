@@ -33,15 +33,15 @@ namespace largeant
 
         virtual G4VPhysicalVolume* Construct();
 
-        // std::shared_ptr<G4LogicalVolume> getLogicalWorldVolume()    { return fLogicalWorld; }
-        // std::shared_ptr<G4LogicalVolume> getLogicalEnvVolume()      { return fLogicalEnv; }
-        // std::shared_ptr<G4LogicalVolume> getLogicalCubeVolume()     { return fLogicalCube; }
+        std::shared_ptr<G4LogicalVolume> getLogicalWorldVolume()    { return fLogicalWorld; }
+        std::shared_ptr<G4LogicalVolume> getLogicalEnvVolume()      { return fLogicalEnv; }
+        std::shared_ptr<G4LogicalVolume> getLogicalCubeVolume()     { return fLogicalCube; }
 
-        // std::shared_ptr<G4VPhysicalVolume> getPhysicalWorldVolume() { return fPhysicalWorld; }
-        // std::shared_ptr<G4VPhysicalVolume> getPhysicalEnvVolume()   { return fPhysicalEnv; }
-        // std::shared_ptr<G4VPhysicalVolume> getPhysicalCubeVolume()  { return fPhysicalCube; }
+        std::shared_ptr<G4VPhysicalVolume> getPhysicalWorldVolume() { return fPhysicalWorld; }
+        std::shared_ptr<G4VPhysicalVolume> getPhysicalEnvVolume()   { return fPhysicalEnv; }
+        std::shared_ptr<G4VPhysicalVolume> getPhysicalCubeVolume()  { return fPhysicalCube; }
 
-        // std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return fScoringVolume; }
+        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return fScoringVolume; }
 
         G4double getWorldX() const { return fWorldX; }
         G4double getWorldY() const { return fWorldY; }

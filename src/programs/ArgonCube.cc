@@ -43,18 +43,24 @@ int main(int argc, char** argv)
         0.063,              /// ratio of Ar38
         99.603              /// ratio of Ar40
     );
-    // create the run manager
+
+//     // create the run manager
+// #ifdef G4MULTITHREADED
+//     G4MTRunManager* RunManager = new G4MTRunManager();
+// #else
     G4RunManager* RunManager = new G4RunManager();
+// #endif
+
     // create the argon cube detector
     RunManager->SetUserInitialization(
         new LArGeantArgonCubeDetector(
             Argon,  // Argon object from above
-            50000,  // length in X (m)
-            50000,  // length in Y (m)
-            50000,  // length in Z (m)
-            10,    // number of pmts in X (m)
-            10,    // number of pmts in Y (m)
-            2000    // thickness of pmts (m)
+            0.1,  // length in X (m)
+            0.1,  // length in Y (m)
+            0.1,  // length in Z (m)
+            8,    // number of pmts in X 
+            8,    // number of pmts in Y 
+            0.001 // thickness of pmts (m)
         )
     );
     // create the physics list
@@ -66,7 +72,7 @@ int main(int argc, char** argv)
         "mu-",  // type of particle to generate
         {0,0,0},// starting position
         {0,0,1},// starting momentum direction
-        200000  // starting momentum (MeV)
+        1  // starting momentum (MeV)
     );
     RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction));
 
@@ -78,8 +84,6 @@ int main(int argc, char** argv)
     // G4ParticleHPManager::GetInstance()->SetProduceFissionFragments( true );
     // G4ParticleHPManager::GetInstance()->SetUseWendtFissionModel( true );
     // G4ParticleHPManager::GetInstance()->SetUseNRESP71Model( true );
-    
-    RunManager->Initialize();
 
     // start the session
     if (argc == 1)

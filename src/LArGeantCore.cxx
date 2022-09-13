@@ -36,4 +36,11 @@ namespace largeant
             return NEST::LArInteraction::ER;
         }
     }
+
+    std::map<NEST::LArInteraction, std::string> LArInteractionMap = 
+    {
+        {NEST::LArInteraction::NR,      "NR"},
+        {NEST::LArInteraction::ER,      "ER"},
+        {NEST::LArInteraction::Alpha,   "Alpha"},
+    };
 }

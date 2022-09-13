@@ -26,7 +26,10 @@ namespace largeant
 
         void AddEdep(G4double edep) { fEdep += edep; }
 
+        G4double GetElectricField() { return fRunAction->GetElectricField(); }
+
     private:
+        std::shared_ptr<LArGeantRunAction> fRunAction;
         G4double fEdep;
     };
 }

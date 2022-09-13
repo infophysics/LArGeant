@@ -12,6 +12,7 @@ namespace largeant
     LArGeantEventAction::LArGeantEventAction(std::shared_ptr<LArGeantRunAction> runAction)
     : G4UserEventAction()
     {
+        fRunAction = runAction;
         fEdep = 0.0;
     }
 

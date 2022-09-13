@@ -1,5 +1,5 @@
 /**
- * @file LArGeantArgonCubeSensitiveDetector.hh
+ * @file LArGeantArgonCubeSiPMSensitiveDetector.hh
  * @author Nicholas Carrara [nmcarrara@ucdavis.edu]
  * @brief 
  * @version 0.1
@@ -14,13 +14,14 @@
 
 namespace largeant
 {
-    class LArGeantArgonCubeSensitiveDetector : public G4VSensitiveDetector
+    class LArGeantArgonCubeSiPMSensitiveDetector : public G4VSensitiveDetector
     {
     public:
-        LArGeantArgonCubeSensitiveDetector(G4String name);
-        ~LArGeantArgonCubeSensitiveDetector();
+        LArGeantArgonCubeSiPMSensitiveDetector(G4String name);
+        ~LArGeantArgonCubeSiPMSensitiveDetector();
 
     private:
         virtual G4bool ProcessHits(G4Step*, G4TouchableHistory*); 
+        G4PhysicsFreeVector* fQuantumEfficiency;
     };
 }

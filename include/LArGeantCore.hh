@@ -7,10 +7,12 @@
  */
 #pragma once
 #include <string>
+#include <map>
 
 #include "LArNEST.hh"
 
 namespace largeant
 {
     NEST::LArInteraction GetLArInteraction(std::string G4Particle);
+    extern std::map<NEST::LArInteraction, std::string> LArInteractionMap;
 }

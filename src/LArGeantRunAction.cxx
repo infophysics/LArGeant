@@ -9,38 +9,39 @@
 
 namespace largeant
 {
-    LArGeantRunAction::LArGeantRunAction()
+    LArGeantRunAction::LArGeantRunAction(G4double efield)
     : G4UserRunAction()
+    , fElectricField(efield)
+    {
+        fMessenger = new G4GenericMessenger(this,
+				      "/largeant/",
+				      "Control of n-tuple quantities");
+        fMessenger->DeclareMethod("electric_field", &LArGeantRunAction::SetElectricField);
+        ConstructRootTrees();
+    }
+
+    void LArGeantRunAction::ConstructRootTrees()
     {
         G4AnalysisManager *man = G4AnalysisManager::Instance();
         man->SetVerboseLevel(1);
         man->SetNtupleMerging(true);
 
-        man->CreateNtuple("Photons", "Photons");
-        man->CreateNtupleIColumn("fEvent");
-        man->CreateNtupleDColumn("fX");
-        man->CreateNtupleDColumn("fY");
-        man->CreateNtupleDColumn("fZ");
-        man->CreateNtupleDColumn("fWavelength");
-        man->FinishNtuple(0);
-
-        man->CreateNtuple("Hits", "Hits");
-        man->CreateNtupleIColumn("fEvent");
-        man->CreateNtupleDColumn("fX");
-        man->CreateNtupleDColumn("fY");
-        man->CreateNtupleDColumn("fZ");
-        man->FinishNtuple(1);
-
         man->CreateNtuple("NEST", "NEST");
-        man->CreateNtupleIColumn("fEvent");
-        man->CreateNtupleSColumn("fParticle");
-        man->CreateNtupleDColumn("fEdep");
-        man->CreateNtupleDColumn("fX");
-        man->CreateNtupleDColumn("fY");
-        man->CreateNtupleDColumn("fZ");
-        man->CreateNtupleDColumn("fNumberOfPhotons");
-        man->CreateNtupleDColumn("fNumberOfElectrons");
-        man->FinishNtuple(2);
+        man->CreateNtupleIColumn("event");
+        man->CreateNtupleSColumn("particle_name");
+        man->CreateNtupleDColumn("efield");
+        man->CreateNtupleDColumn("dE");
+        man->CreateNtupleDColumn("dx");
+        man->CreateNtupleSColumn("lar_interaction");
+        man->CreateNtupleDColumn("x_i");
+        man->CreateNtupleDColumn("y_i");
+        man->CreateNtupleDColumn("z_i");
+        man->CreateNtupleDColumn("x_f");
+        man->CreateNtupleDColumn("y_f");
+        man->CreateNtupleDColumn("z_f");
+        man->CreateNtupleIColumn("dP");
+        man->CreateNtupleIColumn("dQ");
+        man->FinishNtuple(0);
     }
 
     LArGeantRunAction::~LArGeantRunAction()

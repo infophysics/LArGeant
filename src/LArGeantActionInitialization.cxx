@@ -9,10 +9,13 @@
 
 namespace largeant
 {
-    LArGeantActionInitialization::LArGeantActionInitialization(LArGeantPrimaryGeneratorAction& primaryGeneratorAction)
+    LArGeantActionInitialization::LArGeantActionInitialization(
+        LArGeantPrimaryGeneratorAction& primaryGeneratorAction,
+        G4double efield
+    )
     {
         fGenerator = std::make_shared<LArGeantPrimaryGeneratorAction>(primaryGeneratorAction);
-        fRunAction = std::make_shared<LArGeantRunAction>();
+        fRunAction = std::make_shared<LArGeantRunAction>(efield);
         fEventAction = std::make_shared<LArGeantEventAction>(fRunAction);
         fSteppingAction = std::make_shared<LArGeantSteppingAction>(fEventAction);
     }

@@ -73,10 +73,10 @@ target_link_libraries(argon_cube ${Geant4_LIBRARIES})
 file(GLOB MACRO_FILES
     "macros/*.mac"
 )
-file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 file(GLOB DATA_FILES
-    "*.dat"
+    "data/*.dat"
 )
+file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 file(COPY ${DATA_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
 add_custom_target(LArGeant DEPENDS largeant)

@@ -14,24 +14,24 @@ namespace largeant
         G4double worldX, 
         G4double worldY, 
         G4double worldZ,
-        G4int numberX,
-        G4int numberY,
-        G4double thickness
+        G4int bottomNumberX,
+        G4int bottomNumberZ,
+        G4double bottomThicknessY
     )
     : G4VUserDetectorConstruction()
     , fWorldX(worldX), fEnvX(worldX)
     , fWorldY(worldY), fEnvY(worldY)
     , fWorldZ(worldZ), fEnvZ(worldZ)
-    , fNumberX(numberX)
-    , fNumberY(numberY)
-    , fThickness(thickness)
+    , fBottomNumberX(bottomNumberX)
+    , fBottomNumberZ(bottomNumberZ)
+    , fBottomThicknessY(bottomThicknessY)
     , fArgon(argon)
     {
         DefineMaterials();
         // set up messenger
         fMessenger = new G4GenericMessenger(this ,"/argon_cube/", "ArgonCube");
-        fMessenger->DeclareProperty("numberX", fNumberX, "Number of Rows");
-        fMessenger->DeclareProperty("numberY", fNumberY, "Number of Columns");
+        fMessenger->DeclareProperty("bottom_array/numberX", fBottomNumberX, "Bottom SiPM number along x");
+        fMessenger->DeclareProperty("bottom_array/numberY", fBottomNumberZ, "Bottom SiPM number along z");
     }
 
     LArGeantArgonCubeDetector::~LArGeantArgonCubeDetector()
@@ -51,9 +51,9 @@ namespace largeant
         fSolidWorld.reset(
             new G4Box(
                 "SolidWorld", 
-                fWorldX+fThickness, 
-                fWorldY+fThickness, 
-                fWorldZ+fThickness
+                fWorldX+fBottomThicknessY, 
+                fWorldY+fBottomThicknessY, 
+                fWorldZ+fBottomThicknessY
             )
         );
         fLogicalWorld.reset(
@@ -103,39 +103,40 @@ namespace largeant
             )
         );
 
-        fSolidDetector.reset(
+        // construct bottom sipm array
+        fBottomSiPMSolidDetector.reset(
             new G4Box(
                 "SolidDetector",
-                (fWorldX)/fNumberX,
-                (fWorldY)/fNumberY,
-                fThickness/2.0      // half-height
+                (fWorldX)/fBottomNumberX,
+                fBottomThicknessY/2.0,
+                (fWorldZ)/fBottomNumberZ
             )
         ); 
-        fLogicalDetector.reset(
+        fBottomSiPMLogicalDetector.reset(
             new G4LogicalVolume(
-                fSolidDetector.get(),
+                fBottomSiPMSolidDetector.get(),
                 fWorldMat.get(),
                 "LogicalDetector"
             )
         );      
-        fFrontFacePhysicalDetector.clear();
-        for (G4int ii = 0; ii < fNumberX; ii++)
+        fBottomSiPMPhysicalDetector.clear();
+        for (G4int ii = 0; ii < fBottomNumberX; ii++)
         {
-            for (G4int jj = 0; jj < fNumberY; jj++)
+            for (G4int jj = 0; jj < fBottomNumberZ; jj++)
             {
-                fFrontFacePhysicalDetector.emplace_back(
+                fBottomSiPMPhysicalDetector.emplace_back(
                     new G4PVPlacement(
                         0,
                         G4ThreeVector(
-                            -(fWorldX) + (fWorldX)/fNumberX + ii * (2 * fWorldX)/fNumberX,
-                            -(fWorldY) + (fWorldY)/fNumberY + jj * (2 * fWorldY)/fNumberY,
-                            fWorldZ+fThickness/2.0
+                            -(fWorldX) + (fWorldX)/fBottomNumberX + ii * (2 * fWorldX)/fBottomNumberX,
+                            -(fWorldY+fBottomThicknessY/2.0),
+                            -(fWorldZ) + (fWorldZ)/fBottomNumberZ + jj * (2 * fWorldZ)/fBottomNumberZ
                         ),
-                        fLogicalDetector.get(),
+                        fBottomSiPMLogicalDetector.get(),
                         "PhysicalDetector",
                         fLogicalWorld.get(),
                         false,
-                        ii + jj * fNumberY,
+                        ii + jj * fBottomNumberZ,
                         true
                     )
                 );
@@ -143,21 +144,12 @@ namespace largeant
         }
                 
         fScoringVolume = fLogicalCube;
-
-        G4Material* material = fPhysicalCube->GetLogicalVolume()->GetMaterial();
-        std::cout << "LAr material properties:" << std::endl;
-        std::cout << "  [name]:     " << material->GetName() << std::endl;
-        std::cout << "  [density]:  " << material->GetDensity() << std::endl;
-        std::cout << "  [state]:    " << material->GetState() << std::endl;
-        std::cout << "  [temp]:     " << material->GetTemperature() << std::endl;
-        std::cout << "  [pressure]: " << material->GetPressure() << std::endl;
-
         return fPhysicalWorld.get();
     }
 
     void LArGeantArgonCubeDetector::ConstructSDandField()
     {
-        fSensitiveDetector = std::make_shared<LArGeantArgonCubeSensitiveDetector>("SensitiveDetector");
-        fLogicalDetector->SetSensitiveDetector(fSensitiveDetector.get());
+        fBottomSiPMSensitiveDetector = std::make_shared<LArGeantArgonCubeSiPMSensitiveDetector>("bottom_sipm");
+        fBottomSiPMLogicalDetector->SetSensitiveDetector(fBottomSiPMSensitiveDetector.get());
     }
 }

@@ -19,7 +19,10 @@ namespace largeant
     class LArGeantActionInitialization : public G4VUserActionInitialization
     {
     public:
-        LArGeantActionInitialization(LArGeantPrimaryGeneratorAction& primaryGeneratorAction);
+        LArGeantActionInitialization(
+            LArGeantPrimaryGeneratorAction& primaryGeneratorAction,
+            G4double efield
+        );
         ~LArGeantActionInitialization();
 
         virtual void Build() const;

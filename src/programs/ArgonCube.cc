@@ -43,6 +43,7 @@ int main(int argc, char** argv)
         0.063,              /// ratio of Ar38
         99.603              /// ratio of Ar40
     );
+    G4double efield = 500.0;
 
 //     // create the run manager
 // #ifdef G4MULTITHREADED
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
         {0,0,1},// starting momentum direction
         1  // starting momentum (MeV)
     );
-    RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction));
+    RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction, efield));
 
     // // Replaced HP environmental variables with C++ calls                                                                                     
     // G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );

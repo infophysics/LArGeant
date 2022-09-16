@@ -13,6 +13,7 @@
 #include "LArGeantRunAction.hh"
 #include "LArGeantEventAction.hh"
 #include "LArGeantSteppingAction.hh"
+#include "LArGeantStackingAction.hh"
 
 namespace largeant
 {
@@ -33,5 +34,6 @@ namespace largeant
         std::shared_ptr<LArGeantRunAction> fRunAction;
         std::shared_ptr<LArGeantEventAction> fEventAction;
         std::shared_ptr<LArGeantSteppingAction> fSteppingAction;
+        std::shared_ptr<LArGeantStackingAction> fStackingAction;
     };
 }

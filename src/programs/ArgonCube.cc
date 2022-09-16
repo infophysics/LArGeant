@@ -70,10 +70,10 @@ int main(int argc, char** argv)
     // create the action initialization
     LArGeantPrimaryGeneratorAction PrimaryGeneratorAction(
         1,      // number of particles to generate
-        "mu-",  // type of particle to generate
+        "alpha",  // type of particle to generate
         {0,0,0},// starting position
         {0,0,1},// starting momentum direction
-        1  // starting momentum (MeV)
+        5  // starting momentum (MeV)
     );
     RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction, efield));
 

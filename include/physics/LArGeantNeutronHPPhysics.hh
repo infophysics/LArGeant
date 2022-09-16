@@ -42,7 +42,7 @@ namespace largeant
         LArGeantNeutronHPPhysics(const G4String& name="neutron");
         ~LArGeantNeutronHPPhysics();
 
-        virtual void ConstructParticle() {};
+        //virtual void ConstructParticle();
         virtual void ConstructProcess();
 
         void PrintNeutronPhysicsLists();

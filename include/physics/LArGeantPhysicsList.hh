@@ -43,6 +43,8 @@
 #include "G4PhysListFactory.hh"
 
 #include "LArGeantNeutronHPPhysics.hh"
+#include "LArDetector.hh"
+#include "LArGeantLArNEST.hh"
 
 namespace largeant
 {
@@ -53,6 +55,7 @@ namespace largeant
         ~LArGeantPhysicsList();
 
         //virtual void ConstructParticle();
+        //virtual void ConstructProcess();
         virtual void SetCuts();
 
         void PrintPhysicsLists();
@@ -60,5 +63,8 @@ namespace largeant
     private:
         std::shared_ptr<G4PhysListFactory> fPhysListFactory;
         std::vector<G4String> fPhysicsLists;
+
+        std::shared_ptr<G4ProcessManager> fPManager = {nullptr};
+        std::shared_ptr<G4ProcessVector> fProcesses = {nullptr};
     };
 }

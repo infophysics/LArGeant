@@ -18,6 +18,7 @@ namespace largeant
         fRunAction = std::make_shared<LArGeantRunAction>(efield);
         fEventAction = std::make_shared<LArGeantEventAction>(fRunAction);
         fSteppingAction = std::make_shared<LArGeantSteppingAction>(fEventAction);
+        fStackingAction = std::make_shared<LArGeantStackingAction>();
     }
 
     LArGeantActionInitialization::~LArGeantActionInitialization()
@@ -30,6 +31,7 @@ namespace largeant
         SetUserAction(fRunAction.get());
         SetUserAction(fEventAction.get());
         SetUserAction(fSteppingAction.get());
+        SetUserAction(fStackingAction.get());
     }
 
     void LArGeantActionInitialization::BuildForMaster() const

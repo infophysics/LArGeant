@@ -63,6 +63,18 @@ namespace largeant
 
     void LArGeantPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
+        G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
+
+        G4int Z = 95;
+        G4int A = 241;
+
+        G4double charge = 0.0*eplus;
+        G4double energy = 0.0*keV;
+
+        G4ParticleDefinition* ion = G4IonTable::GetIonTable()->GetIon(Z, A, energy);
+        fParticleGun->SetParticleDefinition(ion);
+        fParticleGun->SetParticleCharge(charge);
+
         fParticleGun->GeneratePrimaryVertex(event);
     }
 }

@@ -27,7 +27,21 @@ namespace largeant
         man->CreateNtupleDColumn("sipm_z");
         man->FinishNtuple(1);
 
+        // load in efficiencies
         fQuantumEfficiency = new G4PhysicsFreeVector();
+
+        std::ifstream datafile;
+        datafile.open("sipm_efficiency.dat");
+        while(1)
+        {
+            G4double wavelength, q_efficiency;
+            datafile >> wavelength >> q_efficiency;
+            fQuantumEfficiency->InsertValues(wavelength, q_efficiency/100.0);
+            if(datafile.eof()) {
+                break;
+            }
+        }
+        datafile.close();
     }
 
     LArGeantArgonCubeSiPMSensitiveDetector::~LArGeantArgonCubeSiPMSensitiveDetector()
@@ -56,7 +70,12 @@ namespace largeant
         G4ThreeVector photonPosition = preStepPoint->GetPosition();
         G4ThreeVector photonMomentum = preStepPoint->GetMomentum();
         G4double wavelength = (1.239841939 * eV / photonMomentum.mag()) * 1000;
-        
+
+        // determine efficiency
+        if(G4UniformRand() >= fQuantumEfficiency->Value(wavelength)) {
+            return false;
+        }
+
         // get the detector position
         const G4VTouchable* touchable = step->GetPreStepPoint()->GetTouchable();
         G4int copyNo = touchable->GetCopyNumber();

@@ -8,7 +8,15 @@ include(${Geant4_USE_FILE})
 
 # grab include directories
 include_directories(LArGeant PUBLIC 
-    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include/
+    ${PROJECT_SOURCE_DIR}/include/actions/
+    ${PROJECT_SOURCE_DIR}/include/analysis/
+    ${PROJECT_SOURCE_DIR}/include/argon/
+    ${PROJECT_SOURCE_DIR}/include/detector/
+    ${PROJECT_SOURCE_DIR}/include/generator/
+    ${PROJECT_SOURCE_DIR}/include/messenger/
+    ${PROJECT_SOURCE_DIR}/include/nest/
+    ${PROJECT_SOURCE_DIR}/include/physics/
     ${PROJECT_SOURCE_DIR}/lib/nest/include/Detectors/
     ${PROJECT_SOURCE_DIR}/lib/nest/include/NEST/
     ${PROJECT_SOURCE_DIR}/lib/gcem/include
@@ -51,8 +59,28 @@ set(NEST_SOURCES
 )
 
 # generate sources and headers
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+file(GLOB sources 
+    ${PROJECT_SOURCE_DIR}/src/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/actions/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/analysis/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/argon/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/detector/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/generator/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/messenger/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/nest/*.cxx
+    ${PROJECT_SOURCE_DIR}/src/physics/*.cxx
+)
+file(GLOB headers 
+    ${PROJECT_SOURCE_DIR}/include/*.hh
+    ${PROJECT_SOURCE_DIR}/include/actions/*.hh
+    ${PROJECT_SOURCE_DIR}/include/analysis/*.hh
+    ${PROJECT_SOURCE_DIR}/include/argon/*.hh
+    ${PROJECT_SOURCE_DIR}/include/detector/*.hh
+    ${PROJECT_SOURCE_DIR}/include/generator/*.hh
+    ${PROJECT_SOURCE_DIR}/include/messenger/*.hh
+    ${PROJECT_SOURCE_DIR}/include/nest/*.hh
+    ${PROJECT_SOURCE_DIR}/include/physics/*.hh
+)
 
 #-----------create programs-----------#
 # argon sphere
@@ -76,8 +104,12 @@ file(GLOB MACRO_FILES
 file(GLOB DATA_FILES
     "data/*.dat"
 )
+file(GLOB ANALYSIS_FILES
+    "analysis/*.py"
+)
 file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 file(COPY ${DATA_FILES} DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY ${ANALYSIS_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
 add_custom_target(LArGeant DEPENDS largeant)
 

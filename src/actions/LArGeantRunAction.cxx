@@ -29,6 +29,11 @@ namespace largeant
         man->CreateNtuple("NEST", "NEST");
         man->CreateNtupleIColumn("event");
         man->CreateNtupleSColumn("particle_name");
+        man->CreateNtupleIColumn("particle_track_id");
+        man->CreateNtupleSColumn("parent_name");
+        man->CreateNtupleIColumn("parent_track_id");
+        man->CreateNtupleSColumn("ancestor_name");
+        man->CreateNtupleIColumn("ancestor_track_id");
         man->CreateNtupleDColumn("efield");
         man->CreateNtupleDColumn("dE");
         man->CreateNtupleDColumn("dx");

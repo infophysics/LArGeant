@@ -22,9 +22,19 @@ namespace largeant
     void LArGeantEventAction::BeginOfEventAction(const G4Event*)
     {
         fEdep = 0.0;
+        fParticleName.clear();
+        fParticleParentName.clear();
+        fParticleParentTrackID.clear();
+        fParticleAncestorName.clear();
+        fParticleAncestorTrackID.clear();
     }
 
     void LArGeantEventAction::EndOfEventAction(const G4Event*)
     {
+        fParticleName.clear();
+        fParticleParentName.clear();
+        fParticleParentTrackID.clear();
+        fParticleAncestorName.clear();
+        fParticleAncestorTrackID.clear();
     }
 }

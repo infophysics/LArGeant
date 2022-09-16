@@ -49,6 +49,14 @@ namespace largeant
     {
     }
 
+    // void LArGeantPhysicsList::ConstructProcess()
+    // { 
+    //     LArDetector* detector;
+    //     LArNESTScintillationProcess* scintillationProcess = new LArNESTScintillationProcess("S1", fElectromagnetic, detector);
+    //     fPManager->AddProcess(scintillationProcess, ordDefault + 1, ordInActive, ordDefault + 1);
+    //     std::cout << "HERE" << std::endl;
+    // }
+
     // void LArGeantPhysicsList::ConstructParticle()
     // {
     //     G4BosonConstructor pBosonConstructor;
@@ -68,6 +76,7 @@ namespace largeant
 
     //     G4ShortLivedConstructor pShortLivedConstructor;
     //     pShortLivedConstructor.ConstructParticle();
+    //     LArNESTThermalElectron::Definition();
     // }
 
     void LArGeantPhysicsList::SetCuts()

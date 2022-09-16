@@ -43,4 +43,18 @@ namespace largeant
         {NEST::LArInteraction::ER,      "ER"},
         {NEST::LArInteraction::Alpha,   "Alpha"},
     };
+
+    ArrayManager::ArrayManager()
+    {
+    }
+
+    ArrayManager* ArrayManager::sInstance = nullptr;
+
+    ArrayManager* ArrayManager::GetInstance()
+    {
+        if(sInstance == nullptr) {
+            sInstance = new ArrayManager();
+        }
+        return sInstance;
+    }
 }

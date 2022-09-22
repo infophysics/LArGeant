@@ -42,20 +42,21 @@ int main(int argc, char** argv)
         99.603              /// ratio of Ar40
     );
     G4double efield = 500.0;
+    G4double stoppingTime = 1000;
     // create the run manager
     G4RunManager* RunManager = new G4RunManager();
     RunManager->SetUserInitialization(new LArGeantArgonSphere(Argon, 50000));
     // create the physics list
     RunManager->SetUserInitialization(new LArGeantPhysicsList());
     // create the action initialization
-    LArGeantPrimaryGeneratorAction PrimaryGeneratorAction(
-        1,      // number of particles to generate
-        "mu-",  // type of particle to generate
-        {0,0,0},// starting position
-        {0,0,1},// starting momentum direction
-        200000  // starting momentum (MeV)
-    );
-    RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction, efield));
+    // LArGeantPrimaryGeneratorAction PrimaryGeneratorAction(
+    //     1,      // number of particles to generate
+    //     "mu-",  // type of particle to generate
+    //     {0,0,0},// starting position
+    //     {0,0,1},// starting momentum direction
+    //     200000  // starting momentum (MeV)
+    // );
+    // RunManager->SetUserInitialization(new LArGeantActionInitialization(PrimaryGeneratorAction, efield, stoppingTime));
 
     // Replaced HP environmental variables with C++ calls                                                                                     
     G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );

@@ -12,8 +12,7 @@ namespace largeant
     LArGeantEventAction::LArGeantEventAction(std::shared_ptr<LArGeantRunAction> runAction)
     : G4UserEventAction()
     {
-        fRunAction = runAction;
-        fEdep = 0.0;
+        mRunAction = runAction;
     }
 
     LArGeantEventAction::~LArGeantEventAction()
@@ -21,20 +20,19 @@ namespace largeant
 
     void LArGeantEventAction::BeginOfEventAction(const G4Event*)
     {
-        fEdep = 0.0;
-        fParticleName.clear();
-        fParticleParentName.clear();
-        fParticleParentTrackID.clear();
-        fParticleAncestorName.clear();
-        fParticleAncestorTrackID.clear();
+        mParticleName.clear();
+        mParticleParentName.clear();
+        mParticleParentTrackID.clear();
+        mParticleAncestorName.clear();
+        mParticleAncestorTrackID.clear();
     }
 
     void LArGeantEventAction::EndOfEventAction(const G4Event*)
     {
-        fParticleName.clear();
-        fParticleParentName.clear();
-        fParticleParentTrackID.clear();
-        fParticleAncestorName.clear();
-        fParticleAncestorTrackID.clear();
+        mParticleName.clear();
+        mParticleParentName.clear();
+        mParticleParentTrackID.clear();
+        mParticleAncestorName.clear();
+        mParticleAncestorTrackID.clear();
     }
 }

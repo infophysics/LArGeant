@@ -1,10 +1,44 @@
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 set(CMAKE_CXX_STANDARD 20)
 
 project(LArGeant)
 
+set(CMAKE_BUILD_TYPE Debug)
+
+# Debug mode
+option(DEBUG_MODE "Compile with debug options" OFF)
+if(DEBUG_MODE)
+    add_compile_options(-g)
+endif()
+
+# Multithreading mode
+option(MULTITHREADING "Compile with multithreading mode" OFF)
+if(MULTITHREADING)
+    if(DEFINED ENV{G4MULTITHREADED})
+        add_definitions(-DLARTPC_MULTITHREADED)
+        message(STATUS "Compiling with multithreading enabled.")
+    else()
+        message(STATUS "Attempt to use multithreading failed - G4MULTITHREADED is not defined! Maybe you didn't compile G4 with multithreading.")
+    endif()
+endif()
+
+# use the visualization manager
+option(USE_VIS "Whether to use the visualization." OFF)
+if(USE_VIS)
+    add_definitions(-DLARTPC_USE_VIS)
+    message(STATUS "Compiling with the visualization enabled.")
+endif()
+
+# use the ui executive/manager
+option(USE_UI "Whether to use the ui interface." OFF)
+if(USE_UI)
+    add_definitions(-DLARTPC_USE_UI)
+    message(STATUS "Compiling with the ui enabled.")
+endif()
+
 find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
+message("Geant4 installation directory -- ${Geant4_DIR}")
 
 # grab include directories
 include_directories(LArGeant PUBLIC 
@@ -113,4 +147,6 @@ file(COPY ${ANALYSIS_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
 add_custom_target(LArGeant DEPENDS largeant)
 
-set(CMAKE_BUILD_TYPE Debug)
+# Generate Python module
+add_subdirectory(lib/pybind11)
+pybind11_add_module(lar_tpc ${SOURCES} "src/bindings.cxx")

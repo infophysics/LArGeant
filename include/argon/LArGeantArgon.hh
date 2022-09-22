@@ -49,41 +49,41 @@ namespace largeant
             G4double Ar40Ratio
         );
         
-        G4double getTemperature() const   { return fTemperature; }
-        G4double getPressure() const      { return fPressure; }
-        G4double getAr36Ratio() const     { return fAr36Ratio; }
-        G4double getAr38Ratio() const     { return fAr38Ratio; }
-        G4double getAr40Ratio() const     { return fAr40Ratio; }
-        G4double getAr36Density() const   { return fAr36Density; }
-        G4double getAr38Density() const   { return fAr38Density; }
-        G4double getAr40Density() const   { return fAr40Density; }
-        G4double getAverageMassMol() const { return fAverageMassMol; }
-        G4double getAverageDensity() const { return fAverageDensity; }
+        G4double getTemperature() const   { return mTemperature; }
+        G4double getPressure() const      { return mPressure; }
+        G4double getAr36Ratio() const     { return mAr36Ratio; }
+        G4double getAr38Ratio() const     { return mAr38Ratio; }
+        G4double getAr40Ratio() const     { return mAr40Ratio; }
+        G4double getAr36Density() const   { return mAr36Density; }
+        G4double getAr38Density() const   { return mAr38Density; }
+        G4double getAr40Density() const   { return mAr40Density; }
+        G4double getAverageMassMol() const { return mAverageMassMol; }
+        G4double getAverageDensity() const { return mAverageDensity; }
 
-        std::shared_ptr<G4Isotope> getIAr36() const { return fIAr36; }
-        std::shared_ptr<G4Isotope> getIAr38() const { return fIAr38; }
-        std::shared_ptr<G4Isotope> getIAr40() const { return fIAr40; }
-        std::shared_ptr<G4Element> getArIsotopes() const { return fArIsotopes; }
+        std::shared_ptr<G4Isotope> getIAr36() const { return mIAr36; }
+        std::shared_ptr<G4Isotope> getIAr38() const { return mIAr38; }
+        std::shared_ptr<G4Isotope> getIAr40() const { return mIAr40; }
+        std::shared_ptr<G4Element> getArIsotopes() const { return mArIsotopes; }
 
-        std::shared_ptr<G4Material> getLAr() const { return fLAr; }
+        std::shared_ptr<G4Material> getLAr() const { return mLAr; }
 
         void DefineMaterials();
 
     private:
-        G4double fTemperature;
-        G4double fPressure;
+        G4double mTemperature;
+        G4double mPressure;
 
-        G4double fAr36Ratio, fAr38Ratio, fAr40Ratio;
-        G4double fAr36Density, fAr38Density, fAr40Density;
+        G4double mAr36Ratio, mAr38Ratio, mAr40Ratio;
+        G4double mAr36Density, mAr38Density, mAr40Density;
 
-        G4double fAverageMassMol;
-        G4double fAverageDensity;
-        G4double fNaturalArDensity;
+        G4double mAverageMassMol;
+        G4double mAverageDensity;
+        G4double mNaturalArDensity;
 
-        std::shared_ptr<G4Isotope> fIAr36 = {nullptr};
-        std::shared_ptr<G4Isotope> fIAr38 = {nullptr};
-        std::shared_ptr<G4Isotope> fIAr40 = {nullptr};
-        std::shared_ptr<G4Element> fArIsotopes = {nullptr};
-        std::shared_ptr<G4Material> fLAr = {nullptr};
+        std::shared_ptr<G4Isotope> mIAr36 = {nullptr};
+        std::shared_ptr<G4Isotope> mIAr38 = {nullptr};
+        std::shared_ptr<G4Isotope> mIAr40 = {nullptr};
+        std::shared_ptr<G4Element> mArIsotopes = {nullptr};
+        std::shared_ptr<G4Material> mLAr = {nullptr};
     };
 }

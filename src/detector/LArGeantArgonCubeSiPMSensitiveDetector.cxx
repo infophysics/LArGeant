@@ -13,22 +13,22 @@ namespace largeant
     : G4VSensitiveDetector(name)
     {
         G4AnalysisManager *man = G4AnalysisManager::Instance();
-        man->CreateNtuple(name, name);
-        man->CreateNtupleIColumn("event");
-        man->CreateNtupleIColumn("track_id");
-        man->CreateNtupleDColumn("x_i");
-        man->CreateNtupleDColumn("y_i");
-        man->CreateNtupleDColumn("z_i");
-        man->CreateNtupleDColumn("energy");
-        man->CreateNtupleDColumn("wavelength");
-        man->CreateNtupleIColumn("sipm_channel");
-        man->CreateNtupleDColumn("sipm_x");
-        man->CreateNtupleDColumn("sipm_y");
-        man->CreateNtupleDColumn("sipm_z");
-        man->FinishNtuple(1);
+        // man->CreateNtuple(name, name);
+        // man->CreateNtupleIColumn("event");
+        // man->CreateNtupleIColumn("track_id");
+        // man->CreateNtupleDColumn("x_i");
+        // man->CreateNtupleDColumn("y_i");
+        // man->CreateNtupleDColumn("z_i");
+        // man->CreateNtupleDColumn("energy");
+        // man->CreateNtupleDColumn("wavelength");
+        // man->CreateNtupleIColumn("sipm_channel");
+        // man->CreateNtupleDColumn("sipm_x");
+        // man->CreateNtupleDColumn("sipm_y");
+        // man->CreateNtupleDColumn("sipm_z");
+        // man->FinishNtuple(1);
 
         // load in efficiencies
-        fQuantumEfficiency = new G4PhysicsFreeVector();
+        mQuantumEfficiency = new G4PhysicsFreeVector();
 
         std::ifstream datafile;
         datafile.open("sipm_efficiency.dat");
@@ -36,7 +36,7 @@ namespace largeant
         {
             G4double wavelength, q_efficiency;
             datafile >> wavelength >> q_efficiency;
-            fQuantumEfficiency->InsertValues(wavelength, q_efficiency/100.0);
+            mQuantumEfficiency->InsertValues(wavelength, q_efficiency/100.0);
             if(datafile.eof()) {
                 break;
             }
@@ -72,7 +72,7 @@ namespace largeant
         G4double wavelength = (1.239841939 * eV / photonMomentum.mag()) * 1000;
 
         // determine efficiency
-        if(G4UniformRand() >= fQuantumEfficiency->Value(wavelength)) {
+        if(G4UniformRand() >= mQuantumEfficiency->Value(wavelength)) {
             return false;
         }
 

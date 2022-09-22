@@ -3,10 +3,10 @@ import uproot
 from matplotlib import pyplot as plt
 import numpy as np
 
-input_file = "output_1.root"
-bins = 250
+input_file = "output_0.root"
+bins = 50
 
-extra_x_ticks = [5869, 5486, 5830, 7066, 6341, ]
+extra_x_ticks = [5486, 5442, 5388]
 
 
 arrays = uproot.open(input_file)['NEST'].arrays(library="np")
@@ -18,7 +18,6 @@ particle = arrays['particle_name']
 parent = arrays['parent_name']
 
 unique_particles = ['alpha']
-print(particle[(parent == 'Pa233')])
 
 fig, axs = plt.subplots()
 for name in unique_particles:
@@ -32,7 +31,6 @@ axs.set_xlabel("energy deposition [keV]")
 #axs.set_yscale("log")
 axs.set_xticks(list(axs.get_xticks()) + extra_x_ticks)
 axs.set_xticklabels(axs.get_xticks(), rotation=45, ha='right')
-axs.set_xlim([4000,max(dE)])
 plt.legend(loc='upper left')
 plt.tight_layout()
 plt.show()

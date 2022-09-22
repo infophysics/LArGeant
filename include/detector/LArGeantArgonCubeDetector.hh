@@ -19,7 +19,7 @@
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 
-#include "LArGeantArgonCube.hh"
+#include "LArGeantArgon.hh"
 #include "LArGeantArgonCubeSiPMSensitiveDetector.hh"
 
 namespace largeant
@@ -40,62 +40,62 @@ namespace largeant
 
         virtual G4VPhysicalVolume* Construct();
 
-        std::shared_ptr<G4LogicalVolume> getLogicalWorldVolume()    { return fLogicalWorld; }
-        std::shared_ptr<G4LogicalVolume> getLogicalCubeVolume()     { return fLogicalCube; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalWorldVolume()    { return mLogicalWorld; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalCubeVolume()     { return mLogicalCube; }
 
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalWorldVolume() { return fPhysicalWorld; }
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalCubeVolume()  { return fPhysicalCube; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalWorldVolume() { return mPhysicalWorld; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalCubeVolume()  { return mPhysicalCube; }
 
-        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return fScoringVolume; }
+        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return mLogicalCube; }
 
-        G4double getWorldX() const { return fWorldX; }
-        G4double getWorldY() const { return fWorldY; }
-        G4double getWorldZ() const { return fWorldZ; }
+        G4double GetWorldX() const { return mWorldX; }
+        G4double GetWorldY() const { return mWorldY; }
+        G4double GetWorldZ() const { return mWorldZ; }
 
     private:
-        // parameters for the geometry of the Cube
-        G4double fWorldX, fWorldY, fWorldZ;
-        G4double fEnvX, fEnvY, fEnvZ;
-        G4int fBottomNumberX = {10};
-        G4int fBottomNumberZ = {10};
-        G4double fBottomThicknessY;
+        // parameters mor the geometry of the Cube
+        G4double mWorldX, mWorldY, mWorldZ;
+        G4double mEnvX, mEnvY, mEnvZ;
+        G4int mBottomNumberX = {10};
+        G4int mBottomNumberZ = {10};
+        G4double mBottomThicknessY;
 
-        // G4 volumes for the Cube
-        std::shared_ptr<G4Box> fSolidWorld = {nullptr};
+        // G4 volumes mor the Cube
+        std::shared_ptr<G4Box> mSolidWorld = {nullptr};
         /// Cube
-        std::shared_ptr<G4Box> fSolidCube = {nullptr};
+        std::shared_ptr<G4Box> mSolidCube = {nullptr};
 
         /// detector
-        std::shared_ptr<G4Box> fBottomSiPMSolidDetector = {nullptr};                 
+        std::shared_ptr<G4Box> mBottomSiPMSolidDetector = {nullptr};                 
         
-        /// logical volume for the Cube
-        std::shared_ptr<G4LogicalVolume> fLogicalWorld = {nullptr};
-        std::shared_ptr<G4LogicalVolume> fLogicalCube = {nullptr};
-        std::shared_ptr<G4LogicalVolume> fBottomSiPMLogicalDetector = {nullptr};   
+        /// logical volume mor the Cube
+        std::shared_ptr<G4LogicalVolume> mLogicalWorld = {nullptr};
+        std::shared_ptr<G4LogicalVolume> mLogicalCube = {nullptr};
+        std::shared_ptr<G4LogicalVolume> mBottomSiPMLogicalDetector = {nullptr};   
         
-        /// physical volume for the Cube
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalWorld = {nullptr};
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalCube = {nullptr};   
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalDetector = {nullptr}; 
+        /// physical volume mor the Cube
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalWorld = {nullptr};
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalCube = {nullptr};   
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalDetector = {nullptr}; 
 
-        std::vector<std::shared_ptr<G4VPhysicalVolume>> fBottomSiPMPhysicalDetector;
-        std::vector<std::shared_ptr<G4VPhysicalVolume>> fFrontSiPMPhysicalDetector;
-        std::vector<std::shared_ptr<G4VPhysicalVolume>> fLeftSideSiPMPhysicalDetector;
-        std::vector<std::shared_ptr<G4VPhysicalVolume>> fRightSideSiPMPhysicalDetector;
+        std::vector<std::shared_ptr<G4VPhysicalVolume>> mBottomSiPMPhysicalDetector;
+        std::vector<std::shared_ptr<G4VPhysicalVolume>> mFrontSiPMPhysicalDetector;
+        std::vector<std::shared_ptr<G4VPhysicalVolume>> mLeftSideSiPMPhysicalDetector;
+        std::vector<std::shared_ptr<G4VPhysicalVolume>> mRightSideSiPMPhysicalDetector;
 
-        LArGeantArgon fArgon;
-        std::shared_ptr<G4Material> fWorldMat = {nullptr};
-        std::shared_ptr<G4Material> fEnvMat = {nullptr};
+        LArGeantArgon mArgon;
+        std::shared_ptr<G4Material> mWorldMat = {nullptr};
+        std::shared_ptr<G4Material> mEnvMat = {nullptr};
 
         void DefineMaterials();
         
-        G4GenericMessenger *fMessenger;
+        G4GenericMessenger *mMessenger;
 
         /// sensitive detector
-        std::shared_ptr<LArGeantArgonCubeSiPMSensitiveDetector> fBottomSiPMSensitiveDetector;
+        std::shared_ptr<LArGeantArgonCubeSiPMSensitiveDetector> mBottomSiPMSensitiveDetector;
         virtual void ConstructSDandField();
 
     protected:
-        std::shared_ptr<G4LogicalVolume> fScoringVolume;
+        //std::shared_ptr<G4LogicalVolume> mScoringVolume;
     };
 }

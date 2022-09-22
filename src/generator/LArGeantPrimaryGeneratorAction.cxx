@@ -14,67 +14,55 @@ namespace largeant
         G4ThreeVector position, G4ThreeVector momentumDirection,
         G4double momentum
     )
-    : fNumberOfParticles(numberOfParticles)
-    , fParticleName(particleName)
-    , fParticlePosition(position)
-    , fParticleMomentumDirection(momentumDirection)
-    , fParticleMomentum(momentum)
+    : mNumberOfParticles(numberOfParticles)
+    , mParticleName(particleName)
+    , mParticlePosition(position)
+    , mParticleMomentumDirection(momentumDirection)
+    , mParticleMomentum(momentum)
     {
-        fParticleGun = new G4ParticleGun(fNumberOfParticles);
-        fParticleTable = G4ParticleTable::GetParticleTable();
-        fParticle = fParticleTable->FindParticle(fParticleName);
+        mParticleGun = new G4ParticleGun(mNumberOfParticles);
+        mParticleTable = G4ParticleTable::GetParticleTable();
+        mParticle = mParticleTable->FindParticle(mParticleName);
         
-        fParticleGun->SetParticlePosition(fParticlePosition);
-        fParticleGun->SetParticleMomentumDirection(fParticleMomentumDirection);
-        fParticleGun->SetParticleMomentum(fParticleMomentum);
-        fParticleGun->SetParticleDefinition(fParticle);
+        mParticleGun->SetParticlePosition(mParticlePosition);
+        mParticleGun->SetParticleMomentumDirection(mParticleMomentumDirection);
+        mParticleGun->SetParticleMomentum(mParticleMomentum);
+        mParticleGun->SetParticleDefinition(mParticle);
     }
 
     LArGeantPrimaryGeneratorAction::~LArGeantPrimaryGeneratorAction()
     {
     }
 
-    void LArGeantPrimaryGeneratorAction::setNumberOfParticles(G4int numberOfParticles)
+    void LArGeantPrimaryGeneratorAction::SetNumberOfParticles(G4int numberOfParticles)
     {
-        fNumberOfParticles = numberOfParticles;
-        fParticleGun->SetNumberOfParticles(fNumberOfParticles);
+        mNumberOfParticles = numberOfParticles;
+        mParticleGun->SetNumberOfParticles(mNumberOfParticles);
     }
-    void LArGeantPrimaryGeneratorAction::setParticle(G4String particleName)
+    void LArGeantPrimaryGeneratorAction::SetParticle(G4String particleName)
     {
-        fParticleName = particleName;
-        fParticle = fParticleTable->FindParticle(fParticleName);
-        fParticleGun->SetParticleDefinition(fParticle);
+        mParticleName = particleName;
+        mParticle = mParticleTable->FindParticle(mParticleName);
+        mParticleGun->SetParticleDefinition(mParticle);
     }
-    void LArGeantPrimaryGeneratorAction::setParticlePosition(G4ThreeVector position)
+    void LArGeantPrimaryGeneratorAction::SetParticlePosition(G4ThreeVector position)
     {
-        fParticlePosition = position;
-        fParticleGun->SetParticlePosition(fParticlePosition);
+        mParticlePosition = position;
+        mParticleGun->SetParticlePosition(mParticlePosition);
     }
-    void LArGeantPrimaryGeneratorAction::setParticleMomentumDirection(G4ThreeVector momentumDirection)
+    void LArGeantPrimaryGeneratorAction::SetParticleMomentumDirection(G4ThreeVector momentumDirection)
     {
-        fParticleMomentumDirection = momentumDirection;
-        fParticleGun->SetParticleMomentumDirection(fParticleMomentumDirection);
+        mParticleMomentumDirection = momentumDirection;
+        mParticleGun->SetParticleMomentumDirection(mParticleMomentumDirection);
     }
-    void LArGeantPrimaryGeneratorAction::setParticleMomentum(G4double momentum)
+    void LArGeantPrimaryGeneratorAction::SetParticleMomentum(G4double momentum)
     {
-        fParticleMomentum = momentum;
-        fParticleGun->SetParticleMomentum(fParticleMomentum);
+        mParticleMomentum = momentum;
+        mParticleGun->SetParticleMomentum(mParticleMomentum);
     }
 
     void LArGeantPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
-        G4ParticleDefinition* particle = fParticleGun->GetParticleDefinition();
-
-        G4int Z = 95;
-        G4int A = 241;
-
-        G4double charge = 0.0*eplus;
-        G4double energy = 0.0*keV;
-
-        G4ParticleDefinition* ion = G4IonTable::GetIonTable()->GetIon(Z, A, energy);
-        fParticleGun->SetParticleDefinition(ion);
-        fParticleGun->SetParticleCharge(charge);
-
-        fParticleGun->GeneratePrimaryVertex(event);
+        mParticleGun->GeneratePrimaryVertex(event);
     }
 }

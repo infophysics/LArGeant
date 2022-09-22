@@ -25,13 +25,13 @@ namespace largeant
     class LArGeantSteppingAction : public G4UserSteppingAction
     {
     public:
-        LArGeantSteppingAction(std::shared_ptr<LArGeantEventAction> eventAction);
+        LArGeantSteppingAction(std::shared_ptr<LArGeantEventAction> EventAction);
         ~LArGeantSteppingAction();
         
         virtual void UserSteppingAction(const G4Step*);
         
     private:
-        std::shared_ptr<LArGeantEventAction> fEventAction;
-        std::shared_ptr<NEST::LArNEST> fLArNEST;
+        std::shared_ptr<LArGeantEventAction> mEventAction;
+        std::shared_ptr<NEST::LArNEST> mLArNEST;
     };
 }

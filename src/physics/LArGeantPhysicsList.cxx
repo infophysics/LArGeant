@@ -41,58 +41,28 @@ namespace largeant
         //RegisterPhysics(new LArGeantNeutronHPPhysics("neutronHP"));
 
         // Get the list of physics lists
-        fPhysListFactory = std::make_shared<G4PhysListFactory>();
-        fPhysicsLists = fPhysListFactory->AvailablePhysLists();
+        mPhysListFactory = std::make_shared<G4PhysListFactory>();
+        mPhysicsLists = mPhysListFactory->AvailablePhysLists();
     }
 
     LArGeantPhysicsList::~LArGeantPhysicsList()
     {
     }
 
-    // void LArGeantPhysicsList::ConstructProcess()
-    // { 
-    //     LArDetector* detector;
-    //     LArNESTScintillationProcess* scintillationProcess = new LArNESTScintillationProcess("S1", fElectromagnetic, detector);
-    //     fPManager->AddProcess(scintillationProcess, ordDefault + 1, ordInActive, ordDefault + 1);
-    //     std::cout << "HERE" << std::endl;
-    // }
-
-    // void LArGeantPhysicsList::ConstructParticle()
-    // {
-    //     G4BosonConstructor pBosonConstructor;
-    //     pBosonConstructor.ConstructParticle();
-
-    //     G4LeptonConstructor pLeptonConstructor;
-    //     pLeptonConstructor.ConstructParticle();
-
-    //     G4MesonConstructor pMesonConstructor;
-    //     pMesonConstructor.ConstructParticle();
-
-    //     G4BaryonConstructor pBaryonConstructor;
-    //     pBaryonConstructor.ConstructParticle();
-
-    //     G4IonConstructor pIonConstructor;
-    //     pIonConstructor.ConstructParticle();
-
-    //     G4ShortLivedConstructor pShortLivedConstructor;
-    //     pShortLivedConstructor.ConstructParticle();
-    //     LArNESTThermalElectron::Definition();
-    // }
-
     void LArGeantPhysicsList::SetCuts()
     {
         SetCutValue(1 * mm, "proton");
-        SetCutValue(1 * mm, "gamma");
-        SetCutValue(1 * mm, "e-");
-        SetCutValue(1 * mm, "e+");
+        SetCutValue(1 * um, "gamma");
+        SetCutValue(1 * um, "e-");
+        SetCutValue(1 * um, "e+");
     }
 
     void LArGeantPhysicsList::PrintPhysicsLists()
     {
         G4cout << "Enabled Physics Lists:" << G4endl;
-        for(size_t ii = 0; ii < fPhysicsLists.size(); ii++)
+        for(size_t ii = 0; ii < mPhysicsLists.size(); ii++)
         {
-            G4cout << "\t[" << ii << "]: " << fPhysicsLists[ii] << G4endl;
+            G4cout << "\t[" << ii << "]: " << mPhysicsLists[ii] << G4endl;
         }
     }
 }

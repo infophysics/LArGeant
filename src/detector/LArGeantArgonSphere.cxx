@@ -11,11 +11,11 @@ namespace largeant
 {
     LArGeantArgonSphere::LArGeantArgonSphere(LArGeantArgon argon, G4double radius)
     : G4VUserDetectorConstruction()
-    , fRadius(radius)
-    , fWorldX(radius), fEnvX(radius)
-    , fWorldY(radius), fEnvY(radius)
-    , fWorldZ(radius), fEnvZ(radius)
-    , fArgon(argon)
+    , mRadius(radius)
+    , mWorldX(radius), mEnvX(radius)
+    , mWorldY(radius), mEnvY(radius)
+    , mWorldZ(radius), mEnvZ(radius)
+    , mArgon(argon)
     {
         DefineMaterials();
     }
@@ -27,20 +27,20 @@ namespace largeant
     void LArGeantArgonSphere::DefineMaterials()
     {
         G4NistManager *nist = G4NistManager::Instance();
-        fWorldMat.reset(nist->FindOrBuildMaterial("G4_AIR"));
-        fEnvMat.reset(nist->FindOrBuildMaterial("G4_AIR"));
+        mWorldMat.reset(nist->FindOrBuildMaterial("G4_AIR"));
+        mEnvMat.reset(nist->FindOrBuildMaterial("G4_AIR"));
     }
 
     G4VPhysicalVolume *LArGeantArgonSphere::Construct()
     {
         // create the world volume
-        fSolidWorld  = std::make_shared<G4Box>("SolidWorld", fWorldX, fWorldY, fWorldZ);
-        fLogicalWorld  = std::make_shared<G4LogicalVolume>(fSolidWorld.get(), fWorldMat.get(), "LogicalWorld");
-        fPhysicalWorld.reset(
+        mSolidWorld  = std::make_shared<G4Box>("SolidWorld", mWorldX, mWorldY, mWorldZ);
+        mLogicalWorld  = std::make_shared<G4LogicalVolume>(mSolidWorld.get(), mWorldMat.get(), "LogicalWorld");
+        mPhysicalWorld.reset(
             new G4PVPlacement(
                 0, 
                 G4ThreeVector(0., 0., 0.),
-                fLogicalWorld.get(),
+                mLogicalWorld.get(),
                 "PhysicalWorld",
                 0, 
                 false,
@@ -48,39 +48,39 @@ namespace largeant
             )
         );
         // create the envelope volume
-        fSolidEnv    = std::make_shared<G4Box>("SolidEnv", fEnvX, fEnvY, fEnvZ);
-        fLogicalEnv  = std::make_shared<G4LogicalVolume>(fSolidEnv.get(), fEnvMat.get(), "LogicalEnv");
-        fPhysicalEnv.reset(
+        mSolidEnv    = std::make_shared<G4Box>("SolidEnv", mEnvX, mEnvY, mEnvZ);
+        mLogicalEnv  = std::make_shared<G4LogicalVolume>(mSolidEnv.get(), mEnvMat.get(), "LogicalEnv");
+        mPhysicalEnv.reset(
             new G4PVPlacement(
                 0,
                 G4ThreeVector(0., 0., 0.),
-                fLogicalEnv.get(),
+                mLogicalEnv.get(),
                 "PhysicalEnv",
-                fLogicalWorld.get(),
+                mLogicalWorld.get(),
                 false,
                 0,
                 true
             )
         );
         // create the argon sphere volume
-        fSolidSphere = std::make_shared<G4Sphere>(
+        mSolidSphere = std::make_shared<G4Sphere>(
             "LArGeant", 
             0, 
-            fRadius, 
+            mRadius, 
             0, 
             2*CLHEP::pi, 
             0, 
             2*CLHEP::pi
         );
         
-        fLogicalSphere = std::make_shared<G4LogicalVolume>(fSolidSphere.get(), fArgon.getLAr().get(), "LogicalSphere");
-        fPhysicalSphere.reset(
+        mLogicalSphere = std::make_shared<G4LogicalVolume>(mSolidSphere.get(), mArgon.getLAr().get(), "LogicalSphere");
+        mPhysicalSphere.reset(
             new G4PVPlacement(
                 0, 
                 G4ThreeVector(0., 0., 0.), 
-                fLogicalSphere.get(), 
+                mLogicalSphere.get(), 
                 "PhysicalSphere", 
-                fLogicalEnv.get(), 
+                mLogicalEnv.get(), 
                 false, 
                 0, 
                 true
@@ -88,9 +88,9 @@ namespace largeant
         );
         
         
-        fScoringVolume = fLogicalSphere;
+        mScoringVolume = mLogicalSphere;
 
-        G4Material* material = fPhysicalSphere->GetLogicalVolume()->GetMaterial();
+        G4Material* material = mPhysicalSphere->GetLogicalVolume()->GetMaterial();
         std::cout << "LAr material properties:" << std::endl;
         std::cout << "  [name]:     " << material->GetName() << std::endl;
         std::cout << "  [density]:  " << material->GetDensity() << std::endl;
@@ -98,6 +98,6 @@ namespace largeant
         std::cout << "  [temp]:     " << material->GetTemperature() << std::endl;
         std::cout << "  [pressure]: " << material->GetPressure() << std::endl;
 
-        return fPhysicalWorld.get();
+        return mPhysicalWorld.get();
     }
 }

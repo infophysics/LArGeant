@@ -13,16 +13,16 @@ namespace largeant
         G4double temperature, G4double pressure,
         G4double Ar36Ratio, G4double Ar38Ratio, G4double Ar40Ratio
     )
-    : fTemperature(temperature)
-    , fPressure(pressure)
-    , fAr36Ratio(Ar36Ratio)
-    , fAr38Ratio(Ar38Ratio)
-    , fAr40Ratio(Ar40Ratio)
+    : mTemperature(temperature)
+    , mPressure(pressure)
+    , mAr36Ratio(Ar36Ratio)
+    , mAr38Ratio(Ar38Ratio)
+    , mAr40Ratio(Ar40Ratio)
     {
 
-        fAverageDensity = 1.406*g/cm3;
-        fNaturalArDensity = 1.3973*g/cm3;
-        fAverageMassMol = Ar36MassMol * fAr36Ratio + Ar38MassMol * fAr38Ratio + Ar40MassMol * fAr40Ratio;
+        mAverageDensity = 1.406*g/cm3;
+        mNaturalArDensity = 1.3973*g/cm3;
+        mAverageMassMol = Ar36MassMol * mAr36Ratio + Ar38MassMol * mAr38Ratio + Ar40MassMol * mAr40Ratio;
 
         DefineMaterials();
     }
@@ -33,12 +33,12 @@ namespace largeant
 
     void LArGeantArgon::setTemperature(G4double temperature)
     {
-        fTemperature = temperature;
+        mTemperature = temperature;
         DefineMaterials();
     }
     void LArGeantArgon::setPressure(G4double pressure)
     {
-        fPressure = pressure;
+        mPressure = pressure;
         DefineMaterials();
     }
     void LArGeantArgon::setRatios(
@@ -47,9 +47,9 @@ namespace largeant
         G4double Ar40Ratio
     )
     {
-        fAr36Ratio = Ar36Ratio;
-        fAr38Ratio = Ar38Ratio;
-        fAr40Ratio = Ar40Ratio;
+        mAr36Ratio = Ar36Ratio;
+        mAr38Ratio = Ar38Ratio;
+        mAr40Ratio = Ar40Ratio;
         DefineMaterials();
     }
 
@@ -57,7 +57,7 @@ namespace largeant
     {
         G4NistManager *nist = G4NistManager::Instance();
 
-        fIAr36.reset( 
+        mIAr36.reset( 
             new G4Isotope(
                 "Ar36",         // name
                 18.,            // atomic number
@@ -66,7 +66,7 @@ namespace largeant
             )
         );  
         
-        fIAr38.reset( 
+        mIAr38.reset( 
             new G4Isotope(
                 "Ar38",         // name
                 18.,            // atomic number
@@ -75,7 +75,7 @@ namespace largeant
             )
         );  
 
-        fIAr40.reset( 
+        mIAr40.reset( 
             new G4Isotope(
                 "Ar40",         // name
                 18.,            // atomic number
@@ -85,31 +85,31 @@ namespace largeant
         );  
 
         // add the isotopes to the definition of Ar
-        fArIsotopes.reset(
+        mArIsotopes.reset(
             new G4Element("ArIsotopes", "Ar", 3)
         );
-        fArIsotopes->AddIsotope(fIAr36.get(), fAr36Ratio * perCent);
-        fArIsotopes->AddIsotope(fIAr38.get(), fAr38Ratio * perCent);
-        fArIsotopes->AddIsotope(fIAr40.get(), fAr40Ratio * perCent);
+        mArIsotopes->AddIsotope(mIAr36.get(), mAr36Ratio * perCent);
+        mArIsotopes->AddIsotope(mIAr38.get(), mAr38Ratio * perCent);
+        mArIsotopes->AddIsotope(mIAr40.get(), mAr40Ratio * perCent);
 
         // need now the definition of LAr with the composition
-        fLAr.reset(
+        mLAr.reset(
             new G4Material(
                 "LAr",          // name
                 18.0,           // number
-                fAverageMassMol,// # of components
-                fAverageDensity,// density
+                mAverageMassMol,// # of components
+                mAverageDensity,// density
                 kStateLiquid,   // state
-                fTemperature,   // temperature
-                fPressure       // pressure
+                mTemperature,   // temperature
+                mPressure       // pressure
             )
         );     
-        // std::cout << "ElectronDensity: " << fLAr->GetElectronDensity() << std::endl;
-        // std::cout << "Radlen: " << fLAr->GetRadlen() << std::endl;
-        // std::cout << "NuclearInterLength: " << fLAr->GetNuclearInterLength() << std::endl;
-        // std::cout << "Temperature: " << fLAr->GetTemperature() << std::endl;
-        // std::cout << "Pressure: " << fLAr->GetPressure() << std::endl;
-        // // fLAr.reset(
+        // std::cout << "ElectronDensity: " << mLAr->GetElectronDensity() << std::endl;
+        // std::cout << "Radlen: " << mLAr->GetRadlen() << std::endl;
+        // std::cout << "NuclearInterLength: " << mLAr->GetNuclearInterLength() << std::endl;
+        // std::cout << "Temperature: " << mLAr->GetTemperature() << std::endl;
+        // std::cout << "Pressure: " << mLAr->GetPressure() << std::endl;
+        // // mLAr.reset(
         // //     nist->FindOrBuildMaterial("G4_lAr")
         // // );
         // G4Material* LAr = nist->FindOrBuildMaterial("G4_lAr");

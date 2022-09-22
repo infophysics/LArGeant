@@ -26,51 +26,51 @@ namespace largeant
     class LArGeantArgonCube : public G4VUserDetectorConstruction
     {
     public:
-        LArGeantArgonCube(LArGeantArgon argon,
+        LArGeantArgonCube(LArGeantArgon Argon,
             G4double worldX, G4double worldY, G4double worldZ
         );
         ~LArGeantArgonCube();
 
         virtual G4VPhysicalVolume* Construct();
 
-        std::shared_ptr<G4LogicalVolume> getLogicalWorldVolume()    { return fLogicalWorld; }
-        std::shared_ptr<G4LogicalVolume> getLogicalEnvVolume()      { return fLogicalEnv; }
-        std::shared_ptr<G4LogicalVolume> getLogicalCubeVolume()     { return fLogicalCube; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalWorldVolume()    { return mLogicalWorld; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalEnvVolume()      { return mLogicalEnv; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalCubeVolume()     { return mLogicalCube; }
 
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalWorldVolume() { return fPhysicalWorld; }
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalEnvVolume()   { return fPhysicalEnv; }
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalCubeVolume()  { return fPhysicalCube; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalWorldVolume() { return mPhysicalWorld; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalEnvVolume()   { return mPhysicalEnv; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalCubeVolume()  { return mPhysicalCube; }
 
-        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return fScoringVolume; }
+        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const   { return mScoringVolume; }
 
-        G4double getWorldX() const { return fWorldX; }
-        G4double getWorldY() const { return fWorldY; }
-        G4double getWorldZ() const { return fWorldZ; }
+        G4double GetWorldX() const { return mWorldX; }
+        G4double GetWorldY() const { return mWorldY; }
+        G4double GetWorldZ() const { return mWorldZ; }
 
     private:
-        // parameters for the geometry of the Cube
-        G4double fWorldX, fWorldY, fWorldZ;
-        G4double fEnvX, fEnvY, fEnvZ;
-        // G4 volumes for the Cube
-        std::shared_ptr<G4Box> fSolidWorld, fSolidEnv;
+        // parameters mor the geometry of the Cube
+        G4double mWorldX, mWorldY, mWorldZ;
+        G4double mEnvX, mEnvY, mEnvZ;
+        // G4 volumes mor the Cube
+        std::shared_ptr<G4Box> mSolidWorld, mSolidEnv;
         /// Cube
-        std::shared_ptr<G4Box> fSolidCube;                 
-        /// logical volume for the Cube
-        std::shared_ptr<G4LogicalVolume> fLogicalWorld, fLogicalEnv, fLogicalCube;   
-        /// physical volume for the Cube
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalWorld = {nullptr};
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalEnv = {nullptr};
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalCube = {nullptr};    
+        std::shared_ptr<G4Box> mSolidCube;                 
+        /// logical volume mor the Cube
+        std::shared_ptr<G4LogicalVolume> mLogicalWorld, mLogicalEnv, mLogicalCube;   
+        /// physical volume mor the Cube
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalWorld = {nullptr};
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalEnv = {nullptr};
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalCube = {nullptr};    
 
-        LArGeantArgon fArgon;
-        std::shared_ptr<G4Material> fWorldMat = {nullptr};
-        std::shared_ptr<G4Material> fEnvMat = {nullptr};
+        LArGeantArgon mArgon;
+        std::shared_ptr<G4Material> mWorldMat = {nullptr};
+        std::shared_ptr<G4Material> mEnvMat = {nullptr};
 
         void DefineMaterials();
         
-        G4GenericMessenger *fMessenger;
+        G4GenericMessenger *mMessenger;
 
     protected:
-        std::shared_ptr<G4LogicalVolume> fScoringVolume;
+        std::shared_ptr<G4LogicalVolume> mScoringVolume;
     };
 }

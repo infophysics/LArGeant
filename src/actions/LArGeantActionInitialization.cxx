@@ -10,15 +10,10 @@
 namespace largeant
 {
     LArGeantActionInitialization::LArGeantActionInitialization(
-        LArGeantPrimaryGeneratorAction& primaryGeneratorAction,
-        G4double efield
+        LArGeantPrimaryGeneratorAction* PrimaryGeneratorAction
     )
     {
-        fGenerator = std::make_shared<LArGeantPrimaryGeneratorAction>(primaryGeneratorAction);
-        fRunAction = std::make_shared<LArGeantRunAction>(efield);
-        fEventAction = std::make_shared<LArGeantEventAction>(fRunAction);
-        fSteppingAction = std::make_shared<LArGeantSteppingAction>(fEventAction);
-        fStackingAction = std::make_shared<LArGeantStackingAction>();
+        mGenerator = std::make_shared<LArGeantPrimaryGeneratorAction>(*PrimaryGeneratorAction);
     }
 
     LArGeantActionInitialization::~LArGeantActionInitialization()
@@ -27,15 +22,20 @@ namespace largeant
 
     void LArGeantActionInitialization::Build() const
     {
-        SetUserAction(fGenerator.get());
-        SetUserAction(fRunAction.get());
-        SetUserAction(fEventAction.get());
-        SetUserAction(fSteppingAction.get());
-        SetUserAction(fStackingAction.get());
+        SetUserAction(mGenerator.get());
+        
+        auto RunAction = std::make_shared<LArGeantRunAction>();
+        SetUserAction(RunAction.get());
+
+        auto EventAction = std::make_shared<LArGeantEventAction>(RunAction);
+        SetUserAction(EventAction.get());
+
+        SetUserAction(new LArGeantSteppingAction(EventAction));
+        SetUserAction(new LArGeantStackingAction);
     }
 
     void LArGeantActionInitialization::BuildForMaster() const
     {
-        SetUserAction(fRunAction.get());
+        SetUserAction(new LArGeantRunAction());
     }
 }

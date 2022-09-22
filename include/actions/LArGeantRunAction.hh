@@ -16,7 +16,7 @@ namespace largeant
     class LArGeantRunAction : public G4UserRunAction
     {
     public:
-        LArGeantRunAction(G4double efield);
+        LArGeantRunAction();
         ~LArGeantRunAction();
 
         void ConstructRootTrees();
@@ -24,11 +24,7 @@ namespace largeant
         virtual void BeginOfRunAction(const G4Run*);
         virtual void EndOfRunAction(const G4Run*);
 
-        G4double GetElectricField() const { return fElectricField; }
-        void SetElectricField(G4double efield) { fElectricField = efield; }
-
     private:
-        G4GenericMessenger *fMessenger;
-        G4double fElectricField;
+        G4GenericMessenger *mMessenger;
     };
 }

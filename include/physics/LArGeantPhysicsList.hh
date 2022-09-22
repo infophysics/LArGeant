@@ -61,10 +61,10 @@ namespace largeant
         void PrintPhysicsLists();
 
     private:
-        std::shared_ptr<G4PhysListFactory> fPhysListFactory;
-        std::vector<G4String> fPhysicsLists;
+        std::shared_ptr<G4PhysListFactory> mPhysListFactory;
+        std::vector<G4String> mPhysicsLists;
 
-        std::shared_ptr<G4ProcessManager> fPManager = {nullptr};
-        std::shared_ptr<G4ProcessVector> fProcesses = {nullptr};
+        std::shared_ptr<G4ProcessManager> mPManager = {nullptr};
+        std::shared_ptr<G4ProcessVector> mProcesses = {nullptr};
     };
 }

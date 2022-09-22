@@ -33,41 +33,41 @@ namespace largeant
 
         virtual G4VPhysicalVolume* Construct();
 
-        std::shared_ptr<G4LogicalVolume> getLogicalWorldVolume()    { return fLogicalWorld; }
-        std::shared_ptr<G4LogicalVolume> getLogicalEnvVolume()      { return fLogicalEnv; }
-        std::shared_ptr<G4LogicalVolume> getLogicalSphereVolume()   { return fLogicalSphere; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalWorldVolume()    { return mLogicalWorld; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalEnvVolume()      { return mLogicalEnv; }
+        std::shared_ptr<G4LogicalVolume> GetLogicalSphereVolume()   { return mLogicalSphere; }
 
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalWorldVolume()  { return fPhysicalWorld; }
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalEnvVolume()    { return fPhysicalEnv; }
-        std::shared_ptr<G4VPhysicalVolume> getPhysicalSphereVolume() { return fPhysicalSphere; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalWorldVolume()  { return mPhysicalWorld; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalEnvVolume()    { return mPhysicalEnv; }
+        std::shared_ptr<G4VPhysicalVolume> GetPhysicalSphereVolume() { return mPhysicalSphere; }
 
-        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const { return fScoringVolume; }
+        std::shared_ptr<G4LogicalVolume> GetScoringVolume() const { return mScoringVolume; }
 
     private:
         // parameters for the geometry of the sphere
-        G4double fRadius; 
-        G4double fWorldX, fWorldY, fWorldZ;
-        G4double fEnvX, fEnvY, fEnvZ;
-        // G4 volumes for the sphere
-        std::shared_ptr<G4Box>  fSolidWorld, fSolidEnv;
+        G4double mRadius; 
+        G4double mWorldX, mWorldY, mWorldZ;
+        G4double mEnvX, mEnvY, mEnvZ;
+        // G4 volumes mor the sphere
+        std::shared_ptr<G4Box>  mSolidWorld, mSolidEnv;
         /// sphere
-        std::shared_ptr<G4Sphere> fSolidSphere;                 
-        /// logical volume for the sphere
-        std::shared_ptr<G4LogicalVolume> fLogicalWorld, fLogicalEnv, fLogicalSphere;   
-        /// physical volume for the sphere
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalWorld = {nullptr};
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalEnv = {nullptr};
-        std::shared_ptr<G4VPhysicalVolume> fPhysicalSphere = {nullptr};    
+        std::shared_ptr<G4Sphere> mSolidSphere;                 
+        /// logical volume mor the sphere
+        std::shared_ptr<G4LogicalVolume> mLogicalWorld, mLogicalEnv, mLogicalSphere;   
+        /// physical volume mor the sphere
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalWorld = {nullptr};
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalEnv = {nullptr};
+        std::shared_ptr<G4VPhysicalVolume> mPhysicalSphere = {nullptr};    
 
-        LArGeantArgon fArgon;
-        std::shared_ptr<G4Material> fWorldMat = {nullptr};
-        std::shared_ptr<G4Material> fEnvMat = {nullptr};
+        LArGeantArgon mArgon;
+        std::shared_ptr<G4Material> mWorldMat = {nullptr};
+        std::shared_ptr<G4Material> mEnvMat = {nullptr};
 
         void DefineMaterials();
 
         G4GenericMessenger *fMessenger;
 
     protected:
-        std::shared_ptr<G4LogicalVolume>  fScoringVolume;
+        std::shared_ptr<G4LogicalVolume>  mScoringVolume;
     };
 }

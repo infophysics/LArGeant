@@ -26,33 +26,33 @@ namespace largeant
         );
         ~LArGeantPrimaryGeneratorAction();
 
-        void setNumberOfParticles(G4int numberOfParticles);
-        void setParticle(G4String particleName);
-        void setParticlePosition(G4ThreeVector position);
-        void setParticleMomentumDirection(G4ThreeVector momentumDirection);
-        void setParticleMomentum(G4double momentum);
+        void SetNumberOfParticles(G4int numberOfParticles);
+        void SetParticle(G4String particleName);
+        void SetParticlePosition(G4ThreeVector position);
+        void SetParticleMomentumDirection(G4ThreeVector momentumDirection);
+        void SetParticleMomentum(G4double momentum);
 
         // method to access particle gun
-        G4int getNumberOfParticles() const { return fNumberOfParticles; }
-        G4ParticleDefinition* getParticle() const { return fParticle; }
-        G4String getParticleName() const { return fParticleName; }
-        G4ThreeVector getParticlePosition() const { return fParticlePosition; }
-        G4ThreeVector getParticleMomentumDirection() const { return fParticleMomentumDirection; }
-        G4double getParticleMomentum() const { return fParticleMomentum; }
-        G4ParticleGun* getParticleGun() const { return fParticleGun; }
+        G4int GetNumberOfParticles() const { return mNumberOfParticles; }
+        G4ParticleDefinition* GetParticle() const { return mParticle; }
+        G4String GetParticleName() const { return mParticleName; }
+        G4ThreeVector GetParticlePosition() const { return mParticlePosition; }
+        G4ThreeVector GetParticleMomentumDirection() const { return mParticleMomentumDirection; }
+        G4double GetParticleMomentum() const { return mParticleMomentum; }
+        G4ParticleGun* GetParticleGun() const { return mParticleGun; }
 
         virtual void GeneratePrimaries(G4Event* event);
 
     private:
-        G4ParticleGun* fParticleGun;
+        G4ParticleGun* mParticleGun;
 
-        G4int fNumberOfParticles;
-        G4ParticleTable* fParticleTable;
-        G4ParticleDefinition* fParticle;
+        G4int mNumberOfParticles;
+        G4ParticleTable* mParticleTable;
+        G4ParticleDefinition* mParticle;
 
-        G4String fParticleName;
-        G4ThreeVector fParticlePosition;
-        G4ThreeVector fParticleMomentumDirection;
-        G4double fParticleMomentum;
+        G4String mParticleName;
+        G4ThreeVector mParticlePosition;
+        G4ThreeVector mParticleMomentumDirection;
+        G4double mParticleMomentum;
     };
 }

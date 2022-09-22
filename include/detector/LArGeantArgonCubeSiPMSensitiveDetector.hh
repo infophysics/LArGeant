@@ -22,6 +22,6 @@ namespace largeant
 
     private:
         virtual G4bool ProcessHits(G4Step*, G4TouchableHistory*); 
-        G4PhysicsFreeVector* fQuantumEfficiency;
+        G4PhysicsFreeVector* mQuantumEfficiency;
     };
 }

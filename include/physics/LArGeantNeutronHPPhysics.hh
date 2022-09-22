@@ -51,7 +51,7 @@ namespace largeant
         void SetThermalPhysics(G4bool flag) {fThermal = flag;};  
         
     private:
-        G4bool  fThermal;
+        G4bool fThermal;
         std::shared_ptr<G4ProcessManager> fPManager = {nullptr};
         std::shared_ptr<G4ProcessVector> fProcesses = {nullptr};
     };

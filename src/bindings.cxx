@@ -9,7 +9,7 @@
  * @date 2022-09-20
  */
 
-namespace largeant
+namespace LArGeant
 {
     
 }

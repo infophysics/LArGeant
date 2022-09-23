@@ -40,17 +40,22 @@ find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
 message("Geant4 installation directory -- ${Geant4_DIR}")
 
-# grab include directories
-include_directories(LArGeant PUBLIC 
-    ${PROJECT_SOURCE_DIR}/include/
-    ${PROJECT_SOURCE_DIR}/include/actions/
-    ${PROJECT_SOURCE_DIR}/include/analysis/
-    ${PROJECT_SOURCE_DIR}/include/argon/
-    ${PROJECT_SOURCE_DIR}/include/detector/
-    ${PROJECT_SOURCE_DIR}/include/generator/
-    ${PROJECT_SOURCE_DIR}/include/messenger/
-    ${PROJECT_SOURCE_DIR}/include/nest/
-    ${PROJECT_SOURCE_DIR}/include/physics/
+# Get all header directories
+MACRO(HEADER_DIRECTORIES return_list)
+    FILE(GLOB_RECURSE new_list *.hh)
+    SET(dir_list "")
+    FOREACH(file_path ${new_list})
+        GET_FILENAME_COMPONENT(dir_path ${file_path} PATH)
+        SET(dir_list ${dir_list} ${dir_path})
+    ENDFOREACH()
+    LIST(REMOVE_DUPLICATES dir_list)
+    SET(${return_list} ${dir_list})
+ENDMACRO()
+
+HEADER_DIRECTORIES(header_list)
+
+include_directories(
+    ${header_list}
     ${PROJECT_SOURCE_DIR}/lib/nest/include/Detectors/
     ${PROJECT_SOURCE_DIR}/lib/nest/include/NEST/
     ${PROJECT_SOURCE_DIR}/lib/gcem/include
@@ -93,27 +98,11 @@ set(NEST_SOURCES
 )
 
 # generate sources and headers
-file(GLOB sources 
+file(GLOB_RECURSE sources 
     ${PROJECT_SOURCE_DIR}/src/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/actions/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/analysis/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/argon/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/detector/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/generator/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/messenger/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/nest/*.cxx
-    ${PROJECT_SOURCE_DIR}/src/physics/*.cxx
 )
-file(GLOB headers 
+file(GLOB_RECURSE headers 
     ${PROJECT_SOURCE_DIR}/include/*.hh
-    ${PROJECT_SOURCE_DIR}/include/actions/*.hh
-    ${PROJECT_SOURCE_DIR}/include/analysis/*.hh
-    ${PROJECT_SOURCE_DIR}/include/argon/*.hh
-    ${PROJECT_SOURCE_DIR}/include/detector/*.hh
-    ${PROJECT_SOURCE_DIR}/include/generator/*.hh
-    ${PROJECT_SOURCE_DIR}/include/messenger/*.hh
-    ${PROJECT_SOURCE_DIR}/include/nest/*.hh
-    ${PROJECT_SOURCE_DIR}/include/physics/*.hh
 )
 
 #-----------create programs-----------#
@@ -130,6 +119,13 @@ add_executable(argon_cube
     ${sources} ${headers} ${NEST_SOURCES}
 )
 target_link_libraries(argon_cube ${Geant4_LIBRARIES})
+
+# argon cube
+add_executable(detector_test 
+    src/programs/DetectorTest.cc 
+    ${sources} ${headers} ${NEST_SOURCES}
+)
+target_link_libraries(detector_test ${Geant4_LIBRARIES})
 
 # copy macro and data files
 file(GLOB MACRO_FILES

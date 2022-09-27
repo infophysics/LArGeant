@@ -14,6 +14,9 @@
 #include "G4VSolid.hh"
 #include "G4Box.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4Step.hh"
+#include "G4TouchableHistory.hh"
+#include "G4StepPoint.hh"
 #include "G4PVPlacement.hh"
 #include "G4LogicalVolume.hh"
 
@@ -22,10 +25,18 @@ namespace LArGeant
     class DetectorComponent
     {
     public:
-        DetectorComponent();
+        DetectorComponent(
+            G4String name, 
+            G4bool isSensitive = false,
+            G4bool isRadioactive = false
+        );
         ~DetectorComponent();
 
         virtual void Construct() = 0;
+
+        void SetName(G4String name);
+        void SetSensitive(G4bool isSensitive);
+        void SetRadioactive(G4bool isRadioactive);
 
         void SetSolidVolume(G4VSolid* solid);
         void SetLogicalVolume(G4LogicalVolume* logical);
@@ -33,6 +44,9 @@ namespace LArGeant
 
         void SetMotherLogical(G4LogicalVolume* mother) { mMotherLogicalVolume.reset(mother); }
         G4LogicalVolume* GetMotherLogical() { return mMotherLogicalVolume.get(); }
+
+        G4String GetName() { return mName; }
+        G4bool GetSensitive() { return mIsSensitive; }
 
         std::shared_ptr<G4VSolid> GetSolidVolume() { return mSolidVolume; }
         std::shared_ptr<G4LogicalVolume> GetLogicalVolume() { return mLogicalVolume; }
@@ -42,7 +56,14 @@ namespace LArGeant
         G4LogicalVolume* GetLogicalVolumePointer() { return mLogicalVolume.get(); }
         G4VPhysicalVolume* GetPhysicalVolumePointer() { return mPhysicalVolume.get(); }
 
+        G4String GetPhysicalVolumeName() { return mPhysicalVolume->GetName(); }
+
+
     private:
+        G4String mName = {"default"};
+        G4bool mIsSensitive = {false};
+        G4bool mIsRadioactive = {false};
+
         std::shared_ptr<G4VSolid> mSolidVolume = {nullptr};
         std::shared_ptr<G4LogicalVolume> mLogicalVolume = {nullptr};
         std::shared_ptr<G4VPhysicalVolume> mPhysicalVolume = {nullptr};

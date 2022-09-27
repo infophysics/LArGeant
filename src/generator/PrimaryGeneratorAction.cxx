@@ -9,9 +9,19 @@
 
 namespace LArGeant
 {
+    PrimaryGeneratorAction::PrimaryGeneratorAction()
+    {
+    }
+
+    PrimaryGeneratorAction::~PrimaryGeneratorAction()
+    {
+    }
+        
     PrimaryGeneratorAction::PrimaryGeneratorAction(
-        G4int numberOfParticles, G4String particleName,
-        G4ThreeVector position, G4ThreeVector momentumDirection,
+        G4int numberOfParticles, 
+        G4String particleName,
+        G4ThreeVector position, 
+        G4ThreeVector momentumDirection,
         G4double momentum
     )
     : mNumberOfParticles(numberOfParticles)
@@ -30,8 +40,9 @@ namespace LArGeant
         mParticleGun->SetParticleDefinition(mParticle);
     }
 
-    PrimaryGeneratorAction::~PrimaryGeneratorAction()
+    void PrimaryGeneratorAction::SetPrimaries(std::vector<Primary> primaries)
     {
+        mPrimaries = primaries;
     }
 
     void PrimaryGeneratorAction::SetNumberOfParticles(G4int numberOfParticles)
@@ -63,6 +74,15 @@ namespace LArGeant
 
     void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
-        mParticleGun->GeneratePrimaryVertex(event);
+        for (auto primary : mPrimaries)
+        {
+            mParticleGun->SetNumberOfParticles(1);
+            mParticleGun->SetParticleDefinition(primary.definition);
+            mParticleGun->SetParticleTime(primary.time);
+            mParticleGun->SetParticlePosition(primary.position);
+            mParticleGun->SetParticleEnergy(primary.energy);
+            mParticleGun->SetParticleMomentumDirection(primary.momentum_direction);
+            mParticleGun->GeneratePrimaryVertex(event);
+        }
     }
 }

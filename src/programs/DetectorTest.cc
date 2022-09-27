@@ -40,16 +40,19 @@ int main(int argc, char** argv)
     G4RunManager* RunManager = new G4RunManager();
 #endif
 
-    // create the argon cube detector
-    auto detector = new LArGeant::ArgonCubeDetector();
-    auto detectorConstruction = new LArGeant::DetectorConstruction(
-        500 * m, 500 * m, 500 * m, detector
-    );
-    RunManager->SetUserInitialization(detectorConstruction);
-
     // create the physics list
     auto PhysicsList = new LArGeant::PhysicsList();
     RunManager->SetUserInitialization(PhysicsList);
+
+    // create the argon cube detector
+    auto detector = new LArGeant::ArgonCubeDetector(
+        5 * cm, 5 * cm, 5 * cm,
+        8, 8, 1 * mm
+    );
+    auto detectorConstruction = new LArGeant::DetectorConstruction(
+        10 * cm, 10 * cm, 10 * cm, detector
+    );
+    RunManager->SetUserInitialization(detectorConstruction);
 
     // create the action initialization
     auto PrimaryGeneratorAction = new LArGeant::PrimaryGeneratorAction(
@@ -57,7 +60,7 @@ int main(int argc, char** argv)
         "mu-",  // type of particle to generate
         {0,0,0},// starting position
         {0,0,1},// starting momentum direction
-        5  // starting momentum (MeV)
+        5       // starting momentum (MeV)
     );
     auto ActionInitialization = new LArGeant::ActionInitialization(PrimaryGeneratorAction);
     RunManager->SetUserInitialization(ActionInitialization);
@@ -86,6 +89,8 @@ int main(int argc, char** argv)
     }
     else
     {
+        UIManager->ApplyCommand("/run/verbose 1");
+        UIManager->ApplyCommand("/event/verbose 0");
         G4String command = "/control/execute ";
         G4String fileName = argv[1];
         UIManager->ApplyCommand(command+fileName);

@@ -16,8 +16,11 @@
 #include "G4Box.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
+#include "G4Step.hh"
+#include "G4StepPoint.hh"
 
 #include "DetectorComponent.hh"
+#include "SensitiveDetector.hh"
 
 namespace LArGeant
 {
@@ -29,11 +32,19 @@ namespace LArGeant
 
         G4int GetNumberOfComponents() { return mDetectorComponents.size(); }
         std::shared_ptr<DetectorComponent> GetDetectorComponent(G4int ii);
+        DetectorComponent* GetDetectorComponentPointer(G4int ii);
 
         void AddDetectorComponent(std::shared_ptr<DetectorComponent>);
+        void SetSensitiveDetector(std::shared_ptr<SensitiveDetector>);
+
+        std::shared_ptr<SensitiveDetector> GetSensitiveDetector() { return mSensitiveDetector; }
+        SensitiveDetector* GetSensitiveDetectorPointer() { return mSensitiveDetector.get(); }
+
+        virtual void ProcessHits(G4Step*, G4TouchableHistory*) { return; };
 
     private:
         std::vector<std::shared_ptr<DetectorComponent>> mDetectorComponents;
+        std::shared_ptr<SensitiveDetector> mSensitiveDetector;
 
     };
 }

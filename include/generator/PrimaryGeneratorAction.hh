@@ -13,18 +13,25 @@
 #include "G4IonTable.hh"
 #include "G4Event.hh"
 
+#include "Core.hh"
+
 namespace LArGeant
 {
     class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     {   
     public:
+        PrimaryGeneratorAction();
+        ~PrimaryGeneratorAction();
+
         PrimaryGeneratorAction(
-            G4int numberOfParticles, G4String particleName,
+            G4int numberOfParticles, 
+            G4String particleName,
             G4ThreeVector position = {G4ThreeVector(0.,0.,0.)}, 
             G4ThreeVector momentumDirection = {G4ThreeVector(0.,0.,1.)},
             G4double momentum = {10. * MeV}
         );
-        ~PrimaryGeneratorAction();
+
+        void SetPrimaries(std::vector<Primary> primaries);
 
         void SetNumberOfParticles(G4int numberOfParticles);
         void SetParticle(G4String particleName);
@@ -54,5 +61,7 @@ namespace LArGeant
         G4ThreeVector mParticlePosition;
         G4ThreeVector mParticleMomentumDirection;
         G4double mParticleMomentum;
+
+        std::vector<Primary> mPrimaries;
     };
 }

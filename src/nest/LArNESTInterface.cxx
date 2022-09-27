@@ -65,8 +65,7 @@ namespace LArGeant
         double t, double kin_E
     ) 
     {
-        // Determine polarization of new photon
-
+        
         double efield_here = fDetector->FitEF(xyz.x(), xyz.y(), xyz.z());
         std::vector<double> efield_vec = fDetector->FitDirEF(xyz.x(), xyz.y(), xyz.z());
         G4ThreeVector efield_dir_here = G4ThreeVector(efield_vec[0], efield_vec[1], efield_vec[2]);
@@ -140,7 +139,8 @@ namespace LArGeant
                             {
                                 if (stack_photons) 
                                 {
-                                    G4Track* onePhoton = MakePhoton(hit.xyz, *photontimes + hit.t);
+                                    //G4Track* onePhoton = MakePhoton(hit.xyz, *photontimes + hit.t);
+                                    G4Track* onePhoton = MakePhoton(hit.xyz, hit.t);
                                     pParticleChange->AddSecondary(onePhoton);
                                 }
                             }
@@ -215,9 +215,8 @@ namespace LArGeant
         const G4Track* parent, const G4Track* child
     ) const 
     {
-        // logic to determine what processes are kicked off by this track and also set
-        // the info
-
+        // logic to determine what processes are 
+        // kicked off by this track and also set the info
         G4String sec_creator = "";
         if (child->GetCreatorProcess()) {
             sec_creator = child->GetCreatorProcess()->GetProcessName();
@@ -227,31 +226,48 @@ namespace LArGeant
             (child->GetDefinition()->GetAtomicNumber() > 0)
         )  // neutron inelastic scatters never join the lineage.
         {
+            G4cout << "neutron" << G4endl;
             return Lineage(NEST::LArInteraction::NR);
         } 
         else if (
-            parent && parent->GetDefinition()->GetAtomicMass() == 83 &&
-            parent->GetDefinition()->GetAtomicNumber() == 36 &&
-            parent->GetDefinition()->GetIonLifeTime() * .693 < 2 * 60 * 60 * s &&
-            parent->GetDefinition()->GetIonLifeTime() * .693 > 1 * 60 * 60 * s
-        ) 
+            parent && parent->GetDefinition()->GetAtomicNumber() == 2 &&
+            parent->GetDefinition()->GetAtomicMass() == 3
+        )
         {
-            return Lineage(NEST::LArInteraction::NR);
-        } 
+            return Lineage(NEST::LArInteraction::Alpha);
+        }
+        // else if (
+        //     parent && parent->GetDefinition()->GetAtomicMass() == 83 &&
+        //     parent->GetDefinition()->GetAtomicNumber() == 36 &&
+        //     parent->GetDefinition()->GetIonLifeTime() * .693 < 2 * 60 * 60 * s &&
+        //     parent->GetDefinition()->GetIonLifeTime() * .693 > 1 * 60 * 60 * s
+        // ) 
+        // {
+        //     G4cout << "Kr83" << G4endl;
+        //     return Lineage(NEST::LArInteraction::NR);
+        // } 
         else if (parent && parent->GetDefinition() == G4Gamma::Definition()) 
         {
-            if (sec_creator.contains("compt")) {
-                return Lineage(NEST::LArInteraction::ER);
-            } else if (sec_creator.contains("conv")) {  // conv is pair production
-                return Lineage(NEST::LArInteraction::ER);
-            } else if (sec_creator.contains("phot")) {
-                return Lineage(NEST::LArInteraction::ER);
-            }
-        } else if (
+            G4cout << "gamma" << G4endl;
+            // if (sec_creator.contains("compt")) {
+            //     return Lineage(NEST::LArInteraction::ER);
+            // } else if (sec_creator.contains("conv")) {  // conv is pair production
+            //     return Lineage(NEST::LArInteraction::ER);
+            // } else if (sec_creator.contains("phot")) {
+            //     return Lineage(NEST::LArInteraction::ER);
+            // }
+            return Lineage(NEST::LArInteraction::ER);
+        } 
+        else if (parent && parent->GetDefinition() == G4Electron::Definition())
+        {
+            return Lineage(NEST::LArInteraction::ER);
+        }
+        else if (
             child->GetDefinition() == G4Electron::Definition() &&
             (sec_creator.contains("Decay") || !parent)
         ) 
         {
+            G4cout << "electron decay" << G4endl;
             return Lineage(NEST::LArInteraction::ER);
         } 
         else if (
@@ -259,6 +275,7 @@ namespace LArGeant
             (sec_creator.contains("Decay") || !parent)
         ) 
         {
+            G4cout << "non electron decay" << G4endl;
             return Lineage(NEST::LArInteraction::ER);
         }
         return Lineage(NEST::LArInteraction::NoneType);
@@ -341,7 +358,6 @@ namespace LArGeant
                     // if (verbose > 1) {
                     //     G4cout << "Made new lineage from primary of type " << sec_type << G4endl;
                     // }
-
                     track_lins.insert(std::make_pair(
                         make_tuple(aTrack.GetParentID(), aTrack.GetVertexPosition(),
                                 aTrack.GetVertexMomentumDirection()), lineages.size() - 1)
@@ -372,9 +388,9 @@ namespace LArGeant
                     }
                 }
             }
-
             for (const G4Track* sec : secondaries) 
             {
+                
                 // Each secondary has a type (including the possible NEST::LArInteraction::NoneType)
                 Lineage sec_lin = GetChildType(&aTrack, sec);
                 NEST::LArInteraction sec_type = sec_lin.type;
@@ -400,6 +416,7 @@ namespace LArGeant
                     //         << " of type " << sec_type
                     //         << sec->GetCreatorProcess()->GetProcessName() << G4endl;
                     // }
+                    
                     lineages.push_back(sec_lin);
                 }
                 step_type = sec_type;

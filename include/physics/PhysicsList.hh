@@ -38,12 +38,18 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
+#include "G4FastSimulationManagerProcess.hh"
+#include "G4FastSimulationPhysics.hh"
+#include "G4StepLimiterPhysics.hh"
+#include "G4StepLimiter.hh"
+
 #include "G4ProcessTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysListFactory.hh"
 
 #include "NeutronHPPhysics.hh"
 #include "LArDetector.hh"
+#include "ScintillationPhysics.hh"
 #include "LArNEST.hh"
 
 namespace LArGeant

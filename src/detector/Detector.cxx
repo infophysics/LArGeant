@@ -26,12 +26,26 @@ namespace LArGeant
             return mDetectorComponents[ii];
         }
         else {
-            return mDetectorComponents[0];
+            return nullptr;
+        }
+    }
+
+    DetectorComponent* Detector::GetDetectorComponentPointer(G4int ii)
+    {
+        if (ii < mDetectorComponents.size()) {
+            return mDetectorComponents[ii].get();
+        }
+        else {
+            return nullptr;
         }
     }
 
     void Detector::AddDetectorComponent(std::shared_ptr<DetectorComponent> component)
     {
-        mDetectorComponents.emplace_back(component);
+        mDetectorComponents.push_back(component);
+    }
+    void Detector::SetSensitiveDetector(std::shared_ptr<SensitiveDetector> sensitive)
+    {
+        mSensitiveDetector = sensitive;
     }
 }

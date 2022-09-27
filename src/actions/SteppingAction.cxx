@@ -22,6 +22,7 @@ namespace LArGeant
 
     void SteppingAction::UserSteppingAction(const G4Step *step)
     {   
+
         // if (step->GetPreStepPoint()->GetGlobalTime() >= mEventAction->GetStoppingTime())
         // {
         //     step->GetTrack()->SetTrackStatus(fStopAndKill);
@@ -90,12 +91,12 @@ namespace LArGeant
         // G4ThreeVector particleEndPosition = postStepPoint->GetPosition();
         // G4ThreeVector particleMomentum = preStepPoint->GetMomentum();
 
-        // // run NEST
+        // run NEST
         // NEST::LArInteraction interaction = GetLArInteraction(particle);
         // NEST::LArNESTResult result = mLArNEST->FullCalculation(
         //     interaction,
         //     edep,
-        //     efield,
+        //     500,
         //     1.393,
         //     false
         // );
@@ -103,6 +104,8 @@ namespace LArGeant
         // if (std::isnan(result.fluctuations.NphFluctuation) || std::isnan(result.fluctuations.NeFluctuation)) {
         //     return;
         // }
+
+
 
         // const std::vector<const G4Track*>* daughters = step->GetSecondaryInCurrentStep();
         // G4int dQ = 0;

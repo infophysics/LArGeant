@@ -27,7 +27,12 @@ namespace LArGeant
         mParticleAncestorTrackID.clear();
 
         // generate list of primaries
-        
+        auto Manager = EventManager::GetEventManager();
+        auto primaries = Manager->GeneratePrimaryList();
+
+        auto RunManager = G4RunManager::GetRunManager();
+        auto Generator = (PrimaryGeneratorAction*)RunManager->GetUserPrimaryGeneratorAction();
+        Generator->SetPrimaries(primaries);
     }
 
     void EventAction::EndOfEventAction(const G4Event*)

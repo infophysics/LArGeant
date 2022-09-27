@@ -74,13 +74,12 @@ namespace LArGeant
             )
         );
 
+        auto Manager = EventManager::GetEventManager();
         for (G4int ii = 0; ii < mDetector->GetNumberOfComponents(); ii++)
         {
-            G4cout << "Adding detector component" << G4endl;
-            G4cout << "Mother: " << mLogicalExperimentalHall.get() << G4endl;
             mDetector->GetDetectorComponent(ii)->SetMotherLogical(mLogicalExperimentalHall.get());
-            G4cout << "Mother: " << mDetector->GetDetectorComponent(ii)->GetMotherLogical() << G4endl;
             mDetector->GetDetectorComponent(ii)->Construct();
+            Manager->AddComponent(mDetector->GetDetectorComponent(ii));
         }
 
         return mPhysicalExperimentalHall.get();
@@ -89,5 +88,17 @@ namespace LArGeant
 
     void DetectorConstruction::ConstructSDandField()
     {
+        std::shared_ptr<SensitiveDetector> Sensitive = std::make_shared<SensitiveDetector>(
+            "SensitiveDetector"
+        );
+        mDetector->SetSensitiveDetector(Sensitive);
+        for (G4int ii = 0; ii < mDetector->GetNumberOfComponents(); ii++)
+        {
+            if(mDetector->GetDetectorComponent(ii)->GetSensitive())
+            {
+                G4cout << "Adding sensitive detector to " << mDetector->GetDetectorComponent(ii)->GetName() << G4endl;
+                mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetSensitiveDetector(mDetector->GetSensitiveDetectorPointer());
+            }
+        }
     }
 }

@@ -19,16 +19,29 @@
 
 #include "Detector.hh"
 #include "ArgonCubeActiveVolume.hh"
+#include "ArgonCubeXZSiPM.hh"
 
 namespace LArGeant
 {
     class ArgonCubeDetector : public Detector
     {
     public:
-        ArgonCubeDetector();
+        ArgonCubeDetector(
+            G4double CubeX,
+            G4double CubeY,
+            G4double CubeZ,
+            G4int BottomNumberX,
+            G4int BottomNumberZ,
+            G4double BottomThicknessY
+        );
         ~ArgonCubeDetector();
 
     private:
-
+        G4double mCubeX = {50 * m};
+        G4double mCubeY = {50 * m};
+        G4double mCubeZ = {50 * m};
+        G4int mBottomNumberX = {8};
+        G4int mBottomNumberZ = {8};
+        G4double mBottomThicknessY = {5};
     };
 }

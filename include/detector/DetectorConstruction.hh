@@ -23,10 +23,12 @@
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 #include "G4Material.hh"
-
+#include "G4SDManager.hh"
 
 #include "DetectorComponent.hh"
 #include "Detector.hh"
+#include "SensitiveDetector.hh"
+#include "EventManager.hh"
 
 namespace LArGeant
 {

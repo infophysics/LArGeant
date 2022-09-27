@@ -42,28 +42,32 @@ namespace LArGeant
 {
     struct Hit 
     {
-    public:
-        Hit(double _E, double _t, G4ThreeVector _xyz)
-        : E(_E), t(_t), xyz(_xyz), result{0, 0, 0, 0} 
-        {};
         double E;
         double t;
         G4ThreeVector xyz;
         NEST::LArYieldFluctuationResult result;
+
+        Hit(double _E, double _t, G4ThreeVector _xyz)
+        : E(_E)
+        , t(_t)
+        , xyz(_xyz)
+        , result{0, 0, 0, 0} 
+        {
+        }
     };
 
     struct Lineage 
     {
-    public:
-        Lineage(NEST::LArInteraction _type) 
-        : type(_type)
-        {};
-
         NEST::LArInteraction type = NEST::LArInteraction::NoneType;
         std::vector<Hit> hits;
         double density = -1;
         NEST::LArNESTResult result;
         bool result_calculated = false;
+
+        Lineage(NEST::LArInteraction _type) 
+        : type(_type)
+        {
+        }
     };
 
     class NoTimeParticleChange : public G4ParticleChange 

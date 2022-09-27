@@ -106,21 +106,7 @@ file(GLOB_RECURSE headers
 )
 
 #-----------create programs-----------#
-# argon sphere
-add_executable(argon_sphere 
-    src/programs/ArgonSphere.cc 
-    ${sources} ${headers} ${NEST_SOURCES}
-)
-target_link_libraries(argon_sphere ${Geant4_LIBRARIES})
-
-# argon cube
-add_executable(argon_cube 
-    src/programs/ArgonCube.cc 
-    ${sources} ${headers} ${NEST_SOURCES}
-)
-target_link_libraries(argon_cube ${Geant4_LIBRARIES})
-
-# argon cube
+# detector test
 add_executable(detector_test 
     src/programs/DetectorTest.cc 
     ${sources} ${headers} ${NEST_SOURCES}

@@ -12,12 +12,32 @@
 
 namespace LArGeant
 {
-    DetectorComponent::DetectorComponent()
+    DetectorComponent::DetectorComponent(
+        G4String name, 
+        G4bool isSensitive,
+        G4bool isRadioactive
+    )
+    : mName(name)
+    , mIsSensitive(isSensitive)
+    , mIsRadioactive(isRadioactive)
     {
     }
 
     DetectorComponent::~DetectorComponent()
     {
+    }
+
+    void DetectorComponent::SetName(G4String name)
+    {
+        mName = name;
+    }
+    void DetectorComponent::SetSensitive(G4bool isSensitive)
+    {
+        mIsSensitive = isSensitive;
+    }
+    void DetectorComponent::SetRadioactive(G4bool isRadioactive)
+    {
+        mIsRadioactive = isRadioactive;
     }
 
     void DetectorComponent::SetSolidVolume(G4VSolid* solid)

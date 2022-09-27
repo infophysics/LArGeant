@@ -16,27 +16,44 @@ namespace LArGeant
 
     EventManager::EventManager()
     {
-		if (sInstance != nullptr) {
-			return;
-		}
     }
 
     EventManager::~EventManager()
     {
     }
 
-    /**
-     * @brief 
-     * @details
-     * 	Change log:
-     * 		2022-09-22 - Initial creation of file.
-     */
-    void EventManager::Initialize()
-    {
-    }
+	void EventManager::AddComponent(std::shared_ptr<DetectorComponent> component)
+	{
+		sDetectorComponents.push_back(component);
+	}
 
     void EventManager::SetPhysicsList(PhysicsList* physicsList)
     {
         sPhysicsList.reset(physicsList);
+    }
+
+    std::vector<Primary> EventManager::GeneratePrimaryList()
+    {
+        std::vector<Primary> primaries;
+        primaries.emplace_back(
+            Primary(
+                "mu-",
+                1,
+                {0., 0., 1.},
+                {5 * MeV},
+                {0., 0., 1.}
+            )
+        );
+        primaries.emplace_back(
+            Primary(
+                "mu-",
+                1,
+                {0., 0., 1.},
+                {5 * MeV},
+                {0., 1., 0.}
+            )
+        );
+
+        return primaries;
     }
 }

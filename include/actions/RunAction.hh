@@ -11,6 +11,9 @@
 #include "G4GenericMessenger.hh"
 #include "G4AnalysisManager.hh"
 
+#include "EventManager.hh"
+#include "PrimaryGeneratorAction.hh"
+
 namespace LArGeant
 {
     class RunAction : public G4UserRunAction

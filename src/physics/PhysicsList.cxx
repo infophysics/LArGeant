@@ -37,6 +37,15 @@ namespace LArGeant
         // Hadron Physics
         RegisterPhysics(new G4HadronPhysicsQGSP_BERT_HP());
 
+        RegisterPhysics(new G4StepLimiterPhysics());
+  
+        RegisterPhysics(new G4FastSimulationPhysics("fastSimPhys"));
+
+        // Scintillation Physics
+        G4OpticalPhoton::Definition();
+        LArNESTThermalElectron::Definition();
+        ReplacePhysics(new ScintillationPhysics("scint"));
+
         // Neutron Physics
         //RegisterPhysics(new NeutronHPPhysics("neutronHP"));
 

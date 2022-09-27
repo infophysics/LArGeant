@@ -21,6 +21,12 @@
 #include "G4VModularPhysicsList.hh"
 
 #include "PhysicsList.hh"
+#include "Core.hh"
+#include "Detector.hh"
+#include "DetectorComponent.hh"
+
+class Detector;
+class DetectorComponent;
 
 namespace LArGeant
 {
@@ -36,19 +42,12 @@ namespace LArGeant
 		EventManager();
         ~EventManager();
 
-        /**
-         * @brief 
-         *  
-         * @details
-         * 	Change log:
-         * 		2022-09-22 - Initial creation of file.
-         */
-        static void Initialize();
-
         // setters for various objects
         static void SetPhysicsList(PhysicsList*);
 
 		static void SetParticle(G4String);
+
+        static void AddComponent(std::shared_ptr<DetectorComponent> component);
 
         // get the event manager
         static std::shared_ptr<EventManager>& GetEventManager() 
@@ -58,11 +57,22 @@ namespace LArGeant
 			}return sInstance; 
 		}
 
+        static std::shared_ptr<DetectorComponent> GetComponent(G4int index)
+        {
+            return sDetectorComponents[index];
+        }
+
+        static G4int GetNumberOfComponents() { return sDetectorComponents.size(); }
+
+        std::vector<Primary> GeneratePrimaryList();
+
     private:
         static std::shared_ptr<EventManager> sInstance;
 
         // various objects
         inline static std::shared_ptr<PhysicsList> sPhysicsList = {nullptr};
+        // inline static std::shared_ptr<Detector> sDetector = {nullptr};
+        inline static std::vector<std::shared_ptr<DetectorComponent>> sDetectorComponents = {nullptr};
         
     };
 }

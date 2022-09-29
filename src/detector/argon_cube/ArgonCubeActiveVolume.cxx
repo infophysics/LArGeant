@@ -29,7 +29,7 @@ namespace LArGeant
         /// create the argon object
         mArgon.reset(
             new Argon(
-                85.8 * kelvin,      /// temperature
+                83.0 * kelvin,      /// temperature
                 0.952 * atmosphere, /// pressure
                 0.334,              /// ratio of Ar36
                 0.063,              /// ratio of Ar38
@@ -40,7 +40,7 @@ namespace LArGeant
         // create the argon Cube volume
         SetSolidVolume(
             new G4Box(
-                "LArVolume", 
+                "Solid_ArgonCubeActiveVolume", 
                 mCubeX, 
                 mCubeY, 
                 mCubeZ
@@ -50,7 +50,7 @@ namespace LArGeant
             new G4LogicalVolume(
                 GetSolidVolumePointer(), 
                 mArgon->GetLAr().get(), 
-                "LogicalVolume"
+                "Logical_ArgonCubeActiveVolume"
             )
         );
         SetPhysicalVolume(
@@ -58,7 +58,7 @@ namespace LArGeant
                 0, 
                 G4ThreeVector(0., 0., 0.), 
                 GetLogicalVolumePointer(), 
-                "PhysicalVolume", 
+                "Physical_ArgonCubeActiveVolume", 
                 GetMotherLogical(), 
                 false, 
                 0, 

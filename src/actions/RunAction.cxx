@@ -32,6 +32,16 @@ namespace LArGeant
         AnalysisManager->CreateNtupleDColumn("pz_particle");
         AnalysisManager->FinishNtuple(0);
 
+        AnalysisManager->CreateNtuple("OpticalPhotons", "OpticalPhotons");
+        AnalysisManager->CreateNtupleDColumn("energy");
+        AnalysisManager->CreateNtupleDColumn("track_length");
+        AnalysisManager->FinishNtuple(1);
+
+        AnalysisManager->CreateNtuple("ThermalElectrons", "ThermalElectrons");
+        AnalysisManager->CreateNtupleDColumn("energy");
+        AnalysisManager->CreateNtupleDColumn("track_length");
+        AnalysisManager->FinishNtuple(2);
+
     }
 
     RunAction::~RunAction()

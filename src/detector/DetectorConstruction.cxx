@@ -49,7 +49,7 @@ namespace LArGeant
         // volume.
         mSolidExperimentalHall.reset(
             new G4Box(
-                "SolidExperimentalHall", 
+                "Solid_ExperimentalHall", 
                 mExperimentalHallX, 
                 mExperimentalHallY, 
                 mExperimentalHallZ
@@ -59,7 +59,7 @@ namespace LArGeant
             new G4LogicalVolume(
                 mSolidExperimentalHall.get(), 
                 mExperimentalHallMaterial.get(), 
-                "LogicalExperimentalHall"
+                "Logical_ExperimentalHall"
             )
         );
         mPhysicalExperimentalHall.reset(
@@ -67,7 +67,7 @@ namespace LArGeant
                 0, 
                 G4ThreeVector(0., 0., 0.),
                 mLogicalExperimentalHall.get(),
-                "PhysicalExperimentalHall",
+                "Physical_ExperimentalHall",
                 0, 
                 false,
                 0

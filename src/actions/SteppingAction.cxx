@@ -15,6 +15,8 @@ namespace LArGeant
         mEventAction = eventAction;
         LArDetector* detector = new LArDetector();
         mLArNEST = std::make_shared<NEST::LArNEST>(detector);
+        mOpticalLengths = 0.0;
+        mOpticalNum = 0;
     }
 
     SteppingAction::~SteppingAction()
@@ -33,8 +35,50 @@ namespace LArGeant
         //     (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
 
         // // get current volumes    
-        // G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-        // G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
+        G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+        G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
+        G4String particle_name = step->GetTrack()->GetParticleDefinition()->GetParticleName();
+        G4ThreeVector particleStartPosition = step->GetPreStepPoint()->GetPosition();
+        G4StepPoint* preStepPoint = step->GetPreStepPoint();
+        G4StepPoint* postStepPoint = step->GetPostStepPoint();
+        const G4VProcess* preProcess = preStepPoint->GetProcessDefinedStep();
+        const G4VProcess* postProcess = postStepPoint->GetProcessDefinedStep();
+        G4String pre = "none";
+        G4String post = "none";
+
+        if (particle_name == "opticalphoton" && int(step->GetTrack()->GetTrackStatus()) == 2)
+        {
+            auto AnalysisManager = G4AnalysisManager::Instance();
+            AnalysisManager->FillNtupleDColumn(1, 0, step->GetTrack()->GetTotalEnergy());
+            AnalysisManager->FillNtupleDColumn(1, 1, step->GetTrack()->GetTrackLength()/cm);
+            AnalysisManager->AddNtupleRow(1);
+            //G4cout << "length: " << step->GetTrack()->GetTrackLength();
+        }
+        if (particle_name == "thermalelectron" && int(step->GetTrack()->GetTrackStatus()) == 2)
+        {
+            auto AnalysisManager = G4AnalysisManager::Instance();
+            AnalysisManager->FillNtupleDColumn(2, 0, step->GetTrack()->GetTotalEnergy());
+            AnalysisManager->FillNtupleDColumn(2, 1, step->GetTrack()->GetTrackLength()/cm);
+            AnalysisManager->AddNtupleRow(2);
+            //G4cout << "length: " << step->GetTrack()->GetTrackLength();
+        }
+        // if (preProcess) { 
+        //     pre = preProcess->GetProcessName();
+        // }
+        // if (postProcess) { 
+        //     post = postProcess->GetProcessName();
+        // }
+        // if (particle_name == "opticalphoton")
+        // {
+        //     G4cout << "volume: " << physicalVolume->GetName() 
+        //     << ", track_id: " << step->GetTrack()->GetTrackID()
+        //     << ", pos: (" << particleStartPosition[0] << "," << particleStartPosition[1] << "," << particleStartPosition[2]
+        //     << ", preprocess: " << pre << ", postprocess: " << post
+        //     << ", energy: " << step->GetTotalEnergyDeposit()/keV << ", status: " << int(step->GetTrack()->GetTrackStatus()) << G4endl;
+        // }
+
+
+
         // G4LogicalVolume *scoringVolume = detectorConstruction->GetScoringVolume().get();
 
         // G4Track* track = step->GetTrack();

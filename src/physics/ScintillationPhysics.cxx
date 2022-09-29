@@ -150,12 +150,13 @@ namespace LArGeant
 
                 G4OpBoundaryProcess* fBoundaryProcess = new G4OpBoundaryProcess();
                 G4OpAbsorption* fAbsorptionProcess = new G4OpAbsorption();
+                G4OpRayleigh* fRayleighScatteringProcess = new G4OpRayleigh();
                 G4OpWLS* fTheWLSProcess = new G4OpWLS();
 
                 if (particleName == "opticalphoton" && pmanager) 
                 {
                     pmanager->AddDiscreteProcess(fAbsorptionProcess);
-                    // pmanager->AddDiscreteProcess(fRayleighScatteringProcess);
+                    pmanager->AddDiscreteProcess(fRayleighScatteringProcess);
                     pmanager->AddDiscreteProcess(fTheWLSProcess);
                     pmanager->AddDiscreteProcess(fBoundaryProcess);
                 }

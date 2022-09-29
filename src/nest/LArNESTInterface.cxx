@@ -42,12 +42,11 @@ namespace LArGeant
         G4ThreeVector photonPolarization = perp.unit();
         // LArDetector* detector = fLArNEST->GetDetector();
         LArDetector* detector;
-        G4double sampledEnergy = 7.08 * eV;  // default if non-detailed secondaries
+        G4double sampledEnergy = 9.7 * eV;  // default if non-detailed secondaries
         if (detailed_secondaries)
         {
-            sampledEnergy = fLArNEST->PhotonEnergy(
-                false /*i.e. S1*/, detector->get_inGas(),
-                detector->get_T_Kelvin()
+            sampledEnergy = fLArNEST->GetPhotonEnergy(
+                detector->get_inGas()
             ) * eV;
         }
         G4DynamicParticle* aQuantum = new G4DynamicParticle(

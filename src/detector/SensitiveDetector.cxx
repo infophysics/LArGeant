@@ -24,8 +24,6 @@ namespace LArGeant
 
     G4bool SensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history)
     { 
-        G4cout << step->GetTrack()->GetParticleDefinition()->GetParticleName() << G4endl;
-
         const G4VTouchable* touchable = step->GetPreStepPoint()->GetTouchable();
         const G4Track* track = step->GetTrack();
         const G4StepPoint *preStepPoint = step->GetPreStepPoint();

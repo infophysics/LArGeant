@@ -33,5 +33,8 @@ namespace LArGeant
     private:
         std::shared_ptr<EventAction> mEventAction;
         std::shared_ptr<NEST::LArNEST> mLArNEST;
+
+        G4double mOpticalLengths;
+        G4int mOpticalNum;
     };
 }

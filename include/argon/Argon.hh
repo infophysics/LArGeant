@@ -49,6 +49,13 @@ namespace LArGeant
             G4double Ar38Ratio, 
             G4double Ar40Ratio
         );
+
+        void SetRefractiveIndexEnergies(std::vector<G4double>);
+        void SetRefractiveIndexSpectrum(std::vector<G4double>);
+        void SetAbsorptionLengthEnergies(std::vector<G4double>);
+        void SetAbsorptionLengthSpectrum(std::vector<G4double>);
+        void SetRayleighScatteringEnergies(std::vector<G4double>);
+        void SetRayleighScatteringSpectrum(std::vector<G4double>);
         
         G4double GetTemperature() const   { return mTemperature; }
         G4double GetPressure() const      { return mPressure; }
@@ -66,9 +73,17 @@ namespace LArGeant
         std::shared_ptr<G4Isotope> GetIAr40() const { return mIAr40; }
         std::shared_ptr<G4Element> GetArIsotopes() const { return mArIsotopes; }
 
+        std::vector<G4double> GetRefractiveIndexEnergies() const { return mRefractiveIndexEnergies; }
+        std::vector<G4double> GetRefractiveIndexSpectrum() const { return mRefractiveIndexSpectrum; }
+        std::vector<G4double> GetAbsorptionLengthEnergies() const { return mAbsorptionLengthEnergies; }
+        std::vector<G4double> GetAbsorptionLengthSpectrum() const { return mAbsorptionLengthSpectrum; }
+        std::vector<G4double> GetRayleighScatteringEnergies() const { return mRayleighScatteringEnergies; }
+        std::vector<G4double> GetRayleighScatteringSpectrum() const { return mRayleighScatteringSpectrum; }
+
         std::shared_ptr<G4Material> GetLAr() const { return mLAr; }
 
         void DefineMaterials();
+        void PrintProperties();
 
     private:
         G4double mTemperature;
@@ -76,6 +91,20 @@ namespace LArGeant
 
         G4double mAr36Ratio, mAr38Ratio, mAr40Ratio;
         G4double mAr36Density, mAr38Density, mAr40Density;
+
+        std::vector<G4double> mRefractiveIndexEnergies;
+        std::vector<G4double> mRefractiveIndexSpectrum;
+
+        std::vector<G4double> mAbsorptionLengthEnergies;
+        std::vector<G4double> mAbsorptionLengthSpectrum;
+
+        std::vector<G4double> mRayleighScatteringEnergies;
+        std::vector<G4double> mRayleighScatteringSpectrum;
+
+        std::vector<G4double> mFastScintillationEnergies;
+        std::vector<G4double> mFastScintillationSpectrum;
+        std::vector<G4double> mSlowScintillationEnergies;
+        std::vector<G4double> mSlowScintillationSpectrum;
 
         G4double mAverageMassMol;
         G4double mAverageDensity;

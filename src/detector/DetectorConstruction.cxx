@@ -88,6 +88,13 @@ namespace LArGeant
 
     void DetectorConstruction::ConstructSDandField()
     {
+        if(!mElectricField.Get())
+        {
+            ElectricField* electricField = new ElectricField(G4ThreeVector(0,0,0));
+            electricField->SetLocalFieldValue(G4ThreeVector(0,500.0 * volt/cm, 0));
+            G4AutoDelete::Register(electricField);
+            mElectricField.Put(electricField);
+        }
         std::shared_ptr<SensitiveDetector> Sensitive = std::make_shared<SensitiveDetector>(
             "SensitiveDetector"
         );
@@ -98,6 +105,10 @@ namespace LArGeant
             {
                 G4cout << "Adding sensitive detector to " << mDetector->GetDetectorComponent(ii)->GetName() << G4endl;
                 mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetSensitiveDetector(mDetector->GetSensitiveDetectorPointer());
+            }
+            if(mDetector->GetDetectorComponent(ii)->GetElectricField())
+            {
+                mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetFieldManager(mElectricField.Get()->GetLocalFieldManager(), true);
             }
         }
     }

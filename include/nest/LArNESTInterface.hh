@@ -42,50 +42,6 @@
 
 namespace LArGeant
 {
-    /**
-     * @brief 
-     * 
-     * @details
-     * 	Change log:
-     * 		2022-09-30 - Initial creation of file.
-     */
-    struct Hit 
-    {
-        double E;
-        double t;
-        G4ThreeVector xyz;
-        NEST::LArYieldFluctuationResult result;
-
-        Hit(double _E, double _t, G4ThreeVector _xyz)
-        : E(_E)
-        , t(_t)
-        , xyz(_xyz)
-        , result{0, 0, 0, 0} 
-        {
-        }
-    };
-
-    /**
-     * @brief 
-     * 
-     * @details
-     * 	Change log:
-     * 		2022-09-30 - Initial creation of file.
-     */
-    struct Lineage 
-    {
-        NEST::LArInteraction type = NEST::LArInteraction::NoneType;
-        std::vector<Hit> hits;
-        double density = -1;
-        NEST::LArNESTResult result;
-        bool result_calculated = false;
-
-        Lineage(NEST::LArInteraction _type) 
-        : type(_type)
-        {
-        }
-    };
-
     class NoTimeParticleChange : public G4ParticleChange 
     {
     public:
@@ -139,8 +95,6 @@ namespace LArGeant
         G4VParticleChange* PostStepDoIt(const G4Track& aTrack, const G4Step& aStep);
         G4VParticleChange* AtRestDoIt(const G4Track& aTrack, const G4Step& aStep);
 
-        void TryPopLineages(const G4Track& aTrack, const G4Step& aStep);
-
         // Called to set the scintillation quantum yield factor, useful for
         // shutting off scintillation entirely, or for producing a universal
         // re-scaling to (for example) represent detector effects. Internally is
@@ -151,22 +105,19 @@ namespace LArGeant
         // Returns the quantum (photon/electron) yield factor. See above.
         G4double GetScintillationYieldFactor() const;
         
-        Lineage GetChildType(const G4Track* aTrack, const G4Track* sec) const;
         G4Track* MakePhoton(G4ThreeVector xyz, double t);
         G4Track* MakeElectron(
             G4ThreeVector xyz, double density, 
             double t,double kin_E
         );
 
-        
-
         void SetDetailedSecondaries(bool detailed)  { mDetailedSecondaries = detailed; }
         void SetStackElectrons(bool stack_e)        { mStackElectrons = stack_e; }
         void SetStackPhotons(bool stack_ph)         { mStackPhotons = stack_ph; }
-        void SetAnalysisTrigger(std::function<void(std::vector<Lineage>)> AnalysisTrigger) 
-        {
-            this->mAnalysisTrigger = AnalysisTrigger;
-        }
+        // void SetAnalysisTrigger(std::function<void(std::vector<Lineage>)> AnalysisTrigger) 
+        // {
+        //     this->mAnalysisTrigger = AnalysisTrigger;
+        // }
         void SetLArNEST(std::unique_ptr<NEST::LArNEST> newcalc) 
         {
             mLArNEST.reset(newcalc.release());
@@ -175,15 +126,11 @@ namespace LArGeant
             mDetector.reset(detector);
         }
         void SetGammaBreak(double _gamma_break) { this->mGammaBreak = _gamma_break; }
-
-        std::vector<Lineage> GetLastLineages() const { return mLineagesPreviousEvent; }
         double GetGammaBreak() const { return mGammaBreak; }
         
 
     protected:
         std::unique_ptr<NEST::LArNEST> mLArNEST = {nullptr};
-        std::vector<Lineage> mLineages;
-        std::vector<Lineage> mLineagesPreviousEvent;
         std::map<std::tuple<int, CLHEP::Hep3Vector, CLHEP::Hep3Vector>, uint64_t>
             track_lins;
         std::unique_ptr<LArDetector> mDetector;
@@ -198,7 +145,7 @@ namespace LArGeant
         // bremsstrahlung) if they are this far from their origin.
         G4double mGammaBreak = 9 * mm;  
 
-        std::function<void(std::vector<Lineage>)> mAnalysisTrigger;
+
     };
 
     inline G4bool LArNESTScintillationProcess::IsApplicable(

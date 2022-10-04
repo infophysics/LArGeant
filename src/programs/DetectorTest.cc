@@ -46,11 +46,11 @@ int main(int argc, char** argv)
 
     // create the argon cube detector
     auto detector = new LArGeant::ArgonCubeDetector(
-        100 * cm, 100 * cm, 100 * cm,
+        10 * cm, 10 * cm, 10 * cm,
         8, 8, 1 * mm
     );
     auto detectorConstruction = new LArGeant::DetectorConstruction(
-        1000 * cm, 1000 * cm, 1000 * cm, detector
+        100 * cm, 100 * cm, 100 * cm, detector
     );
     RunManager->SetUserInitialization(detectorConstruction);
 

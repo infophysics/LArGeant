@@ -65,8 +65,9 @@ namespace LArGeant
     {
         double efield_here = mDetector->FitEF(xyz.x(), xyz.y(), xyz.z());
         std::vector<double> efield_vec = mDetector->FitDirEF(xyz.x(), xyz.y(), xyz.z());
-        G4ThreeVector efield_dir_here = G4ThreeVector(efield_vec[0], efield_vec[1], efield_vec[2]);
-
+        //G4ThreeVector efield_dir_here = G4ThreeVector(efield_vec[0], efield_vec[1], efield_vec[2]);
+        G4ThreeVector efield_dir_here = G4ThreeVector(0, 1, 0);
+        efield_here = 500 * volt / cm;
         if (efield_here > 0) 
         {
             G4ParticleMomentum electronMomentum = efield_dir_here.unit();
@@ -82,123 +83,6 @@ namespace LArGeant
         }
     }
 
-    void LArNESTScintillationProcess::TryPopLineages(const G4Track& aTrack, const G4Step& aStep) 
-    {
-        pParticleChange->SetNumberOfSecondaries(1e7);
-        // ready to pop out OP and TE?
-        if (
-            aTrack.GetKineticEnergy() == 0 &&
-            StackingAction::theStackingAction->isUrgentEmpty() &&
-            aStep.GetSecondary()->empty()
-        ) 
-        {
-            mLineagesPreviousEvent.clear();
-            for (auto& lineage : mLineages) 
-            {
-                double etot = std::accumulate(
-                    lineage.hits.begin(), lineage.hits.end(), 0.,
-                    [](double a, Hit b) { return a + b.E; }
-                );
-                if (etot == 0) {
-                    continue;
-                }
-                G4ThreeVector maxHit_xyz = std::max_element(
-                    lineage.hits.begin(), lineage.hits.end(),
-                    [](Hit a, Hit b) { return a.E < b.E; }
-                )->xyz;
-                double efield_here = mDetector->FitEF(maxHit_xyz.x(), maxHit_xyz.y(), maxHit_xyz.z());
-
-                lineage.result = mLArNEST->FullCalculation(
-                    lineage.type, etot, efield_here, lineage.density, false
-                );
-                lineage.result_calculated = true;
-
-                // check if photons were generated
-                if (int(lineage.result.fluctuations.NphFluctuation)) 
-                {
-                    auto photontimes = lineage.result.photon_times.begin();
-                    double ecum = 0;
-                    int phot_cum = 0;
-                    for (auto& hit : lineage.hits) 
-                    {
-                        hit.result.NphFluctuation = round(
-                            (int(lineage.result.fluctuations.NphFluctuation) - phot_cum) * hit.E / (etot - ecum)
-                        );
-                        ecum += hit.E;
-                        phot_cum += int(hit.result.NphFluctuation);
-                        for (int i = 0; i < int(hit.result.NphFluctuation); ++i) 
-                        {
-                            if (
-                                mYieldFactor == 1 ||
-                                (mYieldFactor > 0 && RandomGen::rndm()->rand_uniform() < mYieldFactor)
-                            ) 
-                            {
-                                if (mStackPhotons) 
-                                {
-                                    //G4Track* onePhoton = MakePhoton(hit.xyz, *photontimes + hit.t);
-                                    G4Track* onePhoton = MakePhoton(hit.xyz, hit.t);
-                                    pParticleChange->AddSecondary(onePhoton);
-                                }
-                            }
-                            ++photontimes;
-                        }
-                    }
-                }
-
-                // check if electrons were generated
-                if (int(lineage.result.fluctuations.NeFluctuation)) 
-                {
-                    double ecum = 0;
-                    double el_cum = 0;
-                    double electron_speed = mLArNEST->SetDriftVelocity(
-                        mDetector->get_T_Kelvin(), lineage.density, efield_here
-                    );
-                    // double electron_kin_E =
-                    //     LArNESTThermalElectron::ThermalElectron()->GetPDGMass() *
-                    //     std::pow(electron_speed * mm / us, 2);
-
-                    // Change units from NEST (mm/us) to G4 intrinsic units (mm/ns)
-                    electron_speed = electron_speed * mm / us;
-                    G4double v     = electron_speed / CLHEP::c_light;
-                    G4double gamma = 1/std::sqrt(1-std::pow(v, 2));
-                    double electron_kin_E = LArNESTThermalElectron::ThermalElectron()->GetPDGMass() * (gamma - 1);
-
-                    for (auto& hit : lineage.hits) 
-                    {
-                        hit.result.NeFluctuation = round(
-                            (int(lineage.result.fluctuations.NeFluctuation) - el_cum) * hit.E / (etot - ecum)
-                        );
-                        ecum += hit.E;
-                        el_cum += int(hit.result.NeFluctuation);
-                        for (int i = 0; i < int(hit.result.NeFluctuation); ++i) 
-                        {
-                            if (mYieldFactor == 1 ||
-                                (mYieldFactor > 0 &&
-                                RandomGen::rndm()->rand_uniform() < mYieldFactor)) 
-                            {
-                                if (mStackElectrons) 
-                                {
-                                    G4Track* oneElectron = MakeElectron(
-                                        hit.xyz, lineage.density,
-                                        hit.t, electron_kin_E
-                                    );
-                                    if (oneElectron) pParticleChange->AddSecondary(oneElectron);
-                                }
-                            }
-                        }
-                    }
-                }
-                mLineagesPreviousEvent.push_back(lineage);
-            }
-            if (mAnalysisTrigger) {
-                mAnalysisTrigger(mLineagesPreviousEvent);
-            }
-            mLineages.clear();
-            track_lins.clear();
-        }
-        return;
-    }
-
     G4VParticleChange* LArNESTScintillationProcess::AtRestDoIt(
         const G4Track& aTrack, const G4Step& aStep
     ) 
@@ -207,255 +91,80 @@ namespace LArGeant
         return G4VRestDiscreteProcess::AtRestDoIt(aTrack, aStep);
     }
 
-    Lineage LArNESTScintillationProcess::GetChildType(
-        const G4Track* parent, const G4Track* child
-    ) const 
-    {
-        // logic to determine what processes are 
-        // kicked off by this track and also set the info
-        G4String sec_creator = "";
-        if (child->GetCreatorProcess()) {
-            sec_creator = child->GetCreatorProcess()->GetProcessName();
-        }
-        if (
-            parent && 
-            parent->GetDefinition() == G4Neutron::Definition() &&
-            child->GetDefinition()->GetAtomicNumber() > 0
-        )  // neutron inelastic scatters never join the lineage.
-        {
-            return Lineage(NEST::LArInteraction::NR);
-        } 
-        else if (
-            parent && 
-            parent->GetDefinition()->GetAtomicNumber() == 2 &&
-            parent->GetDefinition()->GetAtomicMass() == 3
-        )
-        {
-            return Lineage(NEST::LArInteraction::Alpha);
-        }
-        else if (
-            parent &&
-            parent->GetDefinition() == G4Gamma::Definition()
-        ) 
-        { 
-            return Lineage(NEST::LArInteraction::ER);
-        } 
-        else if (
-            parent && 
-            parent->GetDefinition() == G4Electron::Definition()
-        )
-        {
-            return Lineage(NEST::LArInteraction::ER);
-        }
-        else if (
-            child->GetDefinition() == G4Electron::Definition() &&
-            (sec_creator.contains("Decay") || !parent)
-        ) 
-        {
-            return Lineage(NEST::LArInteraction::ER);
-        } 
-        else if (
-            child->GetDefinition()->GetAtomicMass() > 1 &&
-            (sec_creator.contains("Decay") || !parent)
-        ) 
-        {
-            return Lineage(NEST::LArInteraction::ER);
-        }
-        return Lineage(NEST::LArInteraction::NoneType);
-    }
+    // Lineage LArNESTScintillationProcess::GetChildType(
+    //     const G4Track* parent, const G4Track* child
+    // ) const 
+    // {
+    //     // G4cout << parent->GetDefinition()->GetAtomicNumber() << G4endl;
+    //     // G4cout << parent->GetDefinition()->GetAtomicMass() << G4endl;
+    //     // G4cout << parent->GetDefinition()->GetParticleName() << G4endl;
+    //     // logic to determine what processes are 
+    //     // kicked off by this track and also set the info
+    //     G4String sec_creator = "";
+    //     if (child->GetCreatorProcess()) {
+    //         sec_creator = child->GetCreatorProcess()->GetProcessName();
+    //     }
+    //     if (
+    //         parent && 
+    //         parent->GetDefinition() == G4Neutron::Definition() &&
+    //         child->GetDefinition()->GetAtomicNumber() > 0
+    //     )  // neutron inelastic scatters never join the lineage.
+    //     {
+    //         return Lineage(NEST::LArInteraction::NR);
+    //     } 
+    //     else if (
+    //         parent && 
+    //         parent->GetDefinition()->GetParticleName() == "alpha"
+    //     )
+    //     {
+    //         return Lineage(NEST::LArInteraction::Alpha);
+    //     }
+    //     else if (
+    //         parent &&
+    //         parent->GetDefinition() == G4Gamma::Definition()
+    //     ) 
+    //     { 
+    //         return Lineage(NEST::LArInteraction::ER);
+    //     } 
+    //     else if (
+    //         parent && 
+    //         parent->GetDefinition() == G4Electron::Definition()
+    //     )
+    //     {
+    //         return Lineage(NEST::LArInteraction::ER);
+    //     }
+    //     else if (
+    //         child->GetDefinition() == G4Electron::Definition() &&
+    //         (sec_creator.contains("Decay") || !parent)
+    //     ) 
+    //     {
+    //         return Lineage(NEST::LArInteraction::ER);
+    //     } 
+    //     else if (
+    //         child->GetDefinition()->GetParticleName() == "alpha" &&
+    //         !parent
+    //     ) 
+    //     {
+    //         return Lineage(NEST::LArInteraction::Alpha);
+    //     } 
+    //     else if (
+    //         child->GetDefinition()->GetAtomicMass() > 1 &&
+    //         (sec_creator.contains("Decay") || !parent)
+    //     ) 
+    //     {
+    //         return Lineage(NEST::LArInteraction::ER);
+    //     }
+    //     return Lineage(NEST::LArInteraction::NoneType);
+    // }
 
     G4VParticleChange* LArNESTScintillationProcess::PostStepDoIt(
         const G4Track& aTrack, const G4Step& aStep
     ) 
     {
+        pParticleChange->SetNumberOfSecondaries(1e7);
         pParticleChange->Initialize(aTrack);
 
-        auto myLinID = track_lins.find(
-            std::make_tuple(
-                aTrack.GetParentID(), 
-                aTrack.GetVertexPosition(),
-                aTrack.GetVertexMomentumDirection()
-            )
-        );
-        // Type of this step.
-        NEST::LArInteraction step_type = NEST::LArInteraction::NoneType;
-        uint sec_mylinid = 0;
-        const vector<const G4Track*> secondaries = *aStep.GetSecondaryInCurrentStep();
-
-        // If the current track is already in a lineage, 
-        // its secondaries inherit that lineage.
-        bool break_lineage = true;
-        if (myLinID != track_lins.end()) 
-        {
-            break_lineage = false;
-            if (aTrack.GetDefinition() == G4Gamma::Definition()) 
-            {
-                G4ThreeVector dist_from_vertex =
-                    aTrack.GetVertexPosition() - aStep.GetPostStepPoint()->GetPosition();
-                // long-travelling gammas break the lineage,
-                // since they are excluded from the single-site
-                // experimental results infomring the NEST model
-                if (dist_from_vertex.mag() > mGammaBreak) {
-                    break_lineage = true;  
-                }
-            }
-            if (!break_lineage) 
-            {
-                for (const G4Track* sec : secondaries) 
-                {
-                    if (sec->GetDefinition() == G4OpticalPhoton::Definition() ||
-                        sec->GetCreatorProcess()->GetProcessName().contains("annihil")
-                    ) {
-                        continue;
-                    }
-                    track_lins.insert(
-                        make_pair(make_tuple(
-                            sec->GetParentID(), sec->GetPosition(),
-                            sec->GetMomentumDirection()), myLinID->second)
-                    );
-                }
-            }
-        }
-        // otherwise, we may need to start a new lineage
-        if (break_lineage) 
-        {
-            // What if the parent is a primary? Give it a lineage just as if it were one
-            // of its own secondaries
-            if (aTrack.GetParentID() == 0 && myLinID == track_lins.end()) 
-            {
-                Lineage sec_lin = GetChildType(0, &aTrack);
-                NEST::LArInteraction sec_type = sec_lin.type;
-                if (sec_type != NEST::LArInteraction::NoneType) 
-                {
-                    mLineages.push_back(sec_lin);
-                    track_lins.insert(std::make_pair(
-                        make_tuple(aTrack.GetParentID(), aTrack.GetVertexPosition(),
-                                aTrack.GetVertexMomentumDirection()), mLineages.size() - 1)
-                    );
-                    myLinID = --track_lins.end();
-                    for (const G4Track* sec : secondaries) 
-                    {
-                        if (sec->GetDefinition() == G4OpticalPhoton::Definition() ||
-                            sec->GetCreatorProcess()->GetProcessName().contains("annihil")
-                        ) 
-                        {
-                            continue;
-                        }
-                        step_type = sec_type;
-                        track_lins.insert(
-                            make_pair(make_tuple(sec->GetParentID(), sec->GetPosition(),
-                                                sec->GetMomentumDirection()),
-                                    mLineages.size() - 1)
-                        );
-                    }
-                }
-            }
-            for (const G4Track* sec : secondaries) 
-            {
-                
-                // Each secondary has a type (including the possible NEST::LArInteraction::NoneType)
-                Lineage sec_lin = GetChildType(&aTrack, sec);
-                NEST::LArInteraction sec_type = sec_lin.type;
-                // The first secondary will change the step_type. Subsequent secondaries
-                // better have the same type as the first. If they don't, something is
-                // weird
-                assert(sec_type == step_type || sec_type == NEST::LArInteraction::NoneType ||
-                        step_type == NEST::LArInteraction::NoneType
-                );
-                // if this is the first secondary to have a non-None type, we've started a
-                // new lineage
-                if (
-                    sec_type != NEST::LArInteraction::NoneType &&
-                    (step_type == NEST::LArInteraction::NoneType)
-                ) 
-                {
-                    mLineages.push_back(sec_lin);
-                }
-                step_type = sec_type;
-                // If the secondary has a non-None type, it also gets a lineage ID.
-                if (sec_type != NEST::LArInteraction::NoneType) 
-                {
-                    track_lins.insert(
-                        std::make_pair(make_tuple(sec->GetParentID(), sec->GetPosition(),
-                                                sec->GetMomentumDirection()),
-                                    mLineages.size() - 1)
-                    );
-                    // for comptons/PEs to add in recoil energy in the parent step
-                    if (sec_type == NEST::LArInteraction::ER) 
-                    {
-                        myLinID = --track_lins.end();
-                        ++sec_mylinid;
-                    }
-                }
-            }
-        }
-        //  If the current track is part of a lineage...
-        auto myLinID2 = track_lins.find(
-            make_tuple(aTrack.GetParentID(), aTrack.GetVertexPosition(),
-                        aTrack.GetVertexMomentumDirection())
-        );
-        if (myLinID2 == track_lins.end()) 
-        {
-            if (sec_mylinid) {
-                myLinID2 = myLinID;
-            }
-            else 
-            {
-                TryPopLineages(aTrack, aStep);
-                return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
-            }
-        }
-        Lineage* myLineage = &mLineages.at(myLinID->second);
-        //...if the step deposited energy...
-        if (aStep.GetTotalEnergyDeposit() <= 0) 
-        {
-            TryPopLineages(aTrack, aStep);
-            return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
-        }
-
-        //... in a noble element...
         const G4Material* preMaterial = aStep.GetPreStepPoint()->GetMaterial();
-        const G4Material* postMaterial = aStep.GetPostStepPoint()->GetMaterial();
-        const G4Element *ElementA = NULL, *ElementB = NULL;
-        if (preMaterial) 
-        {
-            const G4ElementVector* theElementVector1 = preMaterial->GetElementVector();
-            ElementA = (*theElementVector1)[0];
-        }
-        if (postMaterial) 
-        {
-            const G4ElementVector* theElementVector2 = postMaterial->GetElementVector();
-            ElementB = (*theElementVector2)[0];
-        }
-        G4int z1, z2;
-        G4bool NobleNow = false, NobleLater = false;
-        if (ElementA) {
-            z1 = (G4int)(ElementA->GetZ());
-        }
-        else {
-            z1 = -1;
-        }
-        if (ElementB) {
-            z2 = (G4int)(ElementB->GetZ());
-        }
-        else {
-            z2 = -1;
-        }
-        if (z1 == 2 || z1 == 10 || z1 == 18 || z1 == 36 || z1 == 54) {
-            NobleNow = true;
-        }
-        if (z2 == 2 || z2 == 10 || z2 == 18 || z2 == 36 || z2 == 54) {
-            NobleLater = true;
-        }
-
-        if (!NobleNow) 
-        {
-            TryPopLineages(aTrack, aStep);
-            return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
-        }
-
-        // ...retrieve the particle's position, time, attributes at both the
-        // beginning and the end of the current step along its track...
         G4StepPoint* pPreStepPoint = aStep.GetPreStepPoint();
         G4StepPoint* pPostStepPoint = aStep.GetPostStepPoint();
         G4ThreeVector x1 = pPostStepPoint->GetPosition();
@@ -464,17 +173,78 @@ namespace LArGeant
         G4double t0 = pPreStepPoint->GetGlobalTime();
 
         G4double Density = preMaterial->GetDensity() / (g / cm3);
-        if (myLineage->density == -1) {
-            myLineage->density = Density;
-        }
         double step_E = aStep.GetTotalEnergyDeposit() / keV;
+        double efield_here = mDetector->FitEF(x1[0], x1[1], x1[2]);
+        NEST::LArInteraction interaction = NEST::LArInteraction::ER;
+        if (aTrack.GetDefinition()->GetParticleName() == "alpha")
+        {
+            interaction = NEST::LArInteraction::Alpha;
+        }
+        else if (
+            aTrack.GetDefinition()->GetParticleName() == "e-" ||
+            aTrack.GetDefinition()->GetParticleName() == "mu-" ||
+            aTrack.GetDefinition()->GetParticleName() == "gamma" ||
+            aTrack.GetDefinition()->GetParticleName() == "e+" ||
+            aTrack.GetDefinition()->GetParticleName() == "mu+"
+        )
+        {
+            interaction = NEST::LArInteraction::ER;
+        }
+        else
+        {
+            interaction = NEST::LArInteraction::NR;
+        }
 
-        // add this hit to the appropriate lineage
-        Hit stepHit(step_E, t0, x1);
-        myLineage->hits.push_back(stepHit);
+        auto result = mLArNEST->FullCalculation(
+            interaction, step_E, efield_here, Density, false
+        );
+        if (int(result.fluctuations.NphFluctuation)) 
+        {
+            for (int i = 0; i < int(result.fluctuations.NphFluctuation); ++i) 
+            {
+                if (
+                    mYieldFactor == 1 ||
+                    (mYieldFactor > 0 && RandomGen::rndm()->rand_uniform() < mYieldFactor)
+                ) 
+                {
+                    if (mStackPhotons) 
+                    {
+                        //G4Track* onePhoton = MakePhoton(hit.xyz, *photontimes + hit.t);
+                        G4Track* onePhoton = MakePhoton(x1, t0);
+                        pParticleChange->AddSecondary(onePhoton);
+                    }
+                }
+            }
+        }
 
-        // the end (exiting)
-        TryPopLineages(aTrack, aStep);
+        // check if electrons were generated
+        if (int(result.fluctuations.NeFluctuation)) 
+        {
+            double electron_speed = mLArNEST->SetDriftVelocity(
+                mDetector->get_T_Kelvin(), Density, efield_here
+            );
+            // Change units from NEST (mm/us) to G4 intrinsic units (mm/ns)
+            electron_speed = electron_speed * (mm / microsecond);
+            G4double v     = electron_speed / CLHEP::c_light;
+            G4double gamma = 1/std::sqrt(1-std::pow(v, 2));
+            double electron_kin_E = LArNESTThermalElectron::ThermalElectron()->GetPDGMass() * (gamma - 1);
+            for (int i = 0; i < int(result.fluctuations.NeFluctuation); ++i) 
+            {
+                if (mYieldFactor == 1 ||
+                    (mYieldFactor > 0 &&
+                    RandomGen::rndm()->rand_uniform() < mYieldFactor)) 
+                {
+                    if (mStackElectrons) 
+                    {
+                        G4Track* oneElectron = MakeElectron(
+                            x1, Density,
+                            t0, electron_kin_E
+                        );
+                        if (oneElectron) pParticleChange->AddSecondary(oneElectron);
+                    }
+                }
+            }
+        }
         return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);
     }
 

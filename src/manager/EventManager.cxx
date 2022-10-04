@@ -35,13 +35,22 @@ namespace LArGeant
     std::vector<Primary> EventManager::GeneratePrimaryList()
     {
         std::vector<Primary> primaries;
+        // primaries.emplace_back(
+        //     Primary(
+        //         "alpha",
+        //         0,
+        //         {0., 0., 0.},
+        //         {5.486 * MeV},
+        //         {0., 0., 1.}
+        //     )
+        // );
         primaries.emplace_back(
             Primary(
                 "mu-",
                 1,
                 {0., 0., 1.},
                 {5 * MeV},
-                {0., 0., 1.}
+                {0., 1., 0.}
             )
         );
         primaries.emplace_back(

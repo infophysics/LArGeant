@@ -24,11 +24,14 @@
 #include "G4LogicalSkinSurface.hh"
 #include "G4Material.hh"
 #include "G4SDManager.hh"
+#include "G4Cache.hh"
+#include "G4AutoDelete.hh"
 
 #include "DetectorComponent.hh"
 #include "Detector.hh"
 #include "SensitiveDetector.hh"
 #include "EventManager.hh"
+#include "ElectricField.hh"
 
 namespace LArGeant
 {
@@ -64,6 +67,8 @@ namespace LArGeant
         std::shared_ptr<G4Material> mExperimentalHallMaterial = {nullptr};
 
         std::shared_ptr<Detector> mDetector = {nullptr};
+
+        G4Cache<ElectricField*> mElectricField = {nullptr};
 
     };
 }

@@ -35,11 +35,20 @@ namespace LArGeant
     {
         mIsSensitive = isSensitive;
     }
+    void DetectorComponent::SetElectricField(G4bool isElectricField)
+    {
+        mIsElectricField = isElectricField;
+    }
     void DetectorComponent::SetRadioactive(G4bool isRadioactive)
     {
         mIsRadioactive = isRadioactive;
     }
 
+    void DetectorComponent::SetElectricFieldVector(G4ThreeVector electricFieldVector)
+    {
+        mElectricFieldVector = electricFieldVector;
+    }
+    
     void DetectorComponent::SetSolidVolume(G4VSolid* solid)
     {
         mSolidVolume.reset(solid);

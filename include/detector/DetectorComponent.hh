@@ -36,7 +36,10 @@ namespace LArGeant
 
         void SetName(G4String name);
         void SetSensitive(G4bool isSensitive);
+        void SetElectricField(G4bool isElectricField);
         void SetRadioactive(G4bool isRadioactive);
+
+        void SetElectricFieldVector(G4ThreeVector);
 
         void SetSolidVolume(G4VSolid* solid);
         void SetLogicalVolume(G4LogicalVolume* logical);
@@ -47,6 +50,9 @@ namespace LArGeant
 
         G4String GetName() { return mName; }
         G4bool GetSensitive() { return mIsSensitive; }
+        G4bool GetElectricField() { return mIsElectricField; }
+
+        G4ThreeVector GetElectricFieldVector() { return mElectricFieldVector; }
 
         std::shared_ptr<G4VSolid> GetSolidVolume() { return mSolidVolume; }
         std::shared_ptr<G4LogicalVolume> GetLogicalVolume() { return mLogicalVolume; }
@@ -63,6 +69,9 @@ namespace LArGeant
         G4String mName = {"default"};
         G4bool mIsSensitive = {false};
         G4bool mIsRadioactive = {false};
+        G4bool mIsElectricField = {false};
+
+        G4ThreeVector mElectricFieldVector = {0.0,0.0,0.0};
 
         std::shared_ptr<G4VSolid> mSolidVolume = {nullptr};
         std::shared_ptr<G4LogicalVolume> mLogicalVolume = {nullptr};

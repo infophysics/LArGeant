@@ -23,7 +23,6 @@ namespace LArGeant
         G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
     
         // Add standard EM Processes
-        //
         G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
         theParticleIterator->reset();
         while ((*theParticleIterator)() ) {
@@ -73,7 +72,7 @@ namespace LArGeant
             } else if (particleName == "alpha" || particleName == "He3") {
                 ph->RegisterProcess(new G4hMultipleScattering(), particle);
                 G4ionIonisation* ionIoni = new G4ionIonisation();
-                ionIoni->SetStepFunction(0.1, 1 * um);
+                ionIoni->SetStepFunction(0.1, 20 * um);
                 ph->RegisterProcess(ionIoni, particle);
                 ph->RegisterProcess(new G4NuclearStopping(), particle);
                 
@@ -133,18 +132,23 @@ namespace LArGeant
             G4ParticleDefinition* particle = particleIteratorP->value();
             G4ProcessManager* pmanager = particle->GetProcessManager();
             G4String particleName = particle->GetParticleName();
-
-            if ( !(particleName.find("e-")!=std::string::npos  || particleName.find("opticalphoton")!=std::string::npos ) ) {
-                continue;
-            }
+            // if ( !(
+            //     particleName.find("e-")!=std::string::npos  || 
+            //     particleName.find("opticalphoton")!=std::string::npos ||
+            //     particleName.find("alpha")!=std::string::npos
+            // )) {
+            //     continue;
+            // }
             if (pmanager) 
             {
+
                 LArNESTScintillationProcess* theNEST2ScintillationProcess = new LArNESTScintillationProcess("S1", fElectromagnetic, lar_nest, detector); //gndet);
                 theNEST2ScintillationProcess->SetDetailedSecondaries(true);
                 theNEST2ScintillationProcess->SetStackElectrons(true);
 
-                if (theNEST2ScintillationProcess->IsApplicable(*particle) && pmanager) 
+                if (theNEST2ScintillationProcess->IsApplicable(*particle)) 
                 {
+  
                     pmanager->AddProcess(theNEST2ScintillationProcess, ordDefault + 1, ordInActive, ordDefault + 1);
                 }
 
@@ -153,7 +157,7 @@ namespace LArGeant
                 G4OpRayleigh* fRayleighScatteringProcess = new G4OpRayleigh();
                 G4OpWLS* fTheWLSProcess = new G4OpWLS();
 
-                if (particleName == "opticalphoton" && pmanager) 
+                if (particleName == "opticalphoton") 
                 {
                     pmanager->AddDiscreteProcess(fAbsorptionProcess);
                     pmanager->AddDiscreteProcess(fRayleighScatteringProcess);

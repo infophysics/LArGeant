@@ -22,6 +22,7 @@ namespace LArGeant
     , mCubeY(CubeY)
     , mCubeZ(CubeZ)
     {
+        SetElectricField(true);
     }
 
     void ArgonCubeActiveVolume::Construct()

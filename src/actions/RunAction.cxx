@@ -42,6 +42,25 @@ namespace LArGeant
         AnalysisManager->CreateNtupleDColumn("track_length");
         AnalysisManager->FinishNtuple(2);
 
+        AnalysisManager->CreateNtuple("NEST", "NEST");
+        AnalysisManager->CreateNtupleIColumn("number_of_photons");
+        AnalysisManager->CreateNtupleIColumn("number_of_electrons");
+        AnalysisManager->CreateNtupleSColumn("particle");
+        AnalysisManager->CreateNtupleDColumn("init_x");
+        AnalysisManager->CreateNtupleDColumn("init_y");
+        AnalysisManager->CreateNtupleDColumn("init_z");
+        AnalysisManager->CreateNtupleDColumn("final_x");
+        AnalysisManager->CreateNtupleDColumn("final_y");
+        AnalysisManager->CreateNtupleDColumn("final_z");
+        AnalysisManager->CreateNtupleDColumn("init_t");
+        AnalysisManager->CreateNtupleDColumn("energy");
+        AnalysisManager->CreateNtupleDColumn("efield");
+        AnalysisManager->CreateNtupleDColumn("density");
+        AnalysisManager->CreateNtupleDColumn("electron_kinetic_energy");
+        AnalysisManager->CreateNtupleDColumn("efield_x");
+        AnalysisManager->CreateNtupleDColumn("efield_y");
+        AnalysisManager->CreateNtupleDColumn("efield_z");
+        AnalysisManager->FinishNtuple(3);
     }
 
     RunAction::~RunAction()

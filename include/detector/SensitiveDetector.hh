@@ -22,7 +22,7 @@
 #include "G4AnalysisManager.hh"
 
 #include "DetectorComponent.hh"
-#include "LArNESTInterface.hh"
+#include "ScintillationProcess.hh"
 
 namespace LArGeant
 {

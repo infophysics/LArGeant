@@ -93,25 +93,12 @@ namespace LArGeant
             }
         }
     
-        // Em options
-        //
-        // Main options and setting parameters are shown here.
-        // Several of them have default values.
-        //
         G4EmParameters* EmParameters = G4EmParameters::Instance();
-        
-        // physics tables
-        //
         EmParameters->SetMinEnergy(10 * eV);      // default 100 eV
         EmParameters->SetMaxEnergy(10 * TeV);     // default 100 TeV
         EmParameters->SetNumberOfBinsPerDecade(12 * 10);    // default=12*7
-        
-        // multiple coulomb scattering
-        //
         EmParameters->SetMscStepLimitType(fUseSafety);  // default
         
-        // Deexcitation
-        //
         G4VAtomDeexcitation* de = new G4UAtomicDeexcitation();
         de->SetFluo(true);
         de->SetAuger(false);
@@ -119,8 +106,11 @@ namespace LArGeant
         G4LossTableManager::Instance()->SetAtomDeexcitation(de);
         
         G4EmModelActivator mact(GetPhysicsName());
+        ConstructScintillationProcess();
+    }
 
-
+    void ScintillationPhysics::ConstructScintillationProcess()
+    {
         auto particleIteratorP=GetParticleIterator();
         particleIteratorP->reset();
 
@@ -141,15 +131,17 @@ namespace LArGeant
             // }
             if (pmanager) 
             {
+                // ScintillationProcess* scintillationProcess = new ScintillationProcess(
+                //     "S1", fElectromagnetic, lar_nest, detector
+                // );
+                ScintillationProcess* scintillationProcess = new ScintillationProcess();
+                scintillationProcess->SetDetailedSecondaries(true);
+                scintillationProcess->SetStackElectrons(true);
 
-                LArNESTScintillationProcess* theNEST2ScintillationProcess = new LArNESTScintillationProcess("S1", fElectromagnetic, lar_nest, detector); //gndet);
-                theNEST2ScintillationProcess->SetDetailedSecondaries(true);
-                theNEST2ScintillationProcess->SetStackElectrons(true);
-
-                if (theNEST2ScintillationProcess->IsApplicable(*particle)) 
+                if (scintillationProcess->IsApplicable(*particle)) 
                 {
   
-                    pmanager->AddProcess(theNEST2ScintillationProcess, ordDefault + 1, ordInActive, ordDefault + 1);
+                    pmanager->AddProcess(scintillationProcess, ordDefault + 1, ordInActive, ordDefault + 1);
                 }
 
                 G4OpBoundaryProcess* fBoundaryProcess = new G4OpBoundaryProcess();

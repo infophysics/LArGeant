@@ -1,5 +1,5 @@
 /**
- * @file LArNESTInterface.hh
+ * @file ScintillationProcess.hh
  * @author Nicholas Carrara [nmcarrara@ucdavis.edu]
  * @brief 
  * @version 0.1
@@ -8,7 +8,9 @@
  * @date 2022-09-14
  */
 #pragma once
+
 #include <functional>
+
 #include "G4Electron.hh"
 #include "G4EmProcessSubType.hh"  
 #include "G4ParticleTable.hh"
@@ -37,8 +39,12 @@
 #include "G4MaterialCutsCouple.hh"
 #include "G4ProductionCuts.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4AnalysisManager.hh"
+
 #include "LArNEST.hh"
 #include "LArDetector.hh"
+#include "ThermalElectron.hh"
+#include "NESTInterface.hh"
 
 namespace LArGeant
 {
@@ -48,33 +54,12 @@ namespace LArGeant
         NoTimeParticleChange() : G4ParticleChange() { debugFlag = false; }
     };
 
-    class LArNESTThermalElectron : public G4ParticleDefinition 
+    
+    class ScintillationProcess : public G4VRestDiscreteProcess 
     {
     public:
-        static LArNESTThermalElectron* Definition();
-        static LArNESTThermalElectron* ThermalElectronDefinition();
-        static LArNESTThermalElectron* ThermalElectron();
-    private:
-        static LArNESTThermalElectron* theInstance;
-        LArNESTThermalElectron() {}
-        ~LArNESTThermalElectron() {}
-    };
-
-    class LArNESTScintillationProcess : public G4VRestDiscreteProcess 
-    {
-    public:
-        LArNESTScintillationProcess(
-            const G4String& processName, 
-            G4ProcessType type,
-            LArDetector* detector
-        );
-        LArNESTScintillationProcess(
-            const G4String& processName, 
-            G4ProcessType type,
-            NEST::LArNEST* customcalc, 
-            LArDetector* detector
-        );
-        ~LArNESTScintillationProcess();
+        ScintillationProcess();
+        ~ScintillationProcess();
 
     public:
         // Returns true -> 'is applicable', for any particle type except for an
@@ -100,43 +85,32 @@ namespace LArGeant
         // re-scaling to (for example) represent detector effects. Internally is
         // used for Lindhard yield factor for NR. Default should be user-set
         // to be 1 (for ER) in your simulation -- see NEST readme
-        void SetScintillationYieldFactor(const G4double yieldfactor);
+        void SetPhotonYieldFactor(const G4double yieldfactor);
+        void SetElectronYieldFactor(const G4double yieldfactor);
         
         // Returns the quantum (photon/electron) yield factor. See above.
-        G4double GetScintillationYieldFactor() const;
+        G4double GetPhotonYieldFactor() const;
+        G4double GetElectronYieldFactor() const;
         
-        G4Track* MakePhoton(G4ThreeVector xyz, double t);
-        G4Track* MakeElectron(
-            G4ThreeVector xyz, double density, 
-            double t,double kin_E
-        );
+        void MakeSinglePhoton(NESTInterfaceResult&);
+        void MakeSingleElectron(NESTInterfaceResult&);
+
+        void MakePhotons(NESTInterfaceResult&);
+        void MakeElectrons(NESTInterfaceResult&);
 
         void SetDetailedSecondaries(bool detailed)  { mDetailedSecondaries = detailed; }
         void SetStackElectrons(bool stack_e)        { mStackElectrons = stack_e; }
         void SetStackPhotons(bool stack_ph)         { mStackPhotons = stack_ph; }
-        // void SetAnalysisTrigger(std::function<void(std::vector<Lineage>)> AnalysisTrigger) 
-        // {
-        //     this->mAnalysisTrigger = AnalysisTrigger;
-        // }
-        void SetLArNEST(std::unique_ptr<NEST::LArNEST> newcalc) 
-        {
-            mLArNEST.reset(newcalc.release());
-            LArDetector* detector;
-            //mDetector.reset(newcalc->GetDetector());
-            mDetector.reset(detector);
-        }
-        void SetGammaBreak(double _gamma_break) { this->mGammaBreak = _gamma_break; }
+        void SetGammaBreak(double _gamma_break)     { this->mGammaBreak = _gamma_break; }
         double GetGammaBreak() const { return mGammaBreak; }
         
 
     protected:
-        std::unique_ptr<NEST::LArNEST> mLArNEST = {nullptr};
-        std::map<std::tuple<int, CLHEP::Hep3Vector, CLHEP::Hep3Vector>, uint64_t>
-            track_lins;
-        std::unique_ptr<LArDetector> mDetector;
+        std::shared_ptr<NESTInterface> mNESTInterface = {nullptr};
         NoTimeParticleChange mParticleChange;
 
-        G4double mYieldFactor = 1;  // turns scint. on/off
+        G4double mPhotonYieldFactor = 1;  
+        G4double mElectronYieldFactor = 1;
         G4bool mDetailedSecondaries = true;
         G4bool mStackElectrons = true;
         G4bool mStackPhotons = true;
@@ -145,10 +119,16 @@ namespace LArGeant
         // bremsstrahlung) if they are this far from their origin.
         G4double mGammaBreak = 9 * mm;  
 
+    private:
+        const G4String mName = {"ScintillationProcess"};
+        G4ProcessType mProcessType = {fElectromagnetic};
+        G4EmProcessSubType mProcessSubType = {fScintillation};
+
+        G4bool mRecordNESTResults = true;
 
     };
 
-    inline G4bool LArNESTScintillationProcess::IsApplicable(
+    inline G4bool ScintillationProcess::IsApplicable(
         const G4ParticleDefinition& aParticleType
     ) 
     {
@@ -162,13 +142,21 @@ namespace LArGeant
         return true;
     }
 
-    inline void LArNESTScintillationProcess::SetScintillationYieldFactor(const G4double yieldfactor)
+    inline void ScintillationProcess::SetPhotonYieldFactor(const G4double yieldfactor)
     {
-        mYieldFactor = yieldfactor;
+        mPhotonYieldFactor = yieldfactor;
+    }
+    inline void ScintillationProcess::SetElectronYieldFactor(const G4double yieldfactor)
+    {
+        mElectronYieldFactor = yieldfactor;
     }
 
-    inline G4double LArNESTScintillationProcess::GetScintillationYieldFactor() const 
+    inline G4double ScintillationProcess::GetPhotonYieldFactor() const 
     {
-        return mYieldFactor;
+        return mPhotonYieldFactor;
+    }
+    inline G4double ScintillationProcess::GetElectronYieldFactor() const 
+    {
+        return mElectronYieldFactor;
     }
 }

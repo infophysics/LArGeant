@@ -43,7 +43,7 @@ namespace LArGeant
 
         // Scintillation Physics
         G4OpticalPhoton::Definition();
-        LArNESTThermalElectron::Definition();
+        ThermalElectron::Definition();
         ReplacePhysics(new ScintillationPhysics("scint"));
 
         // Neutron Physics

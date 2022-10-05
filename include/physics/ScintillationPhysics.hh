@@ -50,7 +50,7 @@
 
 #include "G4FastSimulationManagerProcess.hh"
 
-#include "LArNESTInterface.hh"
+#include "ScintillationProcess.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpRayleigh.hh"
 #include "G4OpWLS.hh"
@@ -65,6 +65,8 @@ namespace LArGeant
         ~ScintillationPhysics();
 
         void ConstructProcess();
+        void ConstructScintillationProcess();
+        
         void ConstructParticle() {}
 
     private:

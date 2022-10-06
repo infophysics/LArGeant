@@ -22,10 +22,13 @@
 #include "G4AnalysisManager.hh"
 
 #include "DetectorComponent.hh"
+#include "EventManager.hh"
 #include "ScintillationProcess.hh"
 
 namespace LArGeant
 {
+    class EventManager;
+    
     class SensitiveDetector : public G4VSensitiveDetector
     {
     public:

@@ -9,8 +9,8 @@
 
 namespace LArGeant
 {
-    ScintillationPhysics::ScintillationPhysics(G4String name)
-    : G4VPhysicsConstructor(name)
+    ScintillationPhysics::ScintillationPhysics()
+    : G4VPhysicsConstructor("ScintillationPhysics")
     {
     }
 
@@ -20,76 +20,96 @@ namespace LArGeant
 
     void ScintillationPhysics::ConstructProcess()
     {
-        G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
+        G4PhysicsListHelper* PhysicsListHelper = G4PhysicsListHelper::GetPhysicsListHelper();
     
         // Add standard EM Processes
-        G4ParticleTable::G4PTblDicIterator* theParticleIterator = theParticleTable->GetIterator();
-        theParticleIterator->reset();
-        while ((*theParticleIterator)() ) {
-            G4ParticleDefinition* particle = theParticleIterator->value();
+        G4ParticleTable::G4PTblDicIterator* ParticleIterator = theParticleTable->GetIterator();
+        ParticleIterator->reset();
+        while ((*ParticleIterator)()) 
+        {
+            G4ParticleDefinition* particle = ParticleIterator->value();
             G4String particleName = particle->GetParticleName();
             
-            if (particleName == "gamma") {
-                ////ph->RegisterProcess(new G4RayleighScattering, particle);
-                ph->RegisterProcess(new G4PhotoElectricEffect, particle);
+            if (particleName == "gamma") 
+            {
+                ////PhysicsListHelper->RegisterProcess(new G4RayleighScattering, particle);
+                PhysicsListHelper->RegisterProcess(new G4PhotoElectricEffect, particle);
                 G4ComptonScattering* cs = new G4ComptonScattering;
                 cs->SetEmModel(new G4KleinNishinaModel());
-                ph->RegisterProcess(cs, particle);
-                ph->RegisterProcess(new G4GammaConversion, particle);
+                PhysicsListHelper->RegisterProcess(cs, particle);
+                PhysicsListHelper->RegisterProcess(new G4GammaConversion, particle);
                 
-            } else if (particleName == "e-") {
-                ph->RegisterProcess(new G4eMultipleScattering(), particle);
+            } 
+            else if (particleName == "e-") 
+            {
+                PhysicsListHelper->RegisterProcess(new G4eMultipleScattering(), particle);
                 G4eIonisation* eIoni = new G4eIonisation();
                 eIoni->SetStepFunction(0.1, 100 * um);
-                ph->RegisterProcess(eIoni, particle);
-                ph->RegisterProcess(new G4eBremsstrahlung(), particle);
+                PhysicsListHelper->RegisterProcess(eIoni, particle);
+                PhysicsListHelper->RegisterProcess(new G4eBremsstrahlung(), particle);
                 
-            } else if (particleName == "e+") {
-                ph->RegisterProcess(new G4eMultipleScattering(), particle);
+            } 
+            else if (particleName == "e+") 
+            {
+                PhysicsListHelper->RegisterProcess(new G4eMultipleScattering(), particle);
                 G4eIonisation* eIoni = new G4eIonisation();
                 eIoni->SetStepFunction(0.1, 100 * um);
-                ph->RegisterProcess(eIoni, particle);
-                ph->RegisterProcess(new G4eBremsstrahlung(), particle);
-                ph->RegisterProcess(new G4eplusAnnihilation(), particle);
+                PhysicsListHelper->RegisterProcess(eIoni, particle);
+                PhysicsListHelper->RegisterProcess(new G4eBremsstrahlung(), particle);
+                PhysicsListHelper->RegisterProcess(new G4eplusAnnihilation(), particle);
                 
-            } else if (particleName == "mu+" || particleName == "mu-") {
-                ph->RegisterProcess(new G4MuMultipleScattering(), particle);
+            } 
+            else if (particleName == "mu+" || particleName == "mu-") 
+            {
+                PhysicsListHelper->RegisterProcess(new G4MuMultipleScattering(), particle);
                 G4MuIonisation* muIoni = new G4MuIonisation();
                 muIoni->SetStepFunction(0.1, 50 * um);
-                ph->RegisterProcess(muIoni, particle);
-                ph->RegisterProcess(new G4MuBremsstrahlung(), particle);
-                ph->RegisterProcess(new G4MuPairProduction(), particle);
+                PhysicsListHelper->RegisterProcess(muIoni, particle);
+                PhysicsListHelper->RegisterProcess(new G4MuBremsstrahlung(), particle);
+                PhysicsListHelper->RegisterProcess(new G4MuPairProduction(), particle);
                 
-            } else if (particleName == "proton" || particleName == "pi-" ||
-                    particleName == "pi+") {
-                ph->RegisterProcess(new G4hMultipleScattering(), particle);
+            } 
+            else if (
+                particleName == "proton" || 
+                particleName == "pi-" ||
+                particleName == "pi+"
+            )
+            {
+                PhysicsListHelper->RegisterProcess(new G4hMultipleScattering(), particle);
                 G4hIonisation* hIoni = new G4hIonisation();
                 hIoni->SetStepFunction(0.1, 20 * um);
-                ph->RegisterProcess(hIoni, particle);
-                ph->RegisterProcess(new G4hBremsstrahlung(), particle);
-                ph->RegisterProcess(new G4hPairProduction(), particle);
+                PhysicsListHelper->RegisterProcess(hIoni, particle);
+                PhysicsListHelper->RegisterProcess(new G4hBremsstrahlung(), particle);
+                PhysicsListHelper->RegisterProcess(new G4hPairProduction(), particle);
                 
-            } else if (particleName == "alpha" || particleName == "He3") {
-                ph->RegisterProcess(new G4hMultipleScattering(), particle);
+            } 
+            else if (particleName == "alpha" || particleName == "He3") 
+            {
+                PhysicsListHelper->RegisterProcess(new G4hMultipleScattering(), particle);
                 G4ionIonisation* ionIoni = new G4ionIonisation();
                 ionIoni->SetStepFunction(0.1, 20 * um);
-                ph->RegisterProcess(ionIoni, particle);
-                ph->RegisterProcess(new G4NuclearStopping(), particle);
+                PhysicsListHelper->RegisterProcess(ionIoni, particle);
+                PhysicsListHelper->RegisterProcess(new G4NuclearStopping(), particle);
                 
-            } else if (particleName == "GenericIon") {
-                ph->RegisterProcess(new G4hMultipleScattering(), particle);
+            } 
+            else if (particleName == "GenericIon") 
+            {
+                PhysicsListHelper->RegisterProcess(new G4hMultipleScattering(), particle);
                 G4ionIonisation* ionIoni = new G4ionIonisation();
                 ionIoni->SetEmModel(new G4IonParametrisedLossModel());
                 ionIoni->SetStepFunction(0.1, 1 * um);
-                ph->RegisterProcess(ionIoni, particle);
-                ph->RegisterProcess(new G4NuclearStopping(), particle);
+                PhysicsListHelper->RegisterProcess(ionIoni, particle);
+                PhysicsListHelper->RegisterProcess(new G4NuclearStopping(), particle);
                 
-            } else if ((!particle->IsShortLived()) &&
-                    (particle->GetPDGCharge() != 0.0) &&
-                    (particle->GetParticleName() != "chargedgeantino")) {
-                // all others charged particles except geantino
-                ph->RegisterProcess(new G4hMultipleScattering(), particle);
-                ph->RegisterProcess(new G4hIonisation(), particle);
+            } 
+            else if (
+                (!particle->IsShortLived()) &&
+                (particle->GetPDGCharge() != 0.0) &&
+                (particle->GetParticleName() != "chargedgeantino")
+            ) 
+            {
+                PhysicsListHelper->RegisterProcess(new G4hMultipleScattering(), particle);
+                PhysicsListHelper->RegisterProcess(new G4hIonisation(), particle);
             }
         }
     
@@ -111,37 +131,28 @@ namespace LArGeant
 
     void ScintillationPhysics::ConstructScintillationProcess()
     {
-        auto particleIteratorP=GetParticleIterator();
-        particleIteratorP->reset();
+        auto ParticleIterator = GetParticleIterator();
+        ParticleIterator->reset();
 
-        LArDetector* detector = new LArDetector();
-        auto lar_nest = new NEST::LArNEST(detector);  
-
-        while( (*particleIteratorP)() )
+        while((*ParticleIterator)())
         {
-            G4ParticleDefinition* particle = particleIteratorP->value();
-            G4ProcessManager* pmanager = particle->GetProcessManager();
+            G4ParticleDefinition* particle = ParticleIterator->value();
+            G4ProcessManager* ProcessManager = particle->GetProcessManager();
             G4String particleName = particle->GetParticleName();
-            // if ( !(
-            //     particleName.find("e-")!=std::string::npos  || 
-            //     particleName.find("opticalphoton")!=std::string::npos ||
-            //     particleName.find("alpha")!=std::string::npos
-            // )) {
-            //     continue;
-            // }
-            if (pmanager) 
+            if (ProcessManager) 
             {
-                // ScintillationProcess* scintillationProcess = new ScintillationProcess(
-                //     "S1", fElectromagnetic, lar_nest, detector
-                // );
                 ScintillationProcess* scintillationProcess = new ScintillationProcess();
                 scintillationProcess->SetDetailedSecondaries(true);
                 scintillationProcess->SetStackElectrons(true);
 
                 if (scintillationProcess->IsApplicable(*particle)) 
                 {
-  
-                    pmanager->AddProcess(scintillationProcess, ordDefault + 1, ordInActive, ordDefault + 1);
+                    ProcessManager->AddProcess(
+                        scintillationProcess, 
+                        ordDefault + 1, 
+                        ordInActive, 
+                        ordDefault + 1
+                    );
                 }
 
                 G4OpBoundaryProcess* fBoundaryProcess = new G4OpBoundaryProcess();
@@ -151,10 +162,10 @@ namespace LArGeant
 
                 if (particleName == "opticalphoton") 
                 {
-                    pmanager->AddDiscreteProcess(fAbsorptionProcess);
-                    pmanager->AddDiscreteProcess(fRayleighScatteringProcess);
-                    pmanager->AddDiscreteProcess(fTheWLSProcess);
-                    pmanager->AddDiscreteProcess(fBoundaryProcess);
+                    ProcessManager->AddDiscreteProcess(fAbsorptionProcess);
+                    ProcessManager->AddDiscreteProcess(fRayleighScatteringProcess);
+                    ProcessManager->AddDiscreteProcess(fTheWLSProcess);
+                    ProcessManager->AddDiscreteProcess(fBoundaryProcess);
                 }
             }
         }

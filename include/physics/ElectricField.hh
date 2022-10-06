@@ -84,6 +84,7 @@ namespace LArGeant
         G4MagIntegratorStepper* mLocalStepper;
         G4MagInt_Driver*        mIntgrDriver;
         G4MagInt_Driver*        mLocalIntgrDriver;
+        
         G4int                   mStepperType;
 
         ElectricFieldMessenger*      mFieldMessenger;

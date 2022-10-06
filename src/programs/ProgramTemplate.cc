@@ -1,5 +1,5 @@
 /**
- * @file ArgonSphere.cc
+ * @file Template.cc
  * @author Nicholas Carrara [nmcarrara@ucdavis.edu]
  * @brief   
  * @version 0.0
@@ -21,46 +21,79 @@
 #include "G4ParticleHPManager.hh"
 
 #include "Argon.hh"
+#include "Xenon.hh"
 #include "ActionInitialization.hh"
 #include "ArgonCubeDetector.hh"
 #include "DetectorConstruction.hh"
+#include "EventManager.hh"
+#include "NESTInterface.hh"
 #include "PhysicsList.hh"
 #include "PrimaryGeneratorAction.hh"
 
 int main(int argc, char** argv)
 {
+    //-------- create the ui executive --------//
     G4UIExecutive* UIExecutive = 0;
     
 
-    // create the run manager
+    //-------- create the run manager --------//
+    /**
+     * The run manager is created with a certain
+     * number of threads.
+     */
+    G4int NumberOfThreads = 10;
 #ifdef G4MULTITHREADED
     G4MTRunManager* RunManager = new G4MTRunManager();
-    RunManager->SetNumberOfThreads(8);
+    RunManager->SetNumberOfThreads(NumberOfThreads);
 #else
     G4RunManager* RunManager = new G4RunManager();
 #endif
 
-    // create the physics list
+
+    //-------- create the physics list --------//
+    /**
+     * The default physics list contains all of the 
+     * Scintillation physics and the NEST interface.
+     */
     auto PhysicsList = new LArGeant::PhysicsList();
     RunManager->SetUserInitialization(PhysicsList);
 
-    // create the argon cube detector
-    auto detector = new LArGeant::ArgonCubeDetector(
-        10 * cm, 10 * cm, 10 * cm,
-        8, 8, 1 * mm
-    );
+
+    //-------- create the detector --------//
+    /**
+     * The detector must be instantiated with an instance of
+     * a LArGeant::Detector, which itself contains the various
+     * components that make up the detector.  
+     * 
+     * The experimental hall is a cube with sides defaulted
+     * to 100cm each.
+     */
+    auto detector = nullptr;
+    G4double ExperimentalHallX = 100 * cm;
+    G4double ExperimentalHallY = 100 * cm;
+    G4double ExperimentalHallZ = 100 * cm;
     auto detectorConstruction = new LArGeant::DetectorConstruction(
-        100 * cm, 100 * cm, 100 * cm, detector
+        ExperimentalHallX,
+        ExperimentalHallY,
+        ExperimentalHallZ,
+        detector
     );
     RunManager->SetUserInitialization(detectorConstruction);
 
-    // create the action initialization
-    auto PrimaryGeneratorAction = new LArGeant::PrimaryGeneratorAction();
-    auto ActionInitialization = new LArGeant::ActionInitialization(PrimaryGeneratorAction);
+
+    //-------- create the action initialization --------//
+    /**
+     * The action initialization does not really need to be
+     * edited, unless the user wants to do something different
+     * than the default behavior.
+     */
+    auto ActionInitialization = new LArGeant::ActionInitialization(
+        new LArGeant::PrimaryGeneratorAction()
+    );
     RunManager->SetUserInitialization(ActionInitialization);
 
 
-    // start the session
+    //-------- start the session --------//
     if (argc == 1)
     {
         UIExecutive = new G4UIExecutive(argc, argv);
@@ -72,8 +105,6 @@ int main(int argc, char** argv)
         RunManager->Initialize();
 #ifdef LARTPC_USE_UI
     G4UImanager* UIManager = G4UImanager::GetUIpointer();
-
-    // start the session
     if (argc == 1)
     {
         UIManager->ApplyCommand("/control/execute vis.mac");

@@ -37,21 +37,25 @@ namespace LArGeant
         G4double        energy = preStepPoint->GetTotalEnergy();
         G4ThreeVector   particleMomentum = preStepPoint->GetMomentum();
 
-        auto AnalysisManager = G4AnalysisManager::Instance();
-        AnalysisManager->FillNtupleIColumn(0, 0, event);
-        AnalysisManager->FillNtupleIColumn(0, 1, copyNo);
-        AnalysisManager->FillNtupleDColumn(0, 2, globalTime);
-        AnalysisManager->FillNtupleIColumn(0, 3, trackID);
-        AnalysisManager->FillNtupleDColumn(0, 4, localTime);
-        AnalysisManager->FillNtupleDColumn(0, 5, particlePosition[0]);
-        AnalysisManager->FillNtupleDColumn(0, 6, particlePosition[1]);
-        AnalysisManager->FillNtupleDColumn(0, 7, particlePosition[2]);
-        AnalysisManager->FillNtupleDColumn(0, 8, energy);
-        AnalysisManager->FillNtupleDColumn(0, 9, particleMomentum[0]);
-        AnalysisManager->FillNtupleDColumn(0, 10, particleMomentum[1]);
-        AnalysisManager->FillNtupleDColumn(0, 11, particleMomentum[2]);
-        AnalysisManager->AddNtupleRow(0);
-
+        auto Manager = EventManager::GetEventManager();
+        if (Manager->SaveHits())
+        {
+            G4int index = Manager->GetIndex("Hits");
+            auto AnalysisManager = G4AnalysisManager::Instance();
+            AnalysisManager->FillNtupleIColumn(index, 0, event);
+            AnalysisManager->FillNtupleIColumn(index, 1, copyNo);
+            AnalysisManager->FillNtupleDColumn(index, 2, globalTime);
+            AnalysisManager->FillNtupleIColumn(index, 3, trackID);
+            AnalysisManager->FillNtupleDColumn(index, 4, localTime);
+            AnalysisManager->FillNtupleDColumn(index, 5, particlePosition[0]);
+            AnalysisManager->FillNtupleDColumn(index, 6, particlePosition[1]);
+            AnalysisManager->FillNtupleDColumn(index, 7, particlePosition[2]);
+            AnalysisManager->FillNtupleDColumn(index, 8, energy);
+            AnalysisManager->FillNtupleDColumn(index, 9, particleMomentum[0]);
+            AnalysisManager->FillNtupleDColumn(index, 10, particleMomentum[1]);
+            AnalysisManager->FillNtupleDColumn(index, 11, particleMomentum[2]);
+            AnalysisManager->AddNtupleRow(index);
+        }
         return true;
     }
 }

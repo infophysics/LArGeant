@@ -24,6 +24,8 @@
 
 namespace LArGeant
 {
+    class SensitiveDetector;
+    
     class Detector
     {
     public:

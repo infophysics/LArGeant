@@ -61,12 +61,12 @@ namespace LArGeant
     class ScintillationPhysics : public G4VPhysicsConstructor
     {
     public:
-        ScintillationPhysics(G4String name);
+        ScintillationPhysics();
         ~ScintillationPhysics();
 
         void ConstructProcess();
         void ConstructScintillationProcess();
-        
+
         void ConstructParticle() {}
 
     private:

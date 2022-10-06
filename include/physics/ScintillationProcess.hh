@@ -44,6 +44,7 @@
 #include "LArNEST.hh"
 #include "LArDetector.hh"
 #include "ThermalElectron.hh"
+#include "EventManager.hh"
 #include "NESTInterface.hh"
 
 namespace LArGeant
@@ -123,8 +124,6 @@ namespace LArGeant
         const G4String mName = {"ScintillationProcess"};
         G4ProcessType mProcessType = {fElectromagnetic};
         G4EmProcessSubType mProcessSubType = {fScintillation};
-
-        G4bool mRecordNESTResults = true;
 
     };
 

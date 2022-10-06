@@ -27,9 +27,19 @@
 
 class Detector;
 class DetectorComponent;
+class PhysicsList;
 
 namespace LArGeant
 {
+    struct Tuple
+    {
+        G4String name = "none";
+        G4int index = -1;
+        Tuple(G4String n, G4int i)
+        : name(n), index(i)
+        {}
+    };
+
     /**
      * @brief Class for handling generation of source primaries,
      * input/output, data saving, messenging, etc.
@@ -44,35 +54,72 @@ namespace LArGeant
 
         // setters for various objects
         static void SetPhysicsList(PhysicsList*);
-
 		static void SetParticle(G4String);
-
-        static void AddComponent(std::shared_ptr<DetectorComponent> component);
 
         // get the event manager
         static std::shared_ptr<EventManager>& GetEventManager() 
         { 	
 			if (sInstance == nullptr) {
 				sInstance = std::make_shared<EventManager>();
+                sTuples.clear();
+                sCurrentTupleIndex = -1;
 			}return sInstance; 
 		}
 
+        // Tuple related functions
+        G4String OutputFileName()       { return sOutputFileName; }
+        G4int GetIndex(G4String);
+        G4bool SaveParticleInfo()       { return sSaveParticleInfo; }
+        G4bool SaveHits()               { return sSaveHits; }
+        G4bool SaveOpticalPhotons()     { return sSaveOpticalPhotons; }
+        G4bool SaveThermalElectrons()   { return sSaveThermalElectrons; }
+        G4bool SaveNEST()               { return sSaveNEST; }
+
+        void OutputFileName(G4String name)      { sOutputFileName = name; }
+        void SaveParticleInfo(G4bool save)      { sSaveParticleInfo = save; }
+        void SaveHits(G4bool save)              { sSaveHits = save; }
+        void SaveOpticalPhotons(G4bool save)    { sSaveOpticalPhotons = save; }
+        void SaveThermalElectrons(G4bool save)  { sSaveThermalElectrons = save; }
+        void SaveNEST(G4bool save)              { sSaveNEST = save; }
+
+        // Scintillation stacking physics
+        G4bool TrackOpticalPhotons()    { return sTrackOpticalPhotons; }
+        G4bool TrackThermalElectrons()  { return sTrackThermalElectrons; }
+
+        void TrackOpticalPhotons(G4bool track)  { sTrackOpticalPhotons = track; }
+        void TrackThermalElectrons(G4bool track){ sTrackThermalElectrons = track; }
+
+        // Detector related functions
+        static void AddComponent(std::shared_ptr<DetectorComponent> component);
         static std::shared_ptr<DetectorComponent> GetComponent(G4int index)
         {
             return sDetectorComponents[index];
         }
-
         static G4int GetNumberOfComponents() { return sDetectorComponents.size(); }
 
+        // Generate primaries
         std::vector<Primary> GeneratePrimaryList();
 
     private:
         static std::shared_ptr<EventManager> sInstance;
 
-        // various objects
         inline static std::shared_ptr<PhysicsList> sPhysicsList = {nullptr};
-        // inline static std::shared_ptr<Detector> sDetector = {nullptr};
         inline static std::vector<std::shared_ptr<DetectorComponent>> sDetectorComponents = {nullptr};
+
+        inline static G4String sOutputFileName = "default";
+        inline static G4int sCurrentTupleIndex = 0;
+
+        inline static G4bool sSaveParticleInfo = false;
+        inline static G4bool sSaveHits = true;
+        inline static G4bool sSaveOpticalPhotons = true;
+        inline static G4bool sSaveThermalElectrons = true;
+        inline static G4bool sSaveNEST = true;
+
+        inline static std::vector<Tuple> sTuples;
+
+        // Scintillation stacking physics
+        inline static G4bool sTrackOpticalPhotons = true;
+        inline static G4bool sTrackThermalElectrons = false;
         
     };
 }

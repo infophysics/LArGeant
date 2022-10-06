@@ -11,6 +11,7 @@ namespace LArGeant
 {
     PrimaryGeneratorAction::PrimaryGeneratorAction()
     {
+        mParticleGun = new G4ParticleGun();
     }
 
     PrimaryGeneratorAction::~PrimaryGeneratorAction()
@@ -20,23 +21,27 @@ namespace LArGeant
     PrimaryGeneratorAction::PrimaryGeneratorAction(
         G4int numberOfParticles, 
         G4String particleName,
+        G4double momentum,
+        G4double energy,
         G4ThreeVector position, 
-        G4ThreeVector momentumDirection,
-        G4double momentum
+        G4ThreeVector momentumDirection
     )
     : mNumberOfParticles(numberOfParticles)
     , mParticleName(particleName)
+    , mParticleMomentum(momentum)
+    , mParticleEnergy(energy)
     , mParticlePosition(position)
     , mParticleMomentumDirection(momentumDirection)
-    , mParticleMomentum(momentum)
     {
         mParticleGun = new G4ParticleGun(mNumberOfParticles);
         mParticleTable = G4ParticleTable::GetParticleTable();
         mParticle = mParticleTable->FindParticle(mParticleName);
-        
+
+        mParticleGun->SetParticleMomentum(mParticleMomentum);
+        mParticleGun->SetParticleEnergy(mParticleEnergy);
         mParticleGun->SetParticlePosition(mParticlePosition);
         mParticleGun->SetParticleMomentumDirection(mParticleMomentumDirection);
-        mParticleGun->SetParticleMomentum(mParticleMomentum);
+        
         mParticleGun->SetParticleDefinition(mParticle);
     }
 
@@ -50,11 +55,21 @@ namespace LArGeant
         mNumberOfParticles = numberOfParticles;
         mParticleGun->SetNumberOfParticles(mNumberOfParticles);
     }
-    void PrimaryGeneratorAction::SetParticle(G4String particleName)
+    void PrimaryGeneratorAction::SetParticleName(G4String particleName)
     {
         mParticleName = particleName;
         mParticle = mParticleTable->FindParticle(mParticleName);
         mParticleGun->SetParticleDefinition(mParticle);
+    }
+    void PrimaryGeneratorAction::SetParticleMomentum(G4double momentum)
+    {
+        mParticleMomentum = momentum;
+        mParticleGun->SetParticleMomentum(mParticleMomentum);
+    }
+    void PrimaryGeneratorAction::SetParticleEnergy(G4double energy)
+    {
+        mParticleEnergy = energy;
+        mParticleGun->SetParticleEnergy(mParticleEnergy);
     }
     void PrimaryGeneratorAction::SetParticlePosition(G4ThreeVector position)
     {
@@ -66,12 +81,7 @@ namespace LArGeant
         mParticleMomentumDirection = momentumDirection;
         mParticleGun->SetParticleMomentumDirection(mParticleMomentumDirection);
     }
-    void PrimaryGeneratorAction::SetParticleMomentum(G4double momentum)
-    {
-        mParticleMomentum = momentum;
-        mParticleGun->SetParticleMomentum(mParticleMomentum);
-    }
-
+    
     void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     {
         for (auto primary : mPrimaries)

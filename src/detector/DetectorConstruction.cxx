@@ -91,7 +91,18 @@ namespace LArGeant
         if(!mElectricField.Get())
         {
             ElectricField* electricField = new ElectricField(G4ThreeVector(0,0,0));
-            electricField->SetLocalFieldValue(G4ThreeVector(0,500.0 * volt/cm, 0));
+
+            // Grab the E-field from the NEST detector
+            auto detector = NESTInterface::GetInterface()->GetLArDetector();
+            G4double efield = detector->FitEF(0, 0, 0);
+            std::vector<G4double> efield_dir = detector->FitDirEF(0, 0, 0);
+            G4ThreeVector efield_direction = {
+                efield * efield_dir[0] * volt / cm, 
+                efield * efield_dir[1] * volt / cm, 
+                efield * efield_dir[2] * volt / cm
+            };
+
+            electricField->SetLocalFieldValue(efield_direction);
             G4AutoDelete::Register(electricField);
             mElectricField.Put(electricField);
         }
@@ -101,13 +112,10 @@ namespace LArGeant
         mDetector->SetSensitiveDetector(Sensitive);
         for (G4int ii = 0; ii < mDetector->GetNumberOfComponents(); ii++)
         {
-            if(mDetector->GetDetectorComponent(ii)->GetSensitive())
-            {
-                G4cout << "Adding sensitive detector to " << mDetector->GetDetectorComponent(ii)->GetName() << G4endl;
+            if(mDetector->GetDetectorComponent(ii)->GetSensitive()) {
                 mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetSensitiveDetector(mDetector->GetSensitiveDetectorPointer());
             }
-            if(mDetector->GetDetectorComponent(ii)->GetElectricField())
-            {
+            if(mDetector->GetDetectorComponent(ii)->GetElectricField()) {
                 mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetFieldManager(mElectricField.Get()->GetLocalFieldManager(), true);
             }
         }

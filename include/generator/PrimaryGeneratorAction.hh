@@ -26,27 +26,31 @@ namespace LArGeant
         PrimaryGeneratorAction(
             G4int numberOfParticles, 
             G4String particleName,
+            G4double momentum = {0. * MeV},
+            G4double energy = {0. * MeV},
             G4ThreeVector position = {G4ThreeVector(0.,0.,0.)}, 
-            G4ThreeVector momentumDirection = {G4ThreeVector(0.,0.,1.)},
-            G4double momentum = {10. * MeV}
+            G4ThreeVector momentumDirection = {G4ThreeVector(0.,0.,1.)}
         );
 
         void SetPrimaries(std::vector<Primary> primaries);
 
         void SetNumberOfParticles(G4int numberOfParticles);
-        void SetParticle(G4String particleName);
+        void SetParticleName(G4String particleName);
+        void SetParticleMomentum(G4double momentum);
+        void SetParticleEnergy(G4double energy);
         void SetParticlePosition(G4ThreeVector position);
         void SetParticleMomentumDirection(G4ThreeVector momentumDirection);
-        void SetParticleMomentum(G4double momentum);
 
         // method to access particle gun
-        G4int GetNumberOfParticles() const { return mNumberOfParticles; }
-        G4ParticleDefinition* GetParticle() const { return mParticle; }
-        G4String GetParticleName() const { return mParticleName; }
-        G4ThreeVector GetParticlePosition() const { return mParticlePosition; }
-        G4ThreeVector GetParticleMomentumDirection() const { return mParticleMomentumDirection; }
-        G4double GetParticleMomentum() const { return mParticleMomentum; }
-        G4ParticleGun* GetParticleGun() const { return mParticleGun; }
+        G4int GetNumberOfParticles() const                  { return mNumberOfParticles; }
+        G4ParticleDefinition* GetParticle() const           { return mParticle; }
+
+        G4String GetParticleName() const                    { return mParticleName; }
+        G4double GetParticleMomentum() const                { return mParticleMomentum; }
+        G4double GetParticleEnergy() const                  { return mParticleEnergy; }
+        G4ThreeVector GetParticlePosition() const           { return mParticlePosition; }
+        G4ThreeVector GetParticleMomentumDirection() const  { return mParticleMomentumDirection; }
+        G4ParticleGun* GetParticleGun() const               { return mParticleGun; }
 
         virtual void GeneratePrimaries(G4Event* event);
 
@@ -58,10 +62,11 @@ namespace LArGeant
         G4ParticleDefinition* mParticle;
 
         G4String mParticleName;
+        G4double mParticleMomentum;
+        G4double mParticleEnergy;
         G4ThreeVector mParticlePosition;
         G4ThreeVector mParticleMomentumDirection;
-        G4double mParticleMomentum;
-
+        
         std::vector<Primary> mPrimaries;
     };
 }

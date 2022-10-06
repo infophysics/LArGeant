@@ -65,4 +65,17 @@ namespace LArGeant
 
         return primaries;
     }
+
+    G4int EventManager::GetIndex(G4String tuple)
+    {
+        for(G4int ii = 0; ii < sTuples.size(); ii++)
+        {
+            if(sTuples[ii].name == tuple) {
+                return ii;
+            }
+        }
+        sCurrentTupleIndex += 1;
+        sTuples.emplace_back(Tuple(tuple, sCurrentTupleIndex));
+        return sCurrentTupleIndex;
+    }
 }

@@ -56,7 +56,7 @@ namespace LArGeant
         primaries.emplace_back(
             Primary(
                 "mu-",
-                1,
+                10,
                 {0., 0., 1.},
                 {5 * MeV},
                 {0., 1., 0.}

@@ -106,14 +106,11 @@ namespace LArGeant
             G4AutoDelete::Register(electricField);
             mElectricField.Put(electricField);
         }
-        std::shared_ptr<SensitiveDetector> Sensitive = std::make_shared<SensitiveDetector>(
-            "SensitiveDetector"
-        );
-        mDetector->SetSensitiveDetector(Sensitive);
+        SensitiveDetector* Sensitive = new SensitiveDetector("SensitiveDetector");
         for (G4int ii = 0; ii < mDetector->GetNumberOfComponents(); ii++)
         {
             if(mDetector->GetDetectorComponent(ii)->GetSensitive()) {
-                mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetSensitiveDetector(mDetector->GetSensitiveDetectorPointer());
+                SetSensitiveDetector(mDetector->GetDetectorComponent(ii)->GetLogicalVolume().get(), Sensitive);
             }
             if(mDetector->GetDetectorComponent(ii)->GetElectricField()) {
                 mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetFieldManager(mElectricField.Get()->GetLocalFieldManager(), true);

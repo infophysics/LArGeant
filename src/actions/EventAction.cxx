@@ -13,6 +13,18 @@ namespace LArGeant
     : G4UserEventAction()
     {
         mRunAction = runAction;
+        mParticleName.clear();
+        mParticlePDG.clear();
+        mParticleParentTrackID.clear();
+        mParticleAncestorTrackID.clear();
+
+        // generate list of primaries
+        auto Manager = EventManager::GetEventManager();
+        auto primaries = Manager->GeneratePrimaryList();
+
+        auto RunManager = G4RunManager::GetRunManager();
+        auto Generator = (PrimaryGeneratorAction*)RunManager->GetUserPrimaryGeneratorAction();
+        Generator->SetPrimaries(primaries);
     }
 
     EventAction::~EventAction()

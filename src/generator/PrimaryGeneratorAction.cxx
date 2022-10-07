@@ -12,6 +12,14 @@ namespace LArGeant
     PrimaryGeneratorAction::PrimaryGeneratorAction()
     {
         mParticleGun = new G4ParticleGun();
+        mParticleTable = G4ParticleTable::GetParticleTable();
+        mParticle = mParticleTable->FindParticle("geantino");
+        mParticleGun->SetNumberOfParticles(1);
+        mParticleGun->SetParticleMomentum(1. * MeV);
+        mParticleGun->SetParticleEnergy(1. * MeV);
+        mParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
+        mParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,1.,0.));
+        mParticleGun->SetParticleDefinition(mParticle);
     }
 
     PrimaryGeneratorAction::~PrimaryGeneratorAction()

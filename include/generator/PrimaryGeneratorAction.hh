@@ -32,7 +32,7 @@ namespace LArGeant
             G4ThreeVector momentumDirection = {G4ThreeVector(0.,0.,1.)}
         );
 
-        void SetPrimaries(std::vector<Primary> primaries);
+        void SetPrimaries(std::vector<PrimaryGeneration> primaries);
 
         void SetNumberOfParticles(G4int numberOfParticles);
         void SetParticleName(G4String particleName);
@@ -59,6 +59,7 @@ namespace LArGeant
 
         G4int mNumberOfParticles;
         G4ParticleTable* mParticleTable;
+        G4IonTable* mIonTable;
         G4ParticleDefinition* mParticle;
 
         G4String mParticleName;
@@ -67,6 +68,6 @@ namespace LArGeant
         G4ThreeVector mParticlePosition;
         G4ThreeVector mParticleMomentumDirection;
         
-        std::vector<Primary> mPrimaries;
+        std::vector<PrimaryGeneration> mPrimaries;
     };
 }

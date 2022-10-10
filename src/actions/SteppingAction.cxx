@@ -13,10 +13,6 @@ namespace LArGeant
     : G4UserSteppingAction()
     {
         mEventAction = eventAction;
-        LArDetector* detector = new LArDetector();
-        mLArNEST = std::make_shared<NEST::LArNEST>(detector);
-        mOpticalLengths = 0.0;
-        mOpticalNum = 0;
     }
 
     SteppingAction::~SteppingAction()
@@ -24,6 +20,9 @@ namespace LArGeant
 
     void SteppingAction::UserSteppingAction(const G4Step *step)
     {   
+        if(step->GetTrack()->GetGlobalTime() >= EventManager::GetEventManager()->EventMaxTime()) {
+            step->GetTrack()->SetTrackStatus(fStopAndKill);
+        }
         G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
         G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
 
@@ -31,56 +30,43 @@ namespace LArGeant
         G4int particle_pdg = step->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
         G4ThreeVector particleStartPosition = step->GetPreStepPoint()->GetPosition();
 
-        G4StepPoint* preStepPoint = step->GetPreStepPoint();
-        G4StepPoint* postStepPoint = step->GetPostStepPoint();
-        const G4VProcess* preProcess = preStepPoint->GetProcessDefinedStep();
-        const G4VProcess* postProcess = postStepPoint->GetProcessDefinedStep();
+        G4StepPoint* pre_step_point = step->GetPreStepPoint();
+        G4StepPoint* post_step_point = step->GetPostStepPoint();
+        const G4VProcess* pre_process = pre_step_point->GetProcessDefinedStep();
+        const G4VProcess* post_process = post_step_point->GetProcessDefinedStep();
+
+        G4ThreeVector pre_step_position = pre_step_point->GetPosition();
+        G4ThreeVector post_step_position = post_step_point->GetPosition();
+
+        G4Track* track = step->GetTrack();
+        G4double local_time = track->GetLocalTime();
+        G4double global_time = track->GetGlobalTime();
+        G4double pre_step_energy = pre_step_point->GetKineticEnergy();
+        G4double post_step_energy = post_step_point->GetKineticEnergy();
+        G4int track_status = (int)track->GetTrackStatus();
+        G4int track_id = track->GetTrackID();
+        G4int parent_track_id = track->GetParentID();
 
         auto Manager = EventManager::GetEventManager();
         auto AnalysisManager = G4AnalysisManager::Instance();
-        if (particle_name == "opticalphoton" && int(step->GetTrack()->GetTrackStatus()) == 2)
+        if(
+            Manager->SavePrimaryInfo() && 
+            mEventAction->GetParticleParentTrackID(track_id) == 0 &&
+            step->GetTotalEnergyDeposit() > 0
+        )
         {
-            if(Manager->SaveOpticalPhotons())
-            {
-                G4int index = Manager->GetIndex("OpticalPhotons");
-                AnalysisManager->FillNtupleDColumn(index, 0, step->GetTrack()->GetTotalEnergy());
-                AnalysisManager->FillNtupleDColumn(index, 1, step->GetTrack()->GetTrackLength()/cm);
-                AnalysisManager->AddNtupleRow(index);
+            if(parent_track_id == 0) {
+                mEventAction->GetPrimaryData(track_id).number_of_edeps += 1;
+                mEventAction->GetPrimaryData(track_id).total_edep += step->GetTotalEnergyDeposit();
             }
-        }
-        if (particle_name == "thermalelectron" && int(step->GetTrack()->GetTrackStatus()) == 2)
-        {
-            if(Manager->SaveThermalElectrons())
-            {
-                G4int index = Manager->GetIndex("ThermalElectrons");
-                AnalysisManager->FillNtupleDColumn(index, 0, step->GetTrack()->GetTotalEnergy());
-                AnalysisManager->FillNtupleDColumn(index, 1, step->GetTrack()->GetTrackLength()/cm);
-                AnalysisManager->AddNtupleRow(index);
+            else if(particle_name == "opticalphoton") {
+                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_optical_photon_edep += step->GetTotalEnergyDeposit();
             }
-        }
-        
-        // Save Particle Info
-        if(Manager->SaveParticleInfo())
-        {
-            G4Track* track = step->GetTrack();
-            G4int track_id = track->GetTrackID(); 
-            if (step->IsFirstStepInVolume())
-            {
-                G4int parent_track_id = track->GetParentID();
-                G4String particle_name = track->GetParticleDefinition()->GetParticleName();
-
-                mEventAction->SetParticleName(particle_name);
-                mEventAction->SetParticlePDG(particle_pdg);
-                mEventAction->SetParticleParentTrackID(parent_track_id);
-                if (parent_track_id == 0) {
-                    mEventAction->SetParticleAncestorTrackID(0);
-                }
-                else if (mEventAction->GetParticleParentTrackID(parent_track_id) == 0) {
-                    mEventAction->SetParticleAncestorTrackID(parent_track_id);
-                }
-                else {
-                    mEventAction->SetParticleAncestorTrackID(mEventAction->GetParticleAncestorTrackID(parent_track_id));
-                }
+            else if(particle_name == "thermalelectron") {
+                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_thermal_electron_edep += step->GetTotalEnergyDeposit();
+            }
+            else {
+                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_daughter_edep += step->GetTotalEnergyDeposit();
             }
         }
     }

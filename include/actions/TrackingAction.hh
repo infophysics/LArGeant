@@ -11,7 +11,22 @@
 #include "G4GenericMessenger.hh"
 #include "G4AnalysisManager.hh"
 
+#include "EventAction.hh"
+#include "Core.hh"
+
 namespace LArGeant
 {
+    class TrackingAction : public G4UserTrackingAction
+    {
+    public:
+        TrackingAction(std::shared_ptr<EventAction> EventAction);
+        ~TrackingAction();
+        
+        virtual void PreUserTrackingAction(const G4Track*);
+        virtual void PostUserTrackingAction(const G4Track*);
+        
+    private:
+        std::shared_ptr<EventAction> mEventAction;
 
+    };
 }

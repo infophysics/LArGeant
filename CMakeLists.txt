@@ -11,11 +11,18 @@ if(DEBUG_MODE)
     add_compile_options(-g)
 endif()
 
+# profiling mode
+option(PROFILING_MODE "Compile with profiling turned on" ON)
+if(PROFILING_MODE)
+    add_definitions(-DLARGEANT_PROFILING)
+    message(STATUS "Compiling with profiling mode turned on")
+endif()
+
 # Multithreading mode
 option(MULTITHREADING "Compile with multithreading mode" OFF)
 if(MULTITHREADING)
     if(DEFINED ENV{G4MULTITHREADED})
-        add_definitions(-DLARTPC_MULTITHREADED)
+        add_definitions(-DLARGEANT_MULTITHREADED)
         message(STATUS "Compiling with multithreading enabled.")
     else()
         message(STATUS "Attempt to use multithreading failed - G4MULTITHREADED is not defined! Maybe you didn't compile G4 with multithreading.")
@@ -25,14 +32,14 @@ endif()
 # use the visualization manager
 option(USE_VIS "Whether to use the visualization." OFF)
 if(USE_VIS)
-    add_definitions(-DLARTPC_USE_VIS)
+    add_definitions(-DLARGEANT_USE_VIS)
     message(STATUS "Compiling with the visualization enabled.")
 endif()
 
 # use the ui executive/manager
 option(USE_UI "Whether to use the ui interface." OFF)
 if(USE_UI)
-    add_definitions(-DLARTPC_USE_UI)
+    add_definitions(-DLARGEANT_USE_UI)
     message(STATUS "Compiling with the ui enabled.")
 endif()
 

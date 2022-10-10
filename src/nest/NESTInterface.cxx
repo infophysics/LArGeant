@@ -206,9 +206,15 @@ namespace LArGeant
         auto result = mLArNEST->FullCalculation(
             interaction, energy, efield, density, false
         );
+        if(result.fluctuations.NphFluctuation < 0 || std::isnan(result.fluctuations.NphFluctuation)) {
+            result.fluctuations.NphFluctuation = 0;
+        }
+        if(result.fluctuations.NeFluctuation < 0 || std::isnan(result.fluctuations.NeFluctuation)) {
+            result.fluctuations.NeFluctuation = 0;
+        }
         return {
-            result.fluctuations.NphFluctuation, 
-            result.fluctuations.NeFluctuation,
+            (int)result.fluctuations.NphFluctuation, 
+            (int)result.fluctuations.NeFluctuation,
             particle,
             init_position,
             final_position,

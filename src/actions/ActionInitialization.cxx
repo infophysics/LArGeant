@@ -31,6 +31,7 @@ namespace LArGeant
         SetUserAction(eventAction.get());
 
         SetUserAction(new SteppingAction(eventAction));
+        SetUserAction(new TrackingAction(eventAction));
         SetUserAction(new StackingAction);
     }
 

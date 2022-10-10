@@ -43,6 +43,7 @@ namespace LArGeant
     {
         mParticleGun = new G4ParticleGun(mNumberOfParticles);
         mParticleTable = G4ParticleTable::GetParticleTable();
+        mIonTable = G4IonTable::GetIonTable();
         mParticle = mParticleTable->FindParticle(mParticleName);
 
         mParticleGun->SetParticleMomentum(mParticleMomentum);
@@ -53,7 +54,7 @@ namespace LArGeant
         mParticleGun->SetParticleDefinition(mParticle);
     }
 
-    void PrimaryGeneratorAction::SetPrimaries(std::vector<Primary> primaries)
+    void PrimaryGeneratorAction::SetPrimaries(std::vector<PrimaryGeneration> primaries)
     {
         mPrimaries = primaries;
     }
@@ -94,8 +95,16 @@ namespace LArGeant
     {
         for (auto primary : mPrimaries)
         {
+            if(primary.ion == true)
+            {
+                auto ion = G4IonTable::GetIonTable()->GetIon(primary.Z, primary.A, primary.energy);
+                mParticleGun->SetParticleDefinition(ion);
+            }
+            else {
+                mParticleGun->SetParticleDefinition(primary.definition);
+            }
             mParticleGun->SetNumberOfParticles(1);
-            mParticleGun->SetParticleDefinition(primary.definition);
+            mParticleGun->SetParticleCharge(primary.charge);
             mParticleGun->SetParticleTime(primary.time);
             mParticleGun->SetParticlePosition(primary.position);
             mParticleGun->SetParticleEnergy(primary.energy);

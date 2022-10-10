@@ -18,6 +18,41 @@ namespace LArGeant
         AnalysisManager->SetVerboseLevel(0);
         AnalysisManager->SetNtupleMerging(true);
 
+        if(Manager->SavePrimaryInfo())
+        {
+            G4int index = Manager->GetIndex("Primaries");
+            AnalysisManager->CreateNtuple("Primaries", "Primaries");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleSColumn("particle");
+            AnalysisManager->CreateNtupleIColumn("pdg");
+            AnalysisManager->CreateNtupleDColumn("init_t");
+            AnalysisManager->CreateNtupleDColumn("init_x");
+            AnalysisManager->CreateNtupleDColumn("init_y");
+            AnalysisManager->CreateNtupleDColumn("init_z");
+            AnalysisManager->CreateNtupleDColumn("init_energy");
+            AnalysisManager->CreateNtupleDColumn("final_t");
+            AnalysisManager->CreateNtupleDColumn("final_x");
+            AnalysisManager->CreateNtupleDColumn("final_y");
+            AnalysisManager->CreateNtupleDColumn("final_z");
+            AnalysisManager->CreateNtupleDColumn("final_energy");
+            AnalysisManager->CreateNtupleIColumn("number_of_daughters");
+            AnalysisManager->CreateNtupleDColumn("total_daughter_init_energy");
+            AnalysisManager->CreateNtupleDColumn("total_daughter_final_energy");
+            AnalysisManager->CreateNtupleDColumn("total_daughter_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_edeps");
+            AnalysisManager->CreateNtupleDColumn("total_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_photons");
+            AnalysisManager->CreateNtupleDColumn("total_optical_photon_init_energy");
+            AnalysisManager->CreateNtupleDColumn("total_optical_photon_final_energy");
+            AnalysisManager->CreateNtupleDColumn("total_optical_photon_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_electrons");
+            AnalysisManager->CreateNtupleDColumn("total_thermal_electron_init_energy");
+            AnalysisManager->CreateNtupleDColumn("total_thermal_electron_final_energy");
+            AnalysisManager->CreateNtupleDColumn("total_thermal_electron_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_hits");
+        }
+
         if(Manager->SaveParticleInfo())
         {
             G4int index = Manager->GetIndex("Particle");
@@ -95,6 +130,9 @@ namespace LArGeant
 
     void RunAction::BeginOfRunAction(const G4Run* run)
     {
+#ifdef LARGEANT_PROFILING
+        EventManager::GetEventManager()->ResetProfiling();
+#endif
         auto Manager = EventManager::GetEventManager();
         auto AnalysisManager = G4AnalysisManager::Instance();
         G4String OutputFileName = Manager->OutputFileName();
@@ -111,10 +149,31 @@ namespace LArGeant
         }
     }
 
-    void RunAction::EndOfRunAction(const G4Run*)
+    void RunAction::EndOfRunAction(const G4Run* run)
     {
         auto AnalysisManager = G4AnalysisManager::Instance();
         AnalysisManager->Write();
         AnalysisManager->CloseFile();
+
+#ifdef LARGEANT_PROFILING
+        auto Manager = EventManager::GetEventManager();
+        G4String RunID = std::to_string(run->GetRunID());
+
+        std::ofstream ProfilingFile;
+        ProfilingFile.open(
+            Manager->OutputFileName() + "_" + RunID + ".profile",
+            std::ios_base::app    
+        );
+        ProfilingFile << "function,number_of_calls,total_time[ms]\n"; 
+        
+        auto Profiles = Manager->GetFunctionProfiles();
+        for(auto const& [key, val] : Profiles)
+        {
+            ProfilingFile << key << ","; 
+            ProfilingFile << val.calls << ","; 
+            ProfilingFile << val.time << "\n";
+        }
+        ProfilingFile.close();
+#endif
     }
 }

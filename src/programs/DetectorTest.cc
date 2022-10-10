@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     
 
     // create the run manager
-#ifdef G4MULTITHREADED
+#ifdef LARGEANT_MULTITHREADED
     G4MTRunManager* RunManager = new G4MTRunManager();
     RunManager->SetNumberOfThreads(8);
 #else
@@ -65,12 +65,12 @@ int main(int argc, char** argv)
     {
         UIExecutive = new G4UIExecutive(argc, argv);
     }
-#ifdef LARTPC_USE_VIS
+#ifdef LARGEANT_USE_VIS
         auto VisManager = std::make_shared<G4VisExecutive>();
         VisManager->Initialize();
 #endif
         RunManager->Initialize();
-#ifdef LARTPC_USE_UI
+#ifdef LARGEANT_USE_UI
     G4UImanager* UIManager = G4UImanager::GetUIpointer();
 
     // start the session
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
     }
 #endif
 
-#ifdef LARTPC_USE_UI_TCSH
+#ifdef LARGEANT_USE_UI_TCSH
         auto UITerminal = std::make_shared<G4UIterminal>(new G4UItcsh);
 #else   
         auto UITerminal = std::make_shared<G4UIterminal>();

@@ -13,6 +13,7 @@
 namespace LArGeant
 {
     std::shared_ptr<EventManager> EventManager::sInstance;
+    std::mutex EventManager::sMutex;
 
     EventManager::EventManager()
     {
@@ -32,11 +33,22 @@ namespace LArGeant
         sPhysicsList.reset(physicsList);
     }
 
-    std::vector<Primary> EventManager::GeneratePrimaryList()
+    std::vector<PrimaryGeneration> EventManager::GeneratePrimaryList()
     {
-        std::vector<Primary> primaries;
+        std::vector<PrimaryGeneration> primaries;
+        primaries.emplace_back(
+            PrimaryGeneration(
+                "Am241",
+                95, 241,
+                0.0 * eplus,
+                0.,
+                {0., 0., 0.},
+                0.0 * keV,
+                {0., 0., 1.}
+            )
+        );
         // primaries.emplace_back(
-        //     Primary(
+        //     PrimaryGeneration(
         //         "alpha",
         //         0,
         //         {0., 0., 0.},
@@ -44,31 +56,31 @@ namespace LArGeant
         //         {0., 0., 1.}
         //     )
         // );
-        primaries.emplace_back(
-            Primary(
-                "mu-",
-                1,
-                {0., 0., 1.},
-                {5 * MeV},
-                {0., 1., 0.}
-            )
-        );
-        primaries.emplace_back(
-            Primary(
-                "mu-",
-                10,
-                {0., 0., 1.},
-                {5 * MeV},
-                {0., 1., 0.}
-            )
-        );
+        // primaries.emplace_back(
+        //     PrimaryGeneration(
+        //         "mu-",
+        //         1 * s,
+        //         {0., 0., 1.},
+        //         {5 * MeV},
+        //         {0., 1., 0.}
+        //     )
+        // );
+        // primaries.emplace_back(
+        //     PrimaryGeneration(
+        //         "mu-",
+        //         10 * s,
+        //         {0., 0., 1.},
+        //         {5 * MeV},
+        //         {0., 1., 0.}
+        //     )
+        // );
 
         return primaries;
     }
 
     G4int EventManager::GetIndex(G4String tuple)
     {
-        for(G4int ii = 0; ii < sTuples.size(); ii++)
+        for(size_t ii = 0; ii < sTuples.size(); ii++)
         {
             if(sTuples[ii].name == tuple) {
                 return ii;

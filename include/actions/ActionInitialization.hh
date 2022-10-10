@@ -13,6 +13,7 @@
 #include "EventAction.hh"
 #include "SteppingAction.hh"
 #include "StackingAction.hh"
+#include "TrackingAction.hh"
 
 namespace LArGeant
 {

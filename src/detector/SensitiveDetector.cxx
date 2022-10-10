@@ -40,6 +40,7 @@ namespace LArGeant
         auto Manager = EventManager::GetEventManager();
         if (Manager->SaveHits())
         {
+            
             G4int index = Manager->GetIndex("Hits");
             auto AnalysisManager = G4AnalysisManager::Instance();
             AnalysisManager->FillNtupleIColumn(index, 0, event);

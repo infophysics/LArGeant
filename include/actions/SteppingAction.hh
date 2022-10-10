@@ -13,10 +13,6 @@
 #include "G4Gamma.hh"
 #include "G4Electron.hh"
 
-#include "LArDetector.hh"
-#include "LArNEST.hh"
-
-#include "ArgonCubeDetector.hh"
 #include "EventAction.hh"
 #include "Core.hh"
 
@@ -32,7 +28,6 @@ namespace LArGeant
         
     private:
         std::shared_ptr<EventAction> mEventAction;
-        std::shared_ptr<NEST::LArNEST> mLArNEST;
 
         G4double mOpticalLengths;
         G4int mOpticalNum;

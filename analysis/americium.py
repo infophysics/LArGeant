@@ -8,6 +8,17 @@ bins = 50
 
 extra_x_ticks = [5486, 5442, 5388]
 
+arrays = uproot.open(input_file)['EnergyDepositions'].arrays(library="np")
+events = arrays['event']
+edeps = arrays['edep']
+particle = arrays['particle']
+
+event_total = [sum(edeps[(events == i) & (particle == 'alpha')]) for i in np.unique(events)]
+print(event_total)
+
+fig, axs = plt.subplots()
+axs.hist(event_total, bins=25)
+plt.show()
 
 arrays = uproot.open(input_file)['NEST'].arrays(library="np")
 dE = arrays['energy']

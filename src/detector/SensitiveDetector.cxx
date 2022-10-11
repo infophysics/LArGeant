@@ -38,9 +38,9 @@ namespace LArGeant
         G4ThreeVector   particleMomentum = preStepPoint->GetMomentum();
 
         auto Manager = EventManager::GetEventManager();
+        G4bool detected_hit = Manager->GetComponentFromCopyNumber(copyNo)->ProcessHits(step, history);
         if (Manager->SaveHits())
         {
-            
             G4int index = Manager->GetIndex("Hits");
             auto AnalysisManager = G4AnalysisManager::Instance();
             AnalysisManager->FillNtupleIColumn(index, 0, event);
@@ -55,6 +55,7 @@ namespace LArGeant
             AnalysisManager->FillNtupleDColumn(index, 9, particleMomentum[0]);
             AnalysisManager->FillNtupleDColumn(index, 10, particleMomentum[1]);
             AnalysisManager->FillNtupleDColumn(index, 11, particleMomentum[2]);
+            AnalysisManager->FillNtupleIColumn(index, 12, detected_hit);
             AnalysisManager->AddNtupleRow(index);
         }
         return true;

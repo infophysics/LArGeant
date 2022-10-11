@@ -15,6 +15,7 @@
 #include "G4Box.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4LogicalVolume.hh"
+#include "G4PhysicsOrderedFreeVector.hh"
 
 #include "Argon.hh"
 #include "DetectorComponent.hh"
@@ -35,7 +36,7 @@ namespace LArGeant
 
         void Construct();
 
-        void ProcessHits(G4Step*, G4TouchableHistory*);
+        G4bool ProcessHits(G4Step*, G4TouchableHistory*);
 
     private:
         G4int mSiPMID = {0};
@@ -45,6 +46,7 @@ namespace LArGeant
         G4ThreeVector mPosition = {0.,0.,0.};
 
         std::shared_ptr<G4Material> mMaterial;
+        G4PhysicsOrderedFreeVector* mQuantumEfficiency;
 
     };
 }

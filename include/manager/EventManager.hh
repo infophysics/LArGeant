@@ -83,10 +83,13 @@ namespace LArGeant
 
         G4bool SavePrimaryInfo()        { return sSavePrimaryInfo; }
         G4bool SaveParticleInfo()       { return sSaveParticleInfo; }
-        G4bool SaveHits()               { return sSaveHits; }
+        G4bool SaveEnergyDepositions()  { return sSaveEnergyDepositions; }
+        
         G4bool SaveOpticalPhotons()     { return sSaveOpticalPhotons; }
         G4bool SaveThermalElectrons()   { return sSaveThermalElectrons; }
         G4bool SaveNEST()               { return sSaveNEST; }
+
+        G4bool SaveHits()               { return sSaveHits; }
 
 #ifdef LARGEANT_PROFILING
         std::map<G4String, Profile> GetFunctionProfiles()     { return sFunctionProfiles; }
@@ -111,10 +114,13 @@ namespace LArGeant
         void OutputFileName(G4String name)      { sOutputFileName = name; }
         void SavePrimaryInfo(G4bool save)       { sSavePrimaryInfo = save; }
         void SaveParticleInfo(G4bool save)      { sSaveParticleInfo = save; }
-        void SaveHits(G4bool save)              { sSaveHits = save; }
+        void SaveEnergyDepositions(G4bool save) { sSaveEnergyDepositions = save; }
+        
         void SaveOpticalPhotons(G4bool save)    { sSaveOpticalPhotons = save; }
         void SaveThermalElectrons(G4bool save)  { sSaveThermalElectrons = save; }
         void SaveNEST(G4bool save)              { sSaveNEST = save; }
+
+        void SaveHits(G4bool save)              { sSaveHits = save; }
 
         // Scintillation stacking physics
         G4bool TrackOpticalPhotons()    { return sTrackOpticalPhotons; }
@@ -134,6 +140,11 @@ namespace LArGeant
             return sDetectorComponents[index];
         }
         static G4int GetNumberOfComponents() { return sDetectorComponents.size(); }
+        static void SetComponentCopyNumber(G4int copyNumber, G4int component) { sComponentCopyNumber[copyNumber] = component; }
+        static std::shared_ptr<DetectorComponent> GetComponentFromCopyNumber(G4int index)
+        {
+            return sDetectorComponents[sComponentCopyNumber[index]];
+        }
 
         // Generate primaries
         std::vector<PrimaryGeneration> GeneratePrimaryList();
@@ -150,10 +161,13 @@ namespace LArGeant
 
         inline static G4bool sSavePrimaryInfo = true;
         inline static G4bool sSaveParticleInfo = false;
-        inline static G4bool sSaveHits = true;
+        inline static G4bool sSaveEnergyDepositions = true;
+    
         inline static G4bool sSaveOpticalPhotons = true;
         inline static G4bool sSaveThermalElectrons = true;
         inline static G4bool sSaveNEST = true;
+        
+        inline static G4bool sSaveHits = true;
 
         inline static std::vector<Tuple> sTuples;
 
@@ -162,6 +176,8 @@ namespace LArGeant
         inline static G4bool sTrackThermalElectrons = false;
 
         inline static G4double sEventMaxTime = 1.e18 * ns;
+
+        inline static std::map<G4int, G4int> sComponentCopyNumber;
 
 #ifdef LARGEANT_PROFILING
         inline static thread_local std::map<G4String, Profile> sFunctionProfiles = {};

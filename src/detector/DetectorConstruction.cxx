@@ -107,10 +107,13 @@ namespace LArGeant
             mElectricField.Put(electricField);
         }
         SensitiveDetector* Sensitive = new SensitiveDetector("SensitiveDetector");
+        G4int CopyNumber = 0;
         for (G4int ii = 0; ii < mDetector->GetNumberOfComponents(); ii++)
         {
             if(mDetector->GetDetectorComponent(ii)->GetSensitive()) {
                 SetSensitiveDetector(mDetector->GetDetectorComponent(ii)->GetLogicalVolume().get(), Sensitive);
+                EventManager::GetEventManager()->SetComponentCopyNumber(CopyNumber, ii);
+                CopyNumber += 1;
             }
             if(mDetector->GetDetectorComponent(ii)->GetElectricField()) {
                 mDetector->GetDetectorComponent(ii)->GetLogicalVolume()->SetFieldManager(mElectricField.Get()->GetLocalFieldManager(), true);

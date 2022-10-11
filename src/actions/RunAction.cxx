@@ -51,6 +51,7 @@ namespace LArGeant
             AnalysisManager->CreateNtupleDColumn("total_thermal_electron_final_energy");
             AnalysisManager->CreateNtupleDColumn("total_thermal_electron_edep");
             AnalysisManager->CreateNtupleIColumn("number_of_hits");
+            AnalysisManager->FinishNtuple(index);
         }
 
         if(Manager->SaveParticleInfo())
@@ -63,6 +64,23 @@ namespace LArGeant
             AnalysisManager->CreateNtupleIColumn("pdg");
             AnalysisManager->CreateNtupleIColumn("parent_track_id");
             AnalysisManager->CreateNtupleIColumn("ancestor_track_id");
+            AnalysisManager->FinishNtuple(index);
+        }
+
+        if(Manager->SaveEnergyDepositions())
+        {
+            G4int index = Manager->GetIndex("EnergyDepositions");
+            AnalysisManager->CreateNtuple("EnergyDepositions", "EnergyDepositions");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleSColumn("particle");
+            AnalysisManager->CreateNtupleIColumn("pdg");
+            AnalysisManager->CreateNtupleDColumn("local_time");
+            AnalysisManager->CreateNtupleDColumn("global_time");
+            AnalysisManager->CreateNtupleDColumn("x");
+            AnalysisManager->CreateNtupleDColumn("y");
+            AnalysisManager->CreateNtupleDColumn("z");
+            AnalysisManager->CreateNtupleDColumn("edep");
             AnalysisManager->FinishNtuple(index);
         }
 
@@ -82,6 +100,7 @@ namespace LArGeant
             AnalysisManager->CreateNtupleDColumn("px_particle");
             AnalysisManager->CreateNtupleDColumn("py_particle");
             AnalysisManager->CreateNtupleDColumn("pz_particle");
+            AnalysisManager->CreateNtupleIColumn("detected");
             AnalysisManager->FinishNtuple(index);
         }
         if(Manager->SaveOpticalPhotons())

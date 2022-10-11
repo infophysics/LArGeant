@@ -19,6 +19,7 @@
 #include "G4StepPoint.hh"
 #include "G4PVPlacement.hh"
 #include "G4LogicalVolume.hh"
+#include "Randomize.hh"
 
 namespace LArGeant
 {
@@ -33,6 +34,7 @@ namespace LArGeant
         ~DetectorComponent();
 
         virtual void Construct() = 0;
+        virtual G4bool ProcessHits(G4Step*,G4TouchableHistory*){ return false; }
 
         void SetName(G4String name);
         void SetSensitive(G4bool isSensitive);

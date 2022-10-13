@@ -105,9 +105,14 @@ namespace LArGeant
                 photonPolarization.z()
             );
             photon->SetKineticEnergy(sampledEnergy);
-            pParticleChange->AddSecondary(new G4Track(
+            G4Track* track = new G4Track(
                 photon, result.init_time, result.final_position
-            ));
+            );
+            track->SetParentID(result.parent_track_id);
+            EventManager::GetEventManager()->AddScintillationParentTrackID(
+                track->GetTrackID(), result.parent_track_id
+            );
+            pParticleChange->AddSecondary(track);
         }
     }
     void ScintillationProcess::MakeElectrons(
@@ -123,9 +128,11 @@ namespace LArGeant
                 ThermalElectron::Definition(), electronMomentum
             );
             electron->SetKineticEnergy(result.electron_kinetic_energy);
-            pParticleChange->AddSecondary(new G4Track(
+            G4Track* track = new G4Track(
                 electron, result.init_time, result.final_position
-            ));
+            );
+            track->SetParentID(result.parent_track_id);
+            pParticleChange->AddSecondary(track);
         }
     }
 
@@ -163,7 +170,8 @@ namespace LArGeant
             final_position, 
             init_time, 
             energy, 
-            density
+            density,
+            aTrack.GetTrackID()
         );
 
         auto Manager = EventManager::GetEventManager();
@@ -190,11 +198,20 @@ namespace LArGeant
             AnalysisManager->FillNtupleDColumn(index, 16, result.efield_direction[2]);
             AnalysisManager->AddNtupleRow(index);
         }
-        if(Manager->TrackOpticalPhotons()) {
-            MakePhotons(result);
+
+        // If in the energy basis, populate the Lineages
+        if(Manager->NESTBasis() == "energy") {
+
         }
-        if(Manager->TrackThermalElectrons()) {
-            MakeElectrons(result);
+        // Otherwise, use the NEST result to create photons and electrons
+        else 
+        {
+            if(Manager->TrackOpticalPhotons()) {
+                MakePhotons(result);
+            }
+            if(Manager->TrackThermalElectrons()) {
+                MakeElectrons(result);
+            }
         }
 
         return G4VRestDiscreteProcess::PostStepDoIt(aTrack, aStep);

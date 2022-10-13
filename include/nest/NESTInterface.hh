@@ -10,6 +10,8 @@
 
 #include "globals.hh"
 #include "G4ThreeVector.hh"
+#include "G4Step.hh"
+#include "G4Track.hh"
 
 #include "VDetector.hh"
 #include "LArDetector.hh"
@@ -19,6 +21,13 @@
 
 namespace LArGeant
 {
+    /**
+     * @brief 
+     * 
+     * @details
+     * 	Change log:
+     * 		2022-10-11 - Initial creation of file.
+     */
     struct NESTInterfaceResult
     {
         G4int number_of_photons = 0;
@@ -32,6 +41,35 @@ namespace LArGeant
         G4double density = 0;
         G4double electron_kinetic_energy = 0;
         G4ThreeVector efield_direction = {0,0,0};
+        G4int parent_track_id = 0;
+    };
+
+    /**
+     * @brief 
+     * 
+     * @details Lineages are used in NESTs LXe
+     * calculation when using the energy basis.
+     * This approach must be used because all 
+     * the energy from a particle interaction needs 
+     * to be summed up to find the <N_gamma> and 
+     * <N_e-> values.
+     * 
+     * 	Change log:
+     * 		2022-10-11 - Initial creation of file.
+     */
+    struct Lineage
+    {
+        NEST::INTERACTION_TYPE type;
+        G4double density = -1;
+        G4int Z = 0;
+        G4int A = 0;
+        NEST::NESTresult result;
+        bool result_calculated = false;
+
+        Lineage(NEST::INTERACTION_TYPE _type)
+        : type(_type)
+        {
+        }
     };
 
     class NESTInterface
@@ -54,13 +92,18 @@ namespace LArGeant
         std::shared_ptr<NEST::LArNEST> GetLArNEST() { return mLArNEST; }
         G4bool GetCalculationMode() { return mCalculationMode; }
 
+        // LXe specific code
+        Lineage GetChildType(const G4Track* parent, const G4Track* child) const;
+        void PopulateLineages(const G4Track& track, const G4Step& step);
+
         NESTInterfaceResult Calculate(
             G4String particle,
             G4ThreeVector init_position,
             G4ThreeVector final_position,
             G4double init_time,
             G4double energy,
-            G4double density
+            G4double density,
+            G4int parent_track_id
         );
 
     private:
@@ -79,6 +122,9 @@ namespace LArGeant
         std::shared_ptr<NEST::NESTcalc> mLXeNEST;
         std::shared_ptr<NEST::LArNEST> mLArNEST;
 
+        std::vector<Lineage> mLineages;
+        std::vector<Lineage> mPreviousLineages;
+
         G4bool mCalculationMode = {1}; 
 
         NESTInterfaceResult CalculateLAr(
@@ -87,7 +133,8 @@ namespace LArGeant
             G4ThreeVector final_position,
             G4double init_time,
             G4double energy,
-            G4double density
+            G4double density,
+            G4int parent_track_id
         );
         NESTInterfaceResult CalculateLXe(
             G4String particle,
@@ -95,7 +142,8 @@ namespace LArGeant
             G4ThreeVector final_position,
             G4double init_time,
             G4double energy,
-            G4double density
+            G4double density,
+            G4int parent_track_id
         );
 
     };

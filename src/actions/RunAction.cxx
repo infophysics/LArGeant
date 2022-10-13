@@ -64,6 +64,7 @@ namespace LArGeant
             AnalysisManager->CreateNtupleIColumn("pdg");
             AnalysisManager->CreateNtupleIColumn("parent_track_id");
             AnalysisManager->CreateNtupleIColumn("ancestor_track_id");
+            AnalysisManager->CreateNtupleIColumn("scintillation_parent_track_id");
             AnalysisManager->FinishNtuple(index);
         }
 
@@ -92,6 +93,7 @@ namespace LArGeant
             AnalysisManager->CreateNtupleIColumn("copy_no");
             AnalysisManager->CreateNtupleDColumn("t_event");
             AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleIColumn("parent_id");
             AnalysisManager->CreateNtupleDColumn("t_particle");
             AnalysisManager->CreateNtupleDColumn("x_particle");
             AnalysisManager->CreateNtupleDColumn("y_particle");
@@ -107,6 +109,9 @@ namespace LArGeant
         {
             G4int index = Manager->GetIndex("OpticalPhotons");
             AnalysisManager->CreateNtuple("OpticalPhotons", "OpticalPhotons");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleIColumn("parent_track_id");
+            AnalysisManager->CreateNtupleIColumn("parent_pdg");
             AnalysisManager->CreateNtupleDColumn("energy");
             AnalysisManager->CreateNtupleDColumn("track_length");
             AnalysisManager->FinishNtuple(index);

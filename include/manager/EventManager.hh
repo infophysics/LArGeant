@@ -25,6 +25,8 @@
 #include "Core.hh"
 #include "Detector.hh"
 #include "DetectorComponent.hh"
+#include "Particle.hh"
+#include "EnergyDeposit.hh"
 
 class Detector;
 class DetectorComponent;
@@ -110,8 +112,9 @@ namespace LArGeant
         void StartFunctionProfile(){}
 #endif
 
-
         void OutputFileName(G4String name)      { sOutputFileName = name; }
+
+        // Options to save various data to root files.
         void SavePrimaryInfo(G4bool save)       { sSavePrimaryInfo = save; }
         void SaveParticleInfo(G4bool save)      { sSaveParticleInfo = save; }
         void SaveEnergyDepositions(G4bool save) { sSaveEnergyDepositions = save; }
@@ -122,7 +125,54 @@ namespace LArGeant
 
         void SaveHits(G4bool save)              { sSaveHits = save; }
 
+        // Event level maps to keep track of particle ids,
+        // parent ids, ancestor ids and pdg codes.
+        inline static thread_local void ClearParticleInfo()
+        {
+            mParticleName.clear();
+            mParticlePDG.clear();
+            mParticleParentTrackID.clear();
+            mParticleAncestorTrackID.clear();
+            mScintillationParentTrackID.clear();
+            mPrimaryData.clear();
+        }
+        inline static thread_local void AddParticleName(G4int track_id, G4String name)                 
+        { mParticleName[track_id] = name; }
+        inline static thread_local void AddParticlePDG(G4int track_id, G4int pdg)
+        { mParticlePDG[track_id] = pdg; }
+        inline static thread_local void AddParticleParentTrackID(G4int track_id, G4int parent_track_id)
+        { mParticleParentTrackID[track_id] = parent_track_id; }
+        inline static thread_local void AddParticleAncestorTrackID(G4int track_id, G4int ancestor_track_id) 
+        { mParticleAncestorTrackID[track_id] = ancestor_track_id; }
+        inline static thread_local void AddScintillationParentTrackID(G4int track_id, G4int scintillation_track_id)
+        { mScintillationParentTrackID[track_id] = scintillation_track_id; }
+
+        inline static thread_local void AddPrimaryData(PrimaryData primary) { mPrimaryData.emplace_back(primary); }
+        inline static thread_local G4int GetNumberOfPrimaries()             { return mPrimaryData.size(); }
+        inline static thread_local std::vector<PrimaryData> GetPrimaries()  { return mPrimaryData; }
+        inline static thread_local PrimaryData& GetPrimaryData(G4int track_id)
+        {
+            for(size_t ii = 0; ii < mPrimaryData.size(); ii++)
+            {
+                if(mPrimaryData[ii].track_id == track_id) {
+                    return mPrimaryData[ii];
+                }
+            }
+            throw std::invalid_argument(
+                "No PrimaryData object matches track_id: " + std::to_string(track_id)
+            );
+        }
+
+        inline static thread_local G4int GetNumberOfParticles()                      { return mParticleName.size(); }
+        inline static thread_local G4String GetParticleName(G4int track_id)          { return mParticleName[track_id]; }
+        inline static thread_local G4int GetParticlePDG(G4int track_id)              { return mParticlePDG[track_id]; }
+        inline static thread_local G4int GetParticleParentTrackID(G4int track_id)    { return mParticleParentTrackID[track_id]; }
+        inline static thread_local G4int GetParticleAncestorTrackID(G4int track_id)  { return mParticleAncestorTrackID[track_id]; }
+        inline static thread_local G4int GetScintillationParentTrackID(G4int track_id) { return mScintillationParentTrackID[track_id]; }
+        inline static thread_local G4int GetNumberOfSimulatedParticles()               { return mParticleName.size(); }
+
         // Scintillation stacking physics
+        G4String NESTBasis()            { return sNESTBasis; }
         G4bool TrackOpticalPhotons()    { return sTrackOpticalPhotons; }
         G4bool TrackThermalElectrons()  { return sTrackThermalElectrons; }
 
@@ -130,6 +180,7 @@ namespace LArGeant
         G4double EventMaxTime() { return sEventMaxTime; }
         void EventMaxTime(G4double maxTime) { sEventMaxTime = maxTime; }
 
+        void NESTBasis(G4String basis)          { sNESTBasis = basis; }
         void TrackOpticalPhotons(G4bool track)  { sTrackOpticalPhotons = track; }
         void TrackThermalElectrons(G4bool track){ sTrackThermalElectrons = track; }
 
@@ -159,8 +210,10 @@ namespace LArGeant
         inline static G4String sOutputFileName = "default";
         inline static G4int sCurrentTupleIndex = 0;
 
+        // Options to save various data to root files.
+        inline static std::vector<Tuple> sTuples;
         inline static G4bool sSavePrimaryInfo = true;
-        inline static G4bool sSaveParticleInfo = false;
+        inline static G4bool sSaveParticleInfo = true;
         inline static G4bool sSaveEnergyDepositions = true;
     
         inline static G4bool sSaveOpticalPhotons = true;
@@ -169,15 +222,26 @@ namespace LArGeant
         
         inline static G4bool sSaveHits = true;
 
-        inline static std::vector<Tuple> sTuples;
-
         // Scintillation stacking physics
+        inline static G4String sNESTBasis = "local_energy";
         inline static G4bool sTrackOpticalPhotons = true;
         inline static G4bool sTrackThermalElectrons = false;
 
-        inline static G4double sEventMaxTime = 1.e18 * ns;
+        inline static G4double sEventMaxTime = 1.e19 * ns;
 
         inline static std::map<G4int, G4int> sComponentCopyNumber;
+
+        // Event level maps to keep track of particle ids,
+        // parent ids, ancestor ids and pdg codes.
+        inline static thread_local std::map<G4int, G4String>   mParticleName;
+        inline static thread_local std::map<G4int, G4int>      mParticlePDG;
+        inline static thread_local std::map<G4int, G4int>      mParticleParentTrackID;
+        inline static thread_local std::map<G4int, G4int>      mParticleAncestorTrackID;
+        inline static thread_local std::map<G4int, G4int>      mScintillationParentTrackID;
+        inline static thread_local std::vector<PrimaryData>    mPrimaryData;
+
+        inline static thread_local std::vector<Particle>       mParticles;
+        inline static thread_local std::vector<EnergyDeposit>  mEnergyDeposits;
 
 #ifdef LARGEANT_PROFILING
         inline static thread_local std::map<G4String, Profile> sFunctionProfiles = {};

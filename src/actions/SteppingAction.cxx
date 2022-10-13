@@ -46,35 +46,26 @@ namespace LArGeant
         G4ThreeVector   post_step_position = post_step_point->GetPosition();
         G4double        edep = step->GetTotalEnergyDeposit();
 
-        if(
-            particle_name == "alpha" &&
-            track_status == 2
-        )
-        {
-            if(pre_process && post_process)
-                G4cout << "alpha: " << pre_process->GetProcessName() << ", " << post_process->GetProcessName() << G4endl;
-        }
-
         auto Manager = EventManager::GetEventManager();
         auto AnalysisManager = G4AnalysisManager::Instance();
         if(
             Manager->SavePrimaryInfo() && 
-            mEventAction->GetParticleParentTrackID(track_id) == 0 &&
+            Manager->GetParticleParentTrackID(track_id) == 0 &&
             edep > 0
         )
         {
             if(parent_track_id == 0) {
-                mEventAction->GetPrimaryData(track_id).number_of_edeps += 1;
-                mEventAction->GetPrimaryData(track_id).total_edep += edep;
+                Manager->GetPrimaryData(track_id).number_of_edeps += 1;
+                Manager->GetPrimaryData(track_id).total_edep += edep;
             }
             else if(particle_name == "opticalphoton") {
-                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_optical_photon_edep += edep;
+                Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_optical_photon_edep += edep;
             }
             else if(particle_name == "thermalelectron") {
-                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_thermal_electron_edep += edep;
+                Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_thermal_electron_edep += edep;
             }
             else {
-                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_daughter_edep += edep;
+                Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_daughter_edep += edep;
             }
         }
         if(

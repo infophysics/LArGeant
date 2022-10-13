@@ -31,23 +31,44 @@ namespace LArGeant
         G4int track_status = (int)track->GetTrackStatus();
         G4int track_id = track->GetTrackID();
         G4int parent_track_id = track->GetParentID();
+        const G4VProcess* creator_process = track->GetCreatorProcess();
+        G4String process = "";
+        if(creator_process) {
+            process = creator_process->GetProcessName();
+        }
 
         auto Manager = EventManager::GetEventManager();
         auto AnalysisManager = G4AnalysisManager::Instance();
 
         // Save Particle Info
         EventManager::GetEventManager()->StartFunctionProfile();
-        mEventAction->AddParticleName(track_id, particle_name);
-        mEventAction->AddParticlePDG(track_id, particle_pdg);
-        mEventAction->AddParticleParentTrackID(track_id, parent_track_id);
+        Manager->AddParticleName(track_id, particle_name);
+        Manager->AddParticlePDG(track_id, particle_pdg);
+        Manager->AddParticleParentTrackID(track_id, parent_track_id);
+
+        // Add ancestor info
         if (parent_track_id == 0) {
-            mEventAction->AddParticleAncestorTrackID(track_id, 0);
+            Manager->AddParticleAncestorTrackID(track_id, 0);
         }
-        else if (mEventAction->GetParticleParentTrackID(parent_track_id) == 0) {
-            mEventAction->AddParticleAncestorTrackID(track_id, parent_track_id);
+        else if (Manager->GetParticleParentTrackID(parent_track_id) == 0) {
+            Manager->AddParticleAncestorTrackID(track_id, parent_track_id);
         }
         else {
-            mEventAction->AddParticleAncestorTrackID(track_id, mEventAction->GetParticleAncestorTrackID(parent_track_id));
+            Manager->AddParticleAncestorTrackID(track_id, Manager->GetParticleAncestorTrackID(parent_track_id));
+        }
+
+        // Add scintillation information
+        if(parent_track_id == 0) {
+            Manager->AddScintillationParentTrackID(track_id, 0);
+        }
+        else 
+        {
+            if(process == "ScintillationProcess" && Manager->GetScintillationParentTrackID(parent_track_id) == 0) {
+                Manager->AddScintillationParentTrackID(track_id, parent_track_id);
+            }
+            else {
+                Manager->AddScintillationParentTrackID(track_id, Manager->GetScintillationParentTrackID(parent_track_id));
+            }
         }
         Manager->EndFunctionProfile("PreUserTrackingAction_SaveParticleInfo");
 
@@ -56,7 +77,7 @@ namespace LArGeant
             EventManager::GetEventManager()->StartFunctionProfile();
             if(parent_track_id == 0)
             {
-                mEventAction->AddPrimaryData(
+                Manager->AddPrimaryData(
                     PrimaryData(
                         particle_name, track_id, particle_pdg,
                         global_time, particle_position[0], particle_position[1],
@@ -68,18 +89,18 @@ namespace LArGeant
             {
                 if(particle_name == "opticalphoton")
                 {
-                    mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).number_of_photons += 1;
-                    mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_optical_photon_init_energy += kinetic_energy;
+                    Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).number_of_photons += 1;
+                    Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_optical_photon_init_energy += kinetic_energy;
                 }
                 else if(particle_name == "thermalelectron")
                 {
-                    mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).number_of_electrons += 1;
-                    mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_thermal_electron_init_energy += kinetic_energy;
+                    Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).number_of_electrons += 1;
+                    Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_thermal_electron_init_energy += kinetic_energy;
                 }
                 else
                 {
-                    mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_daughter_init_energy += kinetic_energy;
-                    mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).number_of_daughters += 1;
+                    Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_daughter_init_energy += kinetic_energy;
+                    Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).number_of_daughters += 1;
                 }
             }
             Manager->EndFunctionProfile("PreUserTrackingAction_SavePrimaryInfo");
@@ -102,21 +123,21 @@ namespace LArGeant
         if(Manager->SavePrimaryInfo())
         {
             EventManager::GetEventManager()->StartFunctionProfile();
-            if(mEventAction->GetParticleParentTrackID(track_id) == 0)
+            if(Manager->GetParticleParentTrackID(track_id) == 0)
             {
-                mEventAction->GetPrimaryData(track_id).AddFinalTrackData(
+                Manager->GetPrimaryData(track_id).AddFinalTrackData(
                     global_time, particle_position[0], particle_position[1],
                     particle_position[2], kinetic_energy
                 );
             }
             else if(particle_name == "opticalphoton") {
-                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_optical_photon_final_energy += kinetic_energy;
+                Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_optical_photon_final_energy += kinetic_energy;
             }
             else if (particle_name == "thermalelectron") {
-                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_thermal_electron_final_energy += kinetic_energy;
+                Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_thermal_electron_final_energy += kinetic_energy;
             }
             else {
-                mEventAction->GetPrimaryData(mEventAction->GetParticleAncestorTrackID(track_id)).total_daughter_final_energy += kinetic_energy;
+                Manager->GetPrimaryData(Manager->GetParticleAncestorTrackID(track_id)).total_daughter_final_energy += kinetic_energy;
             }
             Manager->EndFunctionProfile("PostUserTrackingAction_SavePrimaryInfo");
         }
@@ -127,8 +148,11 @@ namespace LArGeant
             {
                 EventManager::GetEventManager()->StartFunctionProfile();
                 G4int index = Manager->GetIndex("OpticalPhotons");
-                AnalysisManager->FillNtupleDColumn(index, 0, track->GetTotalEnergy());
-                AnalysisManager->FillNtupleDColumn(index, 1, track->GetTrackLength()/cm);
+                AnalysisManager->FillNtupleIColumn(index, 0, track->GetTrackID());
+                AnalysisManager->FillNtupleIColumn(index, 1, Manager->GetParticleParentTrackID(track_id));
+                AnalysisManager->FillNtupleIColumn(index, 2, Manager->GetParticlePDG(Manager->GetParticleParentTrackID(track_id)));
+                AnalysisManager->FillNtupleDColumn(index, 3, track->GetTotalEnergy());
+                AnalysisManager->FillNtupleDColumn(index, 4, track->GetTrackLength()/cm);
                 AnalysisManager->AddNtupleRow(index);
                 Manager->EndFunctionProfile("PostUserTrackingAction_SaveOpticalPhotons");
             }

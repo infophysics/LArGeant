@@ -90,4 +90,582 @@ namespace LArGeant
         sTuples.emplace_back(Tuple(tuple, sCurrentTupleIndex));
         return sCurrentTupleIndex;
     }
+
+    void EventManager::CreateTuples()
+    {
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        AnalysisManager->SetDefaultFileType("root");
+        AnalysisManager->SetVerboseLevel(0);
+        AnalysisManager->SetNtupleMerging(true);
+
+        if(SaveParticleMaps())
+        {
+            G4int index = GetIndex("ParticleMaps");
+            AnalysisManager->CreateNtuple("ParticleMaps", "ParticleMaps");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleSColumn("particle");
+            AnalysisManager->CreateNtupleIColumn("pdg");
+            AnalysisManager->CreateNtupleIColumn("parent_track_id");
+            AnalysisManager->CreateNtupleIColumn("ancestor_track_id");
+            AnalysisManager->CreateNtupleIColumn("scintillation_parent_track_id");
+            AnalysisManager->FinishNtuple(index);
+        }
+        if(SavePrimaryInfo())
+        {
+            G4int index = GetIndex("Primaries");
+            AnalysisManager->CreateNtuple("Primaries", "Primaries");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleSColumn("particle");
+            AnalysisManager->CreateNtupleIColumn("pdg");
+            AnalysisManager->CreateNtupleDColumn("init_t");
+            AnalysisManager->CreateNtupleDColumn("init_x");
+            AnalysisManager->CreateNtupleDColumn("init_y");
+            AnalysisManager->CreateNtupleDColumn("init_z");
+            AnalysisManager->CreateNtupleDColumn("init_energy");
+            AnalysisManager->CreateNtupleDColumn("final_t");
+            AnalysisManager->CreateNtupleDColumn("final_x");
+            AnalysisManager->CreateNtupleDColumn("final_y");
+            AnalysisManager->CreateNtupleDColumn("final_z");
+            AnalysisManager->CreateNtupleDColumn("final_energy");
+            AnalysisManager->CreateNtupleIColumn("number_of_daughters");
+            AnalysisManager->CreateNtupleDColumn("total_daughter_init_energy");
+            AnalysisManager->CreateNtupleDColumn("total_daughter_final_energy");
+            AnalysisManager->CreateNtupleDColumn("total_daughter_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_edeps");
+            AnalysisManager->CreateNtupleDColumn("total_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_photons");
+            AnalysisManager->CreateNtupleDColumn("total_optical_photon_init_energy");
+            AnalysisManager->CreateNtupleDColumn("total_optical_photon_final_energy");
+            AnalysisManager->CreateNtupleDColumn("total_optical_photon_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_electrons");
+            AnalysisManager->CreateNtupleDColumn("total_thermal_electron_init_energy");
+            AnalysisManager->CreateNtupleDColumn("total_thermal_electron_final_energy");
+            AnalysisManager->CreateNtupleDColumn("total_thermal_electron_edep");
+            AnalysisManager->CreateNtupleIColumn("number_of_hits");
+            AnalysisManager->FinishNtuple(index);
+        }
+        if(SaveEnergyDeposits())
+        {
+            G4int index = GetIndex("EnergyDeposits");
+            AnalysisManager->CreateNtuple("EnergyDeposits", "EnergyDeposits");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleSColumn("particle");
+            AnalysisManager->CreateNtupleIColumn("pdg");
+            AnalysisManager->CreateNtupleDColumn("local_time");
+            AnalysisManager->CreateNtupleDColumn("global_time");
+            AnalysisManager->CreateNtupleDColumn("init_x");
+            AnalysisManager->CreateNtupleDColumn("init_y");
+            AnalysisManager->CreateNtupleDColumn("init_z");
+            AnalysisManager->CreateNtupleDColumn("final_x");
+            AnalysisManager->CreateNtupleDColumn("final_y");
+            AnalysisManager->CreateNtupleDColumn("final_z");
+            AnalysisManager->CreateNtupleDColumn("edep");
+            AnalysisManager->FinishNtuple(index);
+        }
+        if(SaveOpticalPhotons())
+        {
+            G4int index = GetIndex("OpticalPhotons");
+            AnalysisManager->CreateNtuple("OpticalPhotons", "OpticalPhotons");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleIColumn("parent_track_id");
+            AnalysisManager->CreateNtupleIColumn("parent_pdg");
+            AnalysisManager->CreateNtupleDColumn("energy");
+            AnalysisManager->CreateNtupleDColumn("track_length");
+            AnalysisManager->FinishNtuple(index);
+        }
+        if(SaveThermalElectrons())
+        {
+            G4int index = GetIndex("ThermalElectrons");
+            AnalysisManager->CreateNtuple("ThermalElectrons", "ThermalElectrons");
+            AnalysisManager->CreateNtupleDColumn("energy");
+            AnalysisManager->CreateNtupleDColumn("track_length");
+            AnalysisManager->FinishNtuple(index);
+        }
+        if(SaveNESTResults())
+        {
+            G4int index = GetIndex("NEST");
+            AnalysisManager->CreateNtuple("NEST", "NEST");
+            AnalysisManager->CreateNtupleIColumn("number_of_photons");
+            AnalysisManager->CreateNtupleIColumn("number_of_electrons");
+            AnalysisManager->CreateNtupleSColumn("particle");
+            AnalysisManager->CreateNtupleDColumn("init_x");
+            AnalysisManager->CreateNtupleDColumn("init_y");
+            AnalysisManager->CreateNtupleDColumn("init_z");
+            AnalysisManager->CreateNtupleDColumn("final_x");
+            AnalysisManager->CreateNtupleDColumn("final_y");
+            AnalysisManager->CreateNtupleDColumn("final_z");
+            AnalysisManager->CreateNtupleDColumn("init_t");
+            AnalysisManager->CreateNtupleDColumn("energy");
+            AnalysisManager->CreateNtupleDColumn("efield");
+            AnalysisManager->CreateNtupleDColumn("density");
+            AnalysisManager->CreateNtupleDColumn("electron_kinetic_energy");
+            AnalysisManager->CreateNtupleDColumn("efield_x");
+            AnalysisManager->CreateNtupleDColumn("efield_y");
+            AnalysisManager->CreateNtupleDColumn("efield_z");
+            AnalysisManager->FinishNtuple(index);
+        }
+        if(SaveHits())
+        {
+            G4int index = GetIndex("Hits");
+            AnalysisManager->CreateNtuple("Hits", "Hits");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("copy_number");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleIColumn("parent_id");
+            AnalysisManager->CreateNtupleDColumn("local_time");
+            AnalysisManager->CreateNtupleDColumn("global_time");
+            AnalysisManager->CreateNtupleDColumn("x_particle");
+            AnalysisManager->CreateNtupleDColumn("y_particle");
+            AnalysisManager->CreateNtupleDColumn("z_particle");
+            AnalysisManager->CreateNtupleDColumn("px_particle");
+            AnalysisManager->CreateNtupleDColumn("py_particle");
+            AnalysisManager->CreateNtupleDColumn("pz_particle");
+            AnalysisManager->CreateNtupleDColumn("energy");
+            AnalysisManager->CreateNtupleIColumn("detected");
+            AnalysisManager->FinishNtuple(index);
+        }
+    }
+
+    void EventManager::FillParticleMaps(G4int EventID)
+    {
+        if(!SaveParticleMaps()) {
+            return;
+        }
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("ParticleMaps");
+        for(size_t ii = 0; ii < GetNumberOfParticles(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
+            AnalysisManager->FillNtupleIColumn(index, 1, ii+1);
+            AnalysisManager->FillNtupleSColumn(index, 2, GetParticleName(ii));
+            AnalysisManager->FillNtupleIColumn(index, 3, GetParticlePDG(ii));
+            AnalysisManager->FillNtupleIColumn(index, 4, GetParticleParentTrackID(ii));
+            AnalysisManager->FillNtupleIColumn(index, 5, GetParticleAncestorTrackID(ii));
+            AnalysisManager->FillNtupleIColumn(index, 6, GetScintillationParentTrackID(ii));
+            AnalysisManager->AddNtupleRow(index);
+        }
+    }
+    void EventManager::FillPrimaryInfo(G4int EventID)
+    {
+        if(!SavePrimaryInfo()) {
+            return;
+        }
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("Primaries");
+        for(size_t ii = 0; ii < mPrimaryData.size(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
+            AnalysisManager->FillNtupleIColumn(index, 1, mPrimaryData[ii].track_id);
+            AnalysisManager->FillNtupleSColumn(index, 2, mPrimaryData[ii].name);
+            AnalysisManager->FillNtupleIColumn(index, 3, mPrimaryData[ii].pdg);
+            AnalysisManager->FillNtupleDColumn(index, 4, mPrimaryData[ii].init_t);
+            AnalysisManager->FillNtupleDColumn(index, 5, mPrimaryData[ii].init_x);
+            AnalysisManager->FillNtupleDColumn(index, 6, mPrimaryData[ii].init_y);
+            AnalysisManager->FillNtupleDColumn(index, 7, mPrimaryData[ii].init_z);
+            AnalysisManager->FillNtupleDColumn(index, 8, mPrimaryData[ii].init_energy);
+            AnalysisManager->FillNtupleDColumn(index, 9, mPrimaryData[ii].final_t);
+            AnalysisManager->FillNtupleDColumn(index, 10, mPrimaryData[ii].final_x);
+            AnalysisManager->FillNtupleDColumn(index, 11, mPrimaryData[ii].final_y);
+            AnalysisManager->FillNtupleDColumn(index, 12, mPrimaryData[ii].final_z);
+            AnalysisManager->FillNtupleDColumn(index, 13, mPrimaryData[ii].final_energy);
+            AnalysisManager->FillNtupleIColumn(index, 14, mPrimaryData[ii].number_of_daughters);
+            AnalysisManager->FillNtupleDColumn(index, 15, mPrimaryData[ii].total_daughter_init_energy);
+            AnalysisManager->FillNtupleDColumn(index, 16, mPrimaryData[ii].total_daughter_final_energy);
+            AnalysisManager->FillNtupleDColumn(index, 17, mPrimaryData[ii].total_daughter_edep);
+            AnalysisManager->FillNtupleIColumn(index, 18, mPrimaryData[ii].number_of_edeps);
+            AnalysisManager->FillNtupleDColumn(index, 19, mPrimaryData[ii].total_edep);
+            AnalysisManager->FillNtupleIColumn(index, 20, mPrimaryData[ii].number_of_photons);
+            AnalysisManager->FillNtupleDColumn(index, 21, mPrimaryData[ii].total_optical_photon_init_energy);
+            AnalysisManager->FillNtupleDColumn(index, 22, mPrimaryData[ii].total_optical_photon_final_energy);
+            AnalysisManager->FillNtupleDColumn(index, 23, mPrimaryData[ii].total_optical_photon_edep);
+            AnalysisManager->FillNtupleIColumn(index, 24, mPrimaryData[ii].number_of_electrons);
+            AnalysisManager->FillNtupleDColumn(index, 25, mPrimaryData[ii].total_thermal_electron_init_energy);
+            AnalysisManager->FillNtupleDColumn(index, 26, mPrimaryData[ii].total_thermal_electron_final_energy);
+            AnalysisManager->FillNtupleDColumn(index, 27, mPrimaryData[ii].total_thermal_electron_edep);
+            AnalysisManager->FillNtupleIColumn(index, 28, mPrimaryData[ii].number_of_hits);
+            AnalysisManager->AddNtupleRow(index);
+        }
+    }
+    void EventManager::FillEnergyDeposits(G4int EventID)
+    {
+        if(!SaveEnergyDeposits()) {
+            return;
+        } 
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("EnergyDeposits");
+        for(size_t ii = 0; ii < mEnergyDeposits.size(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, mEnergyDeposits[ii].event);
+            AnalysisManager->FillNtupleIColumn(index, 1, mEnergyDeposits[ii].track_id);
+            AnalysisManager->FillNtupleSColumn(index, 2, mEnergyDeposits[ii].name);
+            AnalysisManager->FillNtupleIColumn(index, 3, mEnergyDeposits[ii].pdg);
+            AnalysisManager->FillNtupleDColumn(index, 4, mEnergyDeposits[ii].local_time);
+            AnalysisManager->FillNtupleDColumn(index, 5, mEnergyDeposits[ii].global_time);
+            AnalysisManager->FillNtupleDColumn(index, 6, mEnergyDeposits[ii].pre_step_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 7, mEnergyDeposits[ii].pre_step_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 8, mEnergyDeposits[ii].pre_step_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 9, mEnergyDeposits[ii].post_step_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 10, mEnergyDeposits[ii].post_step_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 11, mEnergyDeposits[ii].post_step_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 12, mEnergyDeposits[ii].energy);
+            AnalysisManager->AddNtupleRow(index);
+        }
+    }
+    void EventManager::FillOpticalPhotons(G4int EventID)
+    {
+        if(!SaveOpticalPhotons()) {
+            return;
+        }
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("OpticalPhotons");
+        for(size_t ii = 0; ii < mOpticalPhotonData.size(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, mOpticalPhotonData[ii].track_id);
+            AnalysisManager->FillNtupleIColumn(index, 1, mOpticalPhotonData[ii].parent_track_id);
+            AnalysisManager->FillNtupleIColumn(index, 2, mOpticalPhotonData[ii].parent_pdg);
+            AnalysisManager->FillNtupleDColumn(index, 3, mOpticalPhotonData[ii].total_energy);
+            AnalysisManager->FillNtupleDColumn(index, 4, mOpticalPhotonData[ii].track_length);
+            AnalysisManager->AddNtupleRow(index);
+        }
+    }
+
+    void EventManager::FillNESTResults(G4int EventID)
+    {
+        if(!SaveNESTResults()) {
+            return;
+        }
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("NEST");
+        for(size_t ii = 0; ii < mNESTInterfaceResults.size(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, mNESTInterfaceResults[ii].number_of_photons);
+            AnalysisManager->FillNtupleIColumn(index, 1, mNESTInterfaceResults[ii].number_of_electrons);
+            AnalysisManager->FillNtupleSColumn(index, 2, mNESTInterfaceResults[ii].particle);
+            AnalysisManager->FillNtupleDColumn(index, 3, mNESTInterfaceResults[ii].init_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 4, mNESTInterfaceResults[ii].init_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 5, mNESTInterfaceResults[ii].init_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 6, mNESTInterfaceResults[ii].final_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 7, mNESTInterfaceResults[ii].final_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 8, mNESTInterfaceResults[ii].final_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 9, mNESTInterfaceResults[ii].init_time);
+            AnalysisManager->FillNtupleDColumn(index, 10, mNESTInterfaceResults[ii].energy);
+            AnalysisManager->FillNtupleDColumn(index, 11, mNESTInterfaceResults[ii].efield);
+            AnalysisManager->FillNtupleDColumn(index, 12, mNESTInterfaceResults[ii].density);
+            AnalysisManager->FillNtupleDColumn(index, 13, mNESTInterfaceResults[ii].electron_kinetic_energy);
+            AnalysisManager->FillNtupleDColumn(index, 14, mNESTInterfaceResults[ii].efield_direction[0]);
+            AnalysisManager->FillNtupleDColumn(index, 15, mNESTInterfaceResults[ii].efield_direction[1]);
+            AnalysisManager->FillNtupleDColumn(index, 16, mNESTInterfaceResults[ii].efield_direction[2]);
+            AnalysisManager->AddNtupleRow(index);
+        }
+    }
+
+    void EventManager::FillHits(G4int EventID)
+    {
+        if (!SaveHits()) {
+            return;
+        }
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("Hits");
+        for(size_t ii = 0; ii < mHits.size(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, mHits[ii].event);
+            AnalysisManager->FillNtupleIColumn(index, 1, mHits[ii].copy_number);
+            AnalysisManager->FillNtupleIColumn(index, 2, mHits[ii].track_id);
+            AnalysisManager->FillNtupleIColumn(index, 3, mHits[ii].parent_track_id);
+            AnalysisManager->FillNtupleDColumn(index, 4, mHits[ii].local_time);
+            AnalysisManager->FillNtupleDColumn(index, 5, mHits[ii].global_time);
+            AnalysisManager->FillNtupleDColumn(index, 6, mHits[ii].particle_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 7, mHits[ii].particle_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 8, mHits[ii].particle_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 9, mHits[ii].particle_momentum[0]);
+            AnalysisManager->FillNtupleDColumn(index, 10,mHits[ii].particle_momentum[1]);
+            AnalysisManager->FillNtupleDColumn(index, 11,mHits[ii].particle_momentum[2]);
+            AnalysisManager->FillNtupleDColumn(index, 12,mHits[ii].energy);
+            AnalysisManager->FillNtupleIColumn(index, 13,mHits[ii].detected);
+            AnalysisManager->AddNtupleRow(index);
+        }
+    }
+
+
+    void EventManager::AddParticleMapsFromTrack(const G4Track* track)
+    {
+        G4int track_id = track->GetTrackID();
+        G4String particle_name = track->GetParticleDefinition()->GetParticleName();
+        G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
+        G4int parent_track_id = track->GetParentID();
+        
+        const G4VProcess* creator_process = track->GetCreatorProcess();
+        G4String process = "";
+        if(creator_process) {
+            process = creator_process->GetProcessName();
+        }
+
+        // Save Particle Info
+        StartFunctionProfile();
+        AddParticleName(track_id, particle_name);
+        AddParticlePDG(track_id, particle_pdg);
+        AddParticleParentTrackID(track_id, parent_track_id);
+
+        // Add ancestor info
+        if (parent_track_id == 0) {
+            AddParticleAncestorTrackID(track_id, 0);
+        }
+        else if (GetParticleParentTrackID(parent_track_id) == 0) {
+            AddParticleAncestorTrackID(track_id, parent_track_id);
+        }
+        else {
+            AddParticleAncestorTrackID(track_id, GetParticleAncestorTrackID(parent_track_id));
+        }
+
+        // Add scintillation information
+        if(parent_track_id == 0) {
+            AddScintillationParentTrackID(track_id, 0);
+        }
+        else 
+        {
+            if(process == "ScintillationProcess" && GetScintillationParentTrackID(parent_track_id) == 0) {
+                AddScintillationParentTrackID(track_id, parent_track_id);
+            }
+            else {
+                AddScintillationParentTrackID(track_id, GetScintillationParentTrackID(parent_track_id));
+            }
+        }
+        EndFunctionProfile("PreUserTrackingAction_SaveParticleInfo");
+    }
+
+    void EventManager::AddPrimaryInfoFromTrackBegin(const G4Track* track)
+    {
+        G4String particle_name = track->GetParticleDefinition()->GetParticleName();
+        G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
+        G4ThreeVector particle_position = track->GetVertexPosition();
+
+        G4double local_time = track->GetLocalTime();
+        G4double global_time = track->GetGlobalTime();
+        G4double kinetic_energy = track->GetKineticEnergy();
+        G4int track_status = (int)track->GetTrackStatus();
+        G4int track_id = track->GetTrackID();
+        G4int parent_track_id = track->GetParentID();
+
+        const G4VProcess* creator_process = track->GetCreatorProcess();
+        G4String process = "";
+        if(creator_process) {
+            process = creator_process->GetProcessName();
+        }
+
+        StartFunctionProfile();
+        if(parent_track_id == 0)
+        {
+            AddPrimaryData(
+                PrimaryData(
+                    particle_name, track_id, particle_pdg,
+                    global_time, particle_position[0], particle_position[1],
+                    particle_position[2], kinetic_energy 
+                )
+            );
+        }
+        else
+        {
+            if(particle_name == "opticalphoton")
+            {
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).number_of_photons += 1;
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_optical_photon_init_energy += kinetic_energy;
+            }
+            else if(particle_name == "thermalelectron")
+            {
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).number_of_electrons += 1;
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_thermal_electron_init_energy += kinetic_energy;
+            }
+            else
+            {
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_daughter_init_energy += kinetic_energy;
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).number_of_daughters += 1;
+            }
+        }
+        EndFunctionProfile("PreUserTrackingAction_SavePrimaryInfo");
+    }
+
+    void EventManager::AddPrimaryInfoFromTrackEnd(const G4Track* track)
+    {
+        StartFunctionProfile();
+        G4String particle_name = track->GetParticleDefinition()->GetParticleName();
+        G4ThreeVector particle_position = track->GetVertexPosition();
+        G4double kinetic_energy = track->GetKineticEnergy();
+        G4int track_id = track->GetTrackID();
+        G4double global_time = track->GetGlobalTime();
+        
+        StartFunctionProfile();
+        if(GetParticleParentTrackID(track_id) == 0)
+        {
+            GetPrimaryData(track_id).AddFinalTrackData(
+                global_time, particle_position[0], particle_position[1],
+                particle_position[2], kinetic_energy
+            );
+        }
+        else if(particle_name == "opticalphoton") {
+            GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_optical_photon_final_energy += kinetic_energy;
+        }
+        else if (particle_name == "thermalelectron") {
+            GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_thermal_electron_final_energy += kinetic_energy;
+        }
+        else {
+            GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_daughter_final_energy += kinetic_energy;
+        }
+        EndFunctionProfile("PostUserTrackingAction_SavePrimaryInfo");
+    }
+
+    void EventManager::AddParticleInfoFromTrack(const G4Track* track)
+    {
+        G4String particle_name = track->GetParticleDefinition()->GetParticleName();
+        G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
+        G4ThreeVector particle_position = track->GetVertexPosition();
+
+        G4double local_time = track->GetLocalTime();
+        G4double global_time = track->GetGlobalTime();
+        G4double kinetic_energy = track->GetKineticEnergy();
+        G4int track_status = (int)track->GetTrackStatus();
+        G4int track_id = track->GetTrackID();
+        G4int parent_track_id = track->GetParentID();
+
+        const G4VProcess* creator_process = track->GetCreatorProcess();
+        G4String process = "";
+        if(creator_process) {
+            process = creator_process->GetProcessName();
+        }
+    }
+    void EventManager::AddParticleInfoFromStep(const G4Step *step)
+    {
+        G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+        G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
+        G4Track* track = step->GetTrack();
+        G4StepPoint* pre_step_point = step->GetPreStepPoint();
+        G4StepPoint* post_step_point = step->GetPostStepPoint();
+        const G4VProcess* pre_process = pre_step_point->GetProcessDefinedStep();
+        const G4VProcess* post_process = post_step_point->GetProcessDefinedStep();
+
+        G4int           event = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+        G4String        particle_name = step->GetTrack()->GetParticleDefinition()->GetParticleName();
+        G4int           particle_pdg = step->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
+        G4ThreeVector   particleStartPosition = step->GetPreStepPoint()->GetPosition();
+        G4double        local_time = track->GetLocalTime();
+        G4double        global_time = track->GetGlobalTime();
+        G4double        pre_step_energy = pre_step_point->GetKineticEnergy();
+        G4double        post_step_energy = post_step_point->GetKineticEnergy();
+        G4int           track_status = (int)track->GetTrackStatus();
+        G4int           track_id = track->GetTrackID();
+        G4int           parent_track_id = track->GetParentID();
+        G4ThreeVector   pre_step_position = pre_step_point->GetPosition();
+        G4ThreeVector   post_step_position = post_step_point->GetPosition();
+        G4double        edep = step->GetTotalEnergyDeposit();
+
+        if(
+            SavePrimaryInfo() && 
+            GetParticleParentTrackID(track_id) == 0 &&
+            edep > 0
+        )
+        {
+            if(parent_track_id == 0) {
+                GetPrimaryData(track_id).number_of_edeps += 1;
+                GetPrimaryData(track_id).total_edep += edep;
+            }
+            else if(particle_name == "opticalphoton") {
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_optical_photon_edep += edep;
+            }
+            else if(particle_name == "thermalelectron") {
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_thermal_electron_edep += edep;
+            }
+            else {
+                GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_daughter_edep += edep;
+            }
+        }
+    }
+
+    void EventManager::AddEnergyDepositInfoFromStep(const G4Step* step)
+    {
+        G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+        G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
+        G4Track* track = step->GetTrack();
+        G4StepPoint* pre_step_point = step->GetPreStepPoint();
+        G4StepPoint* post_step_point = step->GetPostStepPoint();
+        const G4VProcess* pre_process = pre_step_point->GetProcessDefinedStep();
+        const G4VProcess* post_process = post_step_point->GetProcessDefinedStep();
+
+        G4int           event = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+        G4String        particle_name = step->GetTrack()->GetParticleDefinition()->GetParticleName();
+        G4int           particle_pdg = step->GetTrack()->GetParticleDefinition()->GetPDGEncoding();
+        G4ThreeVector   particleStartPosition = step->GetPreStepPoint()->GetPosition();
+        G4double        local_time = track->GetLocalTime();
+        G4double        global_time = track->GetGlobalTime();
+        G4double        pre_step_energy = pre_step_point->GetKineticEnergy();
+        G4double        post_step_energy = post_step_point->GetKineticEnergy();
+        G4int           track_status = (int)track->GetTrackStatus();
+        G4int           track_id = track->GetTrackID();
+        G4int           parent_track_id = track->GetParentID();
+        G4ThreeVector   pre_step_position = pre_step_point->GetPosition();
+        G4ThreeVector   post_step_position = post_step_point->GetPosition();
+        G4double        edep = step->GetTotalEnergyDeposit();
+
+        mEnergyDeposits.emplace_back(
+            EnergyDeposit(
+                event, track_id, particle_name,
+                particle_pdg, local_time, global_time,
+                pre_step_position, post_step_position,
+                edep
+            )
+        );
+
+    }
+
+    void EventManager::AddOpticalPhotonInfoFromTrackEnd(const G4Track* track)
+    {
+        G4String particle_name = track->GetParticleDefinition()->GetParticleName();
+        if(particle_name == "opticalphoton")
+        {
+            mOpticalPhotonData.emplace_back(OpticalPhotonData(
+                track->GetTrackID(), track->GetParentID(),
+                GetParticlePDG(track->GetParentID()),
+                track->GetTotalEnergy(), track->GetTrackLength()/cm
+            ));
+        }
+    }
+
+    void EventManager::AddThermalElectronInfoFromTrackEnd(const G4Track* track)
+    {
+
+    }
+
+    void EventManager::AddNESTResultFromStep(NESTInterfaceResult result)
+    {
+        mNESTInterfaceResults.emplace_back(result);
+    }
+
+    void EventManager::AddHitInfoFromStep(G4Step* step, G4TouchableHistory* history)
+    {
+        const G4VTouchable* touchable = step->GetPreStepPoint()->GetTouchable();
+        const G4Track* track = step->GetTrack();
+        const G4StepPoint *preStepPoint = step->GetPreStepPoint();
+
+        G4int           event = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+        G4int           copyNo = touchable->GetCopyNumber();
+        G4double        globalTime = preStepPoint->GetGlobalTime();
+        G4int           trackID = track->GetTrackID();
+        G4int           parentID = track->GetParentID();
+        G4double        localTime = preStepPoint->GetLocalTime();
+        G4ThreeVector   particlePosition = preStepPoint->GetPosition();
+        G4double        energy = preStepPoint->GetTotalEnergy();
+        G4ThreeVector   particleMomentum = preStepPoint->GetMomentum();
+
+        G4bool detected_hit = GetComponentFromCopyNumber(copyNo)->ProcessHits(step, history);
+        mHits.emplace_back(
+            Hit(
+                event, copyNo, trackID,
+                parentID, localTime, globalTime,
+                particlePosition, particleMomentum,
+                energy, detected_hit
+            )
+        );
+
+    }
 }

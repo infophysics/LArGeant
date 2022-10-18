@@ -175,29 +175,7 @@ namespace LArGeant
         );
 
         auto Manager = EventManager::GetEventManager();
-        if(Manager->SaveNEST())
-        {
-            auto AnalysisManager = G4AnalysisManager::Instance();
-            G4int index = Manager->GetIndex("NEST");
-            AnalysisManager->FillNtupleIColumn(index, 0, result.number_of_photons);
-            AnalysisManager->FillNtupleIColumn(index, 1, result.number_of_electrons);
-            AnalysisManager->FillNtupleSColumn(index, 2, result.particle);
-            AnalysisManager->FillNtupleDColumn(index, 3, result.init_position[0]);
-            AnalysisManager->FillNtupleDColumn(index, 4, result.init_position[1]);
-            AnalysisManager->FillNtupleDColumn(index, 5, result.init_position[2]);
-            AnalysisManager->FillNtupleDColumn(index, 6, result.final_position[0]);
-            AnalysisManager->FillNtupleDColumn(index, 7, result.final_position[1]);
-            AnalysisManager->FillNtupleDColumn(index, 8, result.final_position[2]);
-            AnalysisManager->FillNtupleDColumn(index, 9, result.init_time);
-            AnalysisManager->FillNtupleDColumn(index, 10, result.energy);
-            AnalysisManager->FillNtupleDColumn(index, 11, result.efield);
-            AnalysisManager->FillNtupleDColumn(index, 12, result.density);
-            AnalysisManager->FillNtupleDColumn(index, 13, result.electron_kinetic_energy);
-            AnalysisManager->FillNtupleDColumn(index, 14, result.efield_direction[0]);
-            AnalysisManager->FillNtupleDColumn(index, 15, result.efield_direction[1]);
-            AnalysisManager->FillNtupleDColumn(index, 16, result.efield_direction[2]);
-            AnalysisManager->AddNtupleRow(index);
-        }
+        Manager->AddNESTResultFromStep(result);
 
         // If in the energy basis, populate the Lineages
         if(Manager->NESTBasis() == "energy") {

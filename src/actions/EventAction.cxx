@@ -45,6 +45,7 @@ namespace LArGeant
         auto AnalysisManager = G4AnalysisManager::Instance();
         Manager->FillParticleMaps(event->GetEventID());
         Manager->FillPrimaryInfo(event->GetEventID());
+        Manager->FillParticleInfo(event->GetEventID());
         Manager->FillOpticalPhotons(event->GetEventID());
         Manager->FillEnergyDeposits(event->GetEventID());
         Manager->FillOpticalPhotons(event->GetEventID());

@@ -35,6 +35,7 @@ namespace LArGeant
 
     std::vector<PrimaryGeneration> EventManager::GeneratePrimaryList()
     {
+        StartFunctionProfile();
         std::vector<PrimaryGeneration> primaries;
         primaries.emplace_back(
             PrimaryGeneration(
@@ -74,7 +75,7 @@ namespace LArGeant
         //         {0., 1., 0.}
         //     )
         // );
-
+        EndFunctionProfile("GeneratePrimaryList");
         return primaries;
     }
 
@@ -91,8 +92,53 @@ namespace LArGeant
         return sCurrentTupleIndex;
     }
 
+    void EventManager::OpenOutputFile(G4int RunID)
+    {
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4String OutputFile = OutputFileName() + "_" + std::to_string(RunID) + ".root";
+        G4bool fileopen = AnalysisManager->OpenFile(OutputFile);
+        if (!fileopen) {
+            G4cout << "File - " + OutputFile 
+                << " - not opened!" << G4endl;
+        }
+        else {
+            G4cout << "File - " + OutputFile
+                << " - opened successfully." << G4endl;
+        }
+    }
+    void EventManager::CloseOutputFile(G4int RunID)
+    {
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        AnalysisManager->Write();
+        AnalysisManager->CloseFile();
+
+#ifdef LARGEANT_PROFILING
+        std::ofstream ProfilingFile;
+        std::filesystem::create_directory(".logs");
+        auto ThreadID = G4Threading::G4GetThreadId();
+        if(ThreadID < 0) { 
+            return;
+        }
+        ProfilingFile.open(
+            ".logs/" + OutputFileName() + "_" + std::to_string(RunID)
+            + "_t" + std::to_string(ThreadID) + ".profile"  
+        );
+        ProfilingFile << "function,number_of_calls,total_time[ms]\n"; 
+        
+        auto Profiles = GetFunctionProfiles();
+        for(auto const& [key, val] : Profiles)
+        {
+            ProfilingFile << key << ","; 
+            ProfilingFile << val.calls << ","; 
+            ProfilingFile << val.time << "\n";
+        }
+        ProfilingFile.close();
+#endif
+    }
+
     void EventManager::CreateTuples()
     {
+        StartFunctionProfile();
         auto AnalysisManager = G4AnalysisManager::Instance();
         AnalysisManager->SetDefaultFileType("root");
         AnalysisManager->SetVerboseLevel(0);
@@ -146,6 +192,26 @@ namespace LArGeant
             AnalysisManager->CreateNtupleIColumn("number_of_hits");
             AnalysisManager->FinishNtuple(index);
         }
+        if(SaveParticleInfo())
+        {
+            G4int index = GetIndex("Particles");
+            AnalysisManager->CreateNtuple("Particles", "Particles");
+            AnalysisManager->CreateNtupleIColumn("event");
+            AnalysisManager->CreateNtupleIColumn("track_id");
+            AnalysisManager->CreateNtupleIColumn("pdg");
+            AnalysisManager->CreateNtupleIColumn("parent_track_id");
+            AnalysisManager->CreateNtupleSColumn("creation_process");
+            AnalysisManager->CreateNtupleDColumn("global_init_time");
+            AnalysisManager->CreateNtupleDColumn("local_init_time");
+            AnalysisManager->CreateNtupleDColumn("init_x");
+            AnalysisManager->CreateNtupleDColumn("init_y");
+            AnalysisManager->CreateNtupleDColumn("init_z");
+            AnalysisManager->CreateNtupleDColumn("init_energy");
+            AnalysisManager->CreateNtupleDColumn("init_px");
+            AnalysisManager->CreateNtupleDColumn("init_py");
+            AnalysisManager->CreateNtupleDColumn("init_pz");
+            AnalysisManager->FinishNtuple(index);
+        }
         if(SaveEnergyDeposits())
         {
             G4int index = GetIndex("EnergyDeposits");
@@ -169,6 +235,7 @@ namespace LArGeant
         {
             G4int index = GetIndex("OpticalPhotons");
             AnalysisManager->CreateNtuple("OpticalPhotons", "OpticalPhotons");
+            AnalysisManager->CreateNtupleIColumn("event");
             AnalysisManager->CreateNtupleIColumn("track_id");
             AnalysisManager->CreateNtupleIColumn("parent_track_id");
             AnalysisManager->CreateNtupleIColumn("parent_pdg");
@@ -180,6 +247,7 @@ namespace LArGeant
         {
             G4int index = GetIndex("ThermalElectrons");
             AnalysisManager->CreateNtuple("ThermalElectrons", "ThermalElectrons");
+            AnalysisManager->CreateNtupleIColumn("event");
             AnalysisManager->CreateNtupleDColumn("energy");
             AnalysisManager->CreateNtupleDColumn("track_length");
             AnalysisManager->FinishNtuple(index);
@@ -188,6 +256,7 @@ namespace LArGeant
         {
             G4int index = GetIndex("NEST");
             AnalysisManager->CreateNtuple("NEST", "NEST");
+            AnalysisManager->CreateNtupleIColumn("event");
             AnalysisManager->CreateNtupleIColumn("number_of_photons");
             AnalysisManager->CreateNtupleIColumn("number_of_electrons");
             AnalysisManager->CreateNtupleSColumn("particle");
@@ -227,10 +296,12 @@ namespace LArGeant
             AnalysisManager->CreateNtupleIColumn("detected");
             AnalysisManager->FinishNtuple(index);
         }
+        EndFunctionProfile("CreateTuples");
     }
 
     void EventManager::FillParticleMaps(G4int EventID)
     {
+        StartFunctionProfile();
         if(!SaveParticleMaps()) {
             return;
         }
@@ -247,9 +318,11 @@ namespace LArGeant
             AnalysisManager->FillNtupleIColumn(index, 6, GetScintillationParentTrackID(ii));
             AnalysisManager->AddNtupleRow(index);
         }
+        EndFunctionProfile("FillParticleMaps");
     }
     void EventManager::FillPrimaryInfo(G4int EventID)
     {
+        StartFunctionProfile();
         if(!SavePrimaryInfo()) {
             return;
         }
@@ -288,9 +361,39 @@ namespace LArGeant
             AnalysisManager->FillNtupleIColumn(index, 28, mPrimaryData[ii].number_of_hits);
             AnalysisManager->AddNtupleRow(index);
         }
+        EndFunctionProfile("FillPrimaryInfo");
+    }
+    void EventManager::FillParticleInfo(G4int EventID)
+    {
+        StartFunctionProfile();
+        if(!SaveParticleInfo()) {
+            return;
+        }
+        auto AnalysisManager = G4AnalysisManager::Instance();
+        G4int index = GetIndex("Particles");
+        for(size_t ii = 0; ii < mParticles.size(); ii++)
+        {
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
+            AnalysisManager->FillNtupleIColumn(index, 1, mParticles[ii].TrackID());
+            AnalysisManager->FillNtupleIColumn(index, 2, mParticles[ii].PDG());
+            AnalysisManager->FillNtupleIColumn(index, 3, mParticles[ii].ParentTrackID());
+            AnalysisManager->FillNtupleSColumn(index, 4, mParticles[ii].CreationProcess());
+            AnalysisManager->FillNtupleDColumn(index, 5, mParticles[ii].GetGlobalCreationTime());
+            AnalysisManager->FillNtupleDColumn(index, 6, mParticles[ii].GetT());
+            AnalysisManager->FillNtupleDColumn(index, 7, mParticles[ii].GetX());
+            AnalysisManager->FillNtupleDColumn(index, 8, mParticles[ii].GetY());
+            AnalysisManager->FillNtupleDColumn(index, 9, mParticles[ii].GetZ());
+            AnalysisManager->FillNtupleDColumn(index, 10, mParticles[ii].GetE());
+            AnalysisManager->FillNtupleDColumn(index, 11, mParticles[ii].GetPx());
+            AnalysisManager->FillNtupleDColumn(index, 12, mParticles[ii].GetPy());
+            AnalysisManager->FillNtupleDColumn(index, 13, mParticles[ii].GetPz());
+            AnalysisManager->AddNtupleRow(index);
+        }
+        EndFunctionProfile("FillParticleInfo");
     }
     void EventManager::FillEnergyDeposits(G4int EventID)
     {
+        StartFunctionProfile();
         if(!SaveEnergyDeposits()) {
             return;
         } 
@@ -298,7 +401,7 @@ namespace LArGeant
         G4int index = GetIndex("EnergyDeposits");
         for(size_t ii = 0; ii < mEnergyDeposits.size(); ii++)
         {
-            AnalysisManager->FillNtupleIColumn(index, 0, mEnergyDeposits[ii].event);
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
             AnalysisManager->FillNtupleIColumn(index, 1, mEnergyDeposits[ii].track_id);
             AnalysisManager->FillNtupleSColumn(index, 2, mEnergyDeposits[ii].name);
             AnalysisManager->FillNtupleIColumn(index, 3, mEnergyDeposits[ii].pdg);
@@ -313,9 +416,11 @@ namespace LArGeant
             AnalysisManager->FillNtupleDColumn(index, 12, mEnergyDeposits[ii].energy);
             AnalysisManager->AddNtupleRow(index);
         }
+        EndFunctionProfile("FillEnergyDeposits");
     }
     void EventManager::FillOpticalPhotons(G4int EventID)
     {
+        StartFunctionProfile();
         if(!SaveOpticalPhotons()) {
             return;
         }
@@ -323,17 +428,20 @@ namespace LArGeant
         G4int index = GetIndex("OpticalPhotons");
         for(size_t ii = 0; ii < mOpticalPhotonData.size(); ii++)
         {
-            AnalysisManager->FillNtupleIColumn(index, 0, mOpticalPhotonData[ii].track_id);
-            AnalysisManager->FillNtupleIColumn(index, 1, mOpticalPhotonData[ii].parent_track_id);
-            AnalysisManager->FillNtupleIColumn(index, 2, mOpticalPhotonData[ii].parent_pdg);
-            AnalysisManager->FillNtupleDColumn(index, 3, mOpticalPhotonData[ii].total_energy);
-            AnalysisManager->FillNtupleDColumn(index, 4, mOpticalPhotonData[ii].track_length);
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
+            AnalysisManager->FillNtupleIColumn(index, 1, mOpticalPhotonData[ii].track_id);
+            AnalysisManager->FillNtupleIColumn(index, 2, mOpticalPhotonData[ii].parent_track_id);
+            AnalysisManager->FillNtupleIColumn(index, 3, mOpticalPhotonData[ii].parent_pdg);
+            AnalysisManager->FillNtupleDColumn(index, 4, mOpticalPhotonData[ii].total_energy);
+            AnalysisManager->FillNtupleDColumn(index, 5, mOpticalPhotonData[ii].track_length);
             AnalysisManager->AddNtupleRow(index);
         }
+        EndFunctionProfile("FillOpticalPhotons");
     }
 
     void EventManager::FillNESTResults(G4int EventID)
     {
+        StartFunctionProfile();
         if(!SaveNESTResults()) {
             return;
         }
@@ -341,29 +449,32 @@ namespace LArGeant
         G4int index = GetIndex("NEST");
         for(size_t ii = 0; ii < mNESTInterfaceResults.size(); ii++)
         {
-            AnalysisManager->FillNtupleIColumn(index, 0, mNESTInterfaceResults[ii].number_of_photons);
-            AnalysisManager->FillNtupleIColumn(index, 1, mNESTInterfaceResults[ii].number_of_electrons);
-            AnalysisManager->FillNtupleSColumn(index, 2, mNESTInterfaceResults[ii].particle);
-            AnalysisManager->FillNtupleDColumn(index, 3, mNESTInterfaceResults[ii].init_position[0]);
-            AnalysisManager->FillNtupleDColumn(index, 4, mNESTInterfaceResults[ii].init_position[1]);
-            AnalysisManager->FillNtupleDColumn(index, 5, mNESTInterfaceResults[ii].init_position[2]);
-            AnalysisManager->FillNtupleDColumn(index, 6, mNESTInterfaceResults[ii].final_position[0]);
-            AnalysisManager->FillNtupleDColumn(index, 7, mNESTInterfaceResults[ii].final_position[1]);
-            AnalysisManager->FillNtupleDColumn(index, 8, mNESTInterfaceResults[ii].final_position[2]);
-            AnalysisManager->FillNtupleDColumn(index, 9, mNESTInterfaceResults[ii].init_time);
-            AnalysisManager->FillNtupleDColumn(index, 10, mNESTInterfaceResults[ii].energy);
-            AnalysisManager->FillNtupleDColumn(index, 11, mNESTInterfaceResults[ii].efield);
-            AnalysisManager->FillNtupleDColumn(index, 12, mNESTInterfaceResults[ii].density);
-            AnalysisManager->FillNtupleDColumn(index, 13, mNESTInterfaceResults[ii].electron_kinetic_energy);
-            AnalysisManager->FillNtupleDColumn(index, 14, mNESTInterfaceResults[ii].efield_direction[0]);
-            AnalysisManager->FillNtupleDColumn(index, 15, mNESTInterfaceResults[ii].efield_direction[1]);
-            AnalysisManager->FillNtupleDColumn(index, 16, mNESTInterfaceResults[ii].efield_direction[2]);
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
+            AnalysisManager->FillNtupleIColumn(index, 1, mNESTInterfaceResults[ii].number_of_photons);
+            AnalysisManager->FillNtupleIColumn(index, 2, mNESTInterfaceResults[ii].number_of_electrons);
+            AnalysisManager->FillNtupleSColumn(index, 3, mNESTInterfaceResults[ii].particle);
+            AnalysisManager->FillNtupleDColumn(index, 4, mNESTInterfaceResults[ii].init_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 5, mNESTInterfaceResults[ii].init_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 6, mNESTInterfaceResults[ii].init_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 7, mNESTInterfaceResults[ii].final_position[0]);
+            AnalysisManager->FillNtupleDColumn(index, 8, mNESTInterfaceResults[ii].final_position[1]);
+            AnalysisManager->FillNtupleDColumn(index, 9, mNESTInterfaceResults[ii].final_position[2]);
+            AnalysisManager->FillNtupleDColumn(index, 10, mNESTInterfaceResults[ii].init_time);
+            AnalysisManager->FillNtupleDColumn(index, 11, mNESTInterfaceResults[ii].energy);
+            AnalysisManager->FillNtupleDColumn(index, 12, mNESTInterfaceResults[ii].efield);
+            AnalysisManager->FillNtupleDColumn(index, 13, mNESTInterfaceResults[ii].density);
+            AnalysisManager->FillNtupleDColumn(index, 14, mNESTInterfaceResults[ii].electron_kinetic_energy);
+            AnalysisManager->FillNtupleDColumn(index, 15, mNESTInterfaceResults[ii].efield_direction[0]);
+            AnalysisManager->FillNtupleDColumn(index, 16, mNESTInterfaceResults[ii].efield_direction[1]);
+            AnalysisManager->FillNtupleDColumn(index, 17, mNESTInterfaceResults[ii].efield_direction[2]);
             AnalysisManager->AddNtupleRow(index);
         }
+        EndFunctionProfile("FillNESTResults");
     }
 
     void EventManager::FillHits(G4int EventID)
     {
+        StartFunctionProfile();
         if (!SaveHits()) {
             return;
         }
@@ -371,7 +482,7 @@ namespace LArGeant
         G4int index = GetIndex("Hits");
         for(size_t ii = 0; ii < mHits.size(); ii++)
         {
-            AnalysisManager->FillNtupleIColumn(index, 0, mHits[ii].event);
+            AnalysisManager->FillNtupleIColumn(index, 0, EventID);
             AnalysisManager->FillNtupleIColumn(index, 1, mHits[ii].copy_number);
             AnalysisManager->FillNtupleIColumn(index, 2, mHits[ii].track_id);
             AnalysisManager->FillNtupleIColumn(index, 3, mHits[ii].parent_track_id);
@@ -387,24 +498,25 @@ namespace LArGeant
             AnalysisManager->FillNtupleIColumn(index, 13,mHits[ii].detected);
             AnalysisManager->AddNtupleRow(index);
         }
+        EndFunctionProfile("FillHits");
     }
 
 
     void EventManager::AddParticleMapsFromTrack(const G4Track* track)
     {
+        StartFunctionProfile();
         G4int track_id = track->GetTrackID();
         G4String particle_name = track->GetParticleDefinition()->GetParticleName();
         G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
         G4int parent_track_id = track->GetParentID();
         
         const G4VProcess* creator_process = track->GetCreatorProcess();
-        G4String process = "";
+        G4String process = "none";
         if(creator_process) {
             process = creator_process->GetProcessName();
         }
 
-        // Save Particle Info
-        StartFunctionProfile();
+        // Save Particle Info    
         AddParticleName(track_id, particle_name);
         AddParticlePDG(track_id, particle_pdg);
         AddParticleParentTrackID(track_id, parent_track_id);
@@ -433,11 +545,12 @@ namespace LArGeant
                 AddScintillationParentTrackID(track_id, GetScintillationParentTrackID(parent_track_id));
             }
         }
-        EndFunctionProfile("PreUserTrackingAction_SaveParticleInfo");
+        EndFunctionProfile("AddParticleMapsFromTrack");
     }
 
     void EventManager::AddPrimaryInfoFromTrackBegin(const G4Track* track)
     {
+        StartFunctionProfile();
         G4String particle_name = track->GetParticleDefinition()->GetParticleName();
         G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
         G4ThreeVector particle_position = track->GetVertexPosition();
@@ -450,12 +563,11 @@ namespace LArGeant
         G4int parent_track_id = track->GetParentID();
 
         const G4VProcess* creator_process = track->GetCreatorProcess();
-        G4String process = "";
+        G4String process = "none";
         if(creator_process) {
             process = creator_process->GetProcessName();
         }
 
-        StartFunctionProfile();
         if(parent_track_id == 0)
         {
             AddPrimaryData(
@@ -484,7 +596,7 @@ namespace LArGeant
                 GetPrimaryData(GetParticleAncestorTrackID(track_id)).number_of_daughters += 1;
             }
         }
-        EndFunctionProfile("PreUserTrackingAction_SavePrimaryInfo");
+        EndFunctionProfile("AddPrimaryInfoFromTrackBegin");
     }
 
     void EventManager::AddPrimaryInfoFromTrackEnd(const G4Track* track)
@@ -496,7 +608,6 @@ namespace LArGeant
         G4int track_id = track->GetTrackID();
         G4double global_time = track->GetGlobalTime();
         
-        StartFunctionProfile();
         if(GetParticleParentTrackID(track_id) == 0)
         {
             GetPrimaryData(track_id).AddFinalTrackData(
@@ -513,30 +624,50 @@ namespace LArGeant
         else {
             GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_daughter_final_energy += kinetic_energy;
         }
-        EndFunctionProfile("PostUserTrackingAction_SavePrimaryInfo");
+        EndFunctionProfile("AddPrimaryInfoFromTrackEnd");
     }
 
-    void EventManager::AddParticleInfoFromTrack(const G4Track* track)
+    void EventManager::AddParticleInfoFromTrackBegin(const G4Track* track)
     {
-        G4String particle_name = track->GetParticleDefinition()->GetParticleName();
-        G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
-        G4ThreeVector particle_position = track->GetVertexPosition();
-
-        G4double local_time = track->GetLocalTime();
-        G4double global_time = track->GetGlobalTime();
-        G4double kinetic_energy = track->GetKineticEnergy();
-        G4int track_status = (int)track->GetTrackStatus();
+        StartFunctionProfile();
         G4int track_id = track->GetTrackID();
+        G4int particle_pdg = track->GetParticleDefinition()->GetPDGEncoding();
         G4int parent_track_id = track->GetParentID();
-
         const G4VProcess* creator_process = track->GetCreatorProcess();
-        G4String process = "";
+        G4String process = "none";
         if(creator_process) {
             process = creator_process->GetProcessName();
         }
+        G4double global_time = track->GetGlobalTime();
+        G4double local_time = track->GetLocalTime();
+        G4ThreeVector particle_position = track->GetVertexPosition();
+        G4double kinetic_energy = track->GetKineticEnergy();
+        G4ThreeVector particle_momentum = track->GetMomentum();
+
+        mParticles.emplace_back(
+            Particle(
+                track_id, 
+                particle_pdg,
+                parent_track_id,
+                process,
+                global_time,
+                local_time,
+                particle_position,
+                kinetic_energy,
+                particle_momentum
+            )
+        );
+        AddParticleTrackID(track_id, mParticles.size()-1);
+        EndFunctionProfile("AddParticleInfoFromTrackBegin");
+    }
+    void EventManager::AddParticleInfoFromTrackEnd(const G4Track* track)
+    {
+        StartFunctionProfile();
+        EndFunctionProfile("AddParticleInfoFromTrackEnd");
     }
     void EventManager::AddParticleInfoFromStep(const G4Step *step)
     {
+        StartFunctionProfile();
         G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
         G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
         G4Track* track = step->GetTrack();
@@ -558,13 +689,12 @@ namespace LArGeant
         G4int           parent_track_id = track->GetParentID();
         G4ThreeVector   pre_step_position = pre_step_point->GetPosition();
         G4ThreeVector   post_step_position = post_step_point->GetPosition();
+        G4ThreeVector   pre_step_momentum = pre_step_point->GetMomentum();
+        G4ThreeVector   post_step_momentum = post_step_point->GetMomentum();
         G4double        edep = step->GetTotalEnergyDeposit();
+        G4double        kinetic_energy = track->GetKineticEnergy();
 
-        if(
-            SavePrimaryInfo() && 
-            GetParticleParentTrackID(track_id) == 0 &&
-            edep > 0
-        )
+        if(GetParticleParentTrackID(track_id) == 0)
         {
             if(parent_track_id == 0) {
                 GetPrimaryData(track_id).number_of_edeps += 1;
@@ -580,10 +710,18 @@ namespace LArGeant
                 GetPrimaryData(GetParticleAncestorTrackID(track_id)).total_daughter_edep += edep;
             }
         }
+        else
+        {
+            mParticles[GetParticleTrackID(track_id)].AddTrajectoryPoint(
+                local_time, pre_step_position, kinetic_energy, pre_step_momentum
+            );
+        }
+        EndFunctionProfile("AddParticleInfoFromStep");
     }
 
     void EventManager::AddEnergyDepositInfoFromStep(const G4Step* step)
     {
+        StartFunctionProfile();
         G4VPhysicalVolume* physicalVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
         G4LogicalVolume *logicalVolume = physicalVolume->GetLogicalVolume();
         G4Track* track = step->GetTrack();
@@ -609,17 +747,18 @@ namespace LArGeant
 
         mEnergyDeposits.emplace_back(
             EnergyDeposit(
-                event, track_id, particle_name,
+                track_id, particle_name,
                 particle_pdg, local_time, global_time,
                 pre_step_position, post_step_position,
                 edep
             )
         );
-
+        EndFunctionProfile("AddEnergyDepositInfoFromStep");
     }
 
     void EventManager::AddOpticalPhotonInfoFromTrackEnd(const G4Track* track)
     {
+        StartFunctionProfile();
         G4String particle_name = track->GetParticleDefinition()->GetParticleName();
         if(particle_name == "opticalphoton")
         {
@@ -629,25 +768,29 @@ namespace LArGeant
                 track->GetTotalEnergy(), track->GetTrackLength()/cm
             ));
         }
+        EndFunctionProfile("AddOpticalPhotonInfoFromTrackEnd");
     }
 
     void EventManager::AddThermalElectronInfoFromTrackEnd(const G4Track* track)
     {
-
+        StartFunctionProfile();
+        EndFunctionProfile("AddThermalElectronInfoFromTrackEnd");
     }
 
     void EventManager::AddNESTResultFromStep(NESTInterfaceResult result)
     {
+        StartFunctionProfile();
         mNESTInterfaceResults.emplace_back(result);
+        EndFunctionProfile("AddNESTResultFromStep");
     }
 
     void EventManager::AddHitInfoFromStep(G4Step* step, G4TouchableHistory* history)
     {
+        StartFunctionProfile();
         const G4VTouchable* touchable = step->GetPreStepPoint()->GetTouchable();
         const G4Track* track = step->GetTrack();
         const G4StepPoint *preStepPoint = step->GetPreStepPoint();
 
-        G4int           event = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
         G4int           copyNo = touchable->GetCopyNumber();
         G4double        globalTime = preStepPoint->GetGlobalTime();
         G4int           trackID = track->GetTrackID();
@@ -660,12 +803,12 @@ namespace LArGeant
         G4bool detected_hit = GetComponentFromCopyNumber(copyNo)->ProcessHits(step, history);
         mHits.emplace_back(
             Hit(
-                event, copyNo, trackID,
+                copyNo, trackID,
                 parentID, localTime, globalTime,
                 particlePosition, particleMomentum,
                 energy, detected_hit
             )
         );
-
+        EndFunctionProfile("AddHitInfoFromStep");
     }
 }

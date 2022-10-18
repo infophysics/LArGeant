@@ -21,21 +21,18 @@ namespace LArGeant
     void TrackingAction::PreUserTrackingAction(const G4Track* track)
     {
         auto Manager = EventManager::GetEventManager();
-        Manager->StartFunctionProfile();
         Manager->AddParticleMapsFromTrack(track);
         Manager->AddPrimaryInfoFromTrackBegin(track);
-        Manager->AddParticleInfoFromTrack(track);
-        Manager->EndFunctionProfile("PreUserTrackingAction");
+        Manager->AddParticleInfoFromTrackBegin(track);
     }
 
     void TrackingAction::PostUserTrackingAction(const G4Track* track)
     {
         auto Manager = EventManager::GetEventManager();
-        EventManager::GetEventManager()->StartFunctionProfile();
         Manager->AddPrimaryInfoFromTrackEnd(track);
+        Manager->AddParticleInfoFromTrackEnd(track);
         Manager->AddOpticalPhotonInfoFromTrackEnd(track);
         Manager->AddThermalElectronInfoFromTrackEnd(track);
-        Manager->EndFunctionProfile("PostUserTrackingAction");
     }
 
 }

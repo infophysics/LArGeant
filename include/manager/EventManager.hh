@@ -11,6 +11,7 @@
 #pragma once
 #include <memory>
 #include <mutex>
+#include <filesystem>
 
 #include "G4RunManager.hh"
 #include "G4MTRunManager.hh"
@@ -87,6 +88,9 @@ namespace LArGeant
         G4String OutputFileName()           { return sOutputFileName; }
         G4int GetIndex(G4String);
         void OutputFileName(G4String name)  { sOutputFileName = name; }
+        void OpenOutputFile(G4int RunID);
+        void CloseOutputFile(G4int RunID);
+
         // event max time
         G4double EventMaxTime()             { return sEventMaxTime; }
         void EventMaxTime(G4double maxTime) { sEventMaxTime = maxTime; }
@@ -124,6 +128,7 @@ namespace LArGeant
         void FillHits(G4int EventID = -1);
         inline static thread_local void ClearEventData()
         {
+            mParticleTrackID.clear();
             mParticleName.clear();
             mParticlePDG.clear();
             mParticleParentTrackID.clear();
@@ -142,6 +147,8 @@ namespace LArGeant
         //*************************************************************************************************//
         // Event level maps to keep track of particle ids,
         // parent ids, ancestor ids and pdg codes.
+        inline static thread_local void AddParticleTrackID(G4int track_id, G4int location)
+        { mParticleTrackID[track_id] = location; }
         inline static thread_local void AddParticleName(G4int track_id, G4String name)                 
         { mParticleName[track_id] = name; }
         inline static thread_local void AddParticlePDG(G4int track_id, G4int pdg)
@@ -153,6 +160,7 @@ namespace LArGeant
         inline static thread_local void AddScintillationParentTrackID(G4int track_id, G4int scintillation_track_id)
         { mScintillationParentTrackID[track_id] = scintillation_track_id; }
 
+        inline static thread_local G4int GetParticleTrackID(G4int track_id)          { return mParticleTrackID[track_id]; }
         inline static thread_local G4String GetParticleName(G4int track_id)          { return mParticleName[track_id]; }
         inline static thread_local G4int GetParticlePDG(G4int track_id)              { return mParticlePDG[track_id]; }
         inline static thread_local G4int GetParticleParentTrackID(G4int track_id)    { return mParticleParentTrackID[track_id]; }
@@ -213,35 +221,42 @@ namespace LArGeant
         //*************************************************************************************************//
         // Add Particle info
         void AddParticleMapsFromTrack(const G4Track* track);
+
         void AddPrimaryInfoFromTrackBegin(const G4Track* track);
         void AddPrimaryInfoFromTrackEnd(const G4Track* track);
-        void AddParticleInfoFromTrack(const G4Track* track);
+
+        void AddParticleInfoFromTrackBegin(const G4Track* track);
+        void AddParticleInfoFromTrackEnd(const G4Track* track);
         void AddParticleInfoFromStep(const G4Step* step);
+
         void AddEnergyDepositInfoFromStep(const G4Step* step);
+
         void AddOpticalPhotonInfoFromTrackEnd(const G4Track* track);
         void AddThermalElectronInfoFromTrackEnd(const G4Track* track);
         void AddNESTResultFromStep(NESTInterfaceResult result);
+
         void AddHitInfoFromStep(G4Step* step, G4TouchableHistory* history);
         //*************************************************************************************************//
 
 
 #ifdef LARGEANT_PROFILING
         std::map<G4String, Profile> GetFunctionProfiles()     { return sFunctionProfiles; }
-        void EndFunctionProfile(G4String func)   { 
+        inline void EndFunctionProfile(G4String func)   { 
             sFunctionProfiles[func].calls += 1; 
             sFunctionProfiles[func].time += (GetTimeInMilliseconds() - sProfilingTime.back()); 
             sProfilingTime.pop_back();
         }
-        void StartFunctionProfile() {
+        inline void StartFunctionProfile() {
             sProfilingTime.emplace_back(GetTimeInMilliseconds());
         }
-        void ResetProfiling() {
+        inline void ResetProfiling() {
             sProfilingTime.clear();
             sFunctionProfiles.clear();
         }
 #else 
-        void EndFunctionProfile(G4String func){}
-        void StartFunctionProfile(){}
+        inline void EndFunctionProfile(G4String func){}
+        inline void StartFunctionProfile(){}
+        inline void ResetProfiling(){}
 #endif
 
     private:
@@ -275,6 +290,7 @@ namespace LArGeant
 
         // Event level maps to keep track of particle ids,
         // parent ids, ancestor ids and pdg codes.
+        inline static thread_local std::map<G4int, G4int>      mParticleTrackID;
         inline static thread_local std::map<G4int, G4String>   mParticleName;
         inline static thread_local std::map<G4int, G4int>      mParticlePDG;
         inline static thread_local std::map<G4int, G4int>      mParticleParentTrackID;

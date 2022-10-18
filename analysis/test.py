@@ -7,35 +7,52 @@ import csv
 input_file = "default_0.root"
 
 hits = uproot.open(input_file)['Hits'].arrays(library="np")
-particles = uproot.open(input_file)['Particle'].arrays(library="np")
-
 hit_event = hits['event']
-particle_event = particles['event']
-
 hit_track_id = hits['track_id']
 hit_parent_track_id = hits['parent_id']
+t = hits['local_time']
+x = hits['x_particle']
+z = hits['z_particle']
+energy = hits['energy'] * 1e6
+wavelength = 1239.8 / energy
+det = hits['detected']
+
+particles = uproot.open(input_file)['ParticleMaps'].arrays(library="np")
+particle_event = particles['event']
+particle = particles['particle']
 particle_track_id = particles['track_id']
 parent_track_id = particles['parent_track_id']
 scint_track_id = particles['scintillation_parent_track_id']
 
-t = hits['t_event']
-x = hits['x_particle']
-z = hits['z_particle']
-energy = hits['E_particle'] * 1e6
-wavelength = 1239.8 / energy
-det = hits['detected']
 
-
-particle = particles['particle']
-alpha_ids = particle_track_id[(particle == 'alpha')]
-alpha_t = []
 
 unique_events = np.unique(particle_event)
-print(unique_events)
 for event in unique_events:
     part = particle[(particle_event == event)]
+
+    t_event = t[(hit_event == event)]
+    id_event = hit_track_id[(hit_event == event)]
+
     track_id = particle_track_id[(particle_event == event)]
     scint = scint_track_id[(particle_event == event)]
+
+    fig, axs = plt.subplots()
+    axs.hist(part)
+    plt.setp(axs.get_xticklabels(),rotation=45,ha='right')
+    axs.set_yscale("log")
+    plt.tight_layout()
+    plt.show()
+    
+    fig, axs = plt.subplots()
+    for p in np.unique(part):
+        ids = scint[(part == p)]
+        ts = np.concatenate([t_event[(id_event == id)] for id in ids])
+        axs.hist(scint, bins=100, label=p, histtype='step', stacked=True, density=True)
+    axs.set_xlabel("t")
+    axs.set_yscale("log")
+    plt.legend()
+    plt.show()
+
     scint = scint[(scint != 0)]
     p_scint = np.concatenate([part[(track_id == id)] for id in scint])
     print(p_scint[(p_scint == 'alpha')])

@@ -46,6 +46,11 @@ namespace LArGeant
         );
 
         G4bool CheckTrajectoryIndex(const G4int ii) const;
+        void AddTrajectoryPoint(
+            G4double t, G4ThreeVector position,
+            G4double E, G4ThreeVector momentum
+        )
+        { return mTrajectory.AddTrajectoryPoint(t, position, E, momentum); }
 
         void SetTrackID(G4int track_id)     { mTrackID = track_id; }
         void SetPDG(G4int pdg)              { mPDG = pdg; }
@@ -60,6 +65,8 @@ namespace LArGeant
         G4String EndProcess() const         { return mEndProcess; }
 
         G4int DaughterTrackID(const G4int ii=0) const;
+
+        G4double GetGlobalCreationTime() const { return mGlobalCreationTime; }
 
         G4double GetT(const G4int ii=0) const;
         G4double GetX(const G4int ii=0) const;
@@ -76,7 +83,7 @@ namespace LArGeant
         G4int mParentTrackID = {0};
         G4String mCreationProcess = {""};
         G4String mEndProcess = {""};
-        G4double mGlobalTime = {0};
+        G4double mGlobalCreationTime = {0};
         std::vector<G4int> mDaughterTrackIDs = {};
         Trajectory mTrajectory;
 

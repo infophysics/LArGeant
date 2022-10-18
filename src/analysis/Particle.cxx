@@ -28,7 +28,7 @@ namespace LArGeant
     , mPDG(pdg)
     , mParentTrackID(parent_track_id)
     , mCreationProcess(creation_process)
-    , mGlobalTime(global_time)
+    , mGlobalCreationTime(global_time)
     {
     }
 
@@ -47,7 +47,7 @@ namespace LArGeant
     , mPDG(pdg)
     , mParentTrackID(parent_track_id)
     , mCreationProcess(creation_process)
-    , mGlobalTime(global_time)
+    , mGlobalCreationTime(global_time)
     {
         mTrajectory.AddTrajectoryPoint(t, position, E, momentum);
     }

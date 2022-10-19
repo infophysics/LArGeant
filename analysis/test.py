@@ -11,18 +11,21 @@ hit_event = hits['event']
 hit_track_id = hits['track_id']
 hit_parent_track_id = hits['parent_id']
 t = hits['local_time']
+gt = hits['global_time']
 x = hits['x_particle']
 z = hits['z_particle']
 energy = hits['energy'] * 1e6
 wavelength = 1239.8 / energy
 det = hits['detected']
+hit_scint = hits['scintillation_ancestor_pdg']
 
 particles = uproot.open(input_file)['ParticleMaps'].arrays(library="np")
 particle_event = particles['event']
 particle = particles['particle']
 particle_track_id = particles['track_id']
 parent_track_id = particles['parent_track_id']
-scint_track_id = particles['scintillation_parent_track_id']
+scint_track_id = particles['scintillation_ancestor_track_id']
+scint_pdg = particles['scintillation_ancestor_pdg']
 
 
 
@@ -30,32 +33,39 @@ unique_events = np.unique(particle_event)
 for event in unique_events:
     part = particle[(particle_event == event)]
 
-    t_event = t[(hit_event == event)]
+    t_event = gt[(hit_event == event)]
+    t_event -= min(t_event)
+    t_local = t[(hit_event == event)]
     id_event = hit_track_id[(hit_event == event)]
 
     track_id = particle_track_id[(particle_event == event)]
-    scint = scint_track_id[(particle_event == event)]
+    scint = scint_pdg[(particle_event == event)]
 
+    scint = hit_scint[(hit_event == event)]
+
+    unique_scint = np.unique(scint)
+    for ii in unique_scint:
+        print(ii)
+    print(len(unique_scint))
     fig, axs = plt.subplots()
-    axs.hist(part)
-    plt.setp(axs.get_xticklabels(),rotation=45,ha='right')
+    axs.hist(scint.astype(str), bins=100)
+    axs.set_xticks([ii for ii in range(len(unique_scint))])
+    axs.set_xticklabels(unique_scint,rotation=45,ha='right')
     axs.set_yscale("log")
     plt.tight_layout()
     plt.show()
     
     fig, axs = plt.subplots()
-    for p in np.unique(part):
-        ids = scint[(part == p)]
-        ts = np.concatenate([t_event[(id_event == id)] for id in ids])
-        axs.hist(scint, bins=100, label=p, histtype='step', stacked=True, density=True)
-    axs.set_xlabel("t")
-    axs.set_yscale("log")
+    axs.hist(t_local, bins=100, label='all', histtype='step', stacked=True)
+    for ii in unique_scint:
+        ts = t_local[(scint == ii)] + t_event[(scint==ii)]
+        print(ts)
+        axs.hist(ts, bins=100, label=ii, histtype='step',stacked=True)
+    axs.set_xlabel("local time [ns]")
+    axs.set_ylabel("sipm hits [n]")
     plt.legend()
     plt.show()
 
-    scint = scint[(scint != 0)]
-    p_scint = np.concatenate([part[(track_id == id)] for id in scint])
-    print(p_scint[(p_scint == 'alpha')])
     
 
 

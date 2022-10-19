@@ -133,7 +133,8 @@ namespace LArGeant
             mParticlePDG.clear();
             mParticleParentTrackID.clear();
             mParticleAncestorTrackID.clear();
-            mScintillationParentTrackID.clear();
+            mScintillationAncestorTrackID.clear();
+            mScintillationAncestorPDG.clear();
             mPrimaryData.clear();
             mParticles.clear();
             mEnergyDeposits.clear();
@@ -157,15 +158,18 @@ namespace LArGeant
         { mParticleParentTrackID[track_id] = parent_track_id; }
         inline static thread_local void AddParticleAncestorTrackID(G4int track_id, G4int ancestor_track_id) 
         { mParticleAncestorTrackID[track_id] = ancestor_track_id; }
-        inline static thread_local void AddScintillationParentTrackID(G4int track_id, G4int scintillation_track_id)
-        { mScintillationParentTrackID[track_id] = scintillation_track_id; }
+        inline static thread_local void AddScintillationAncestorTrackID(G4int track_id, G4int scintillation_track_id)
+        { mScintillationAncestorTrackID[track_id] = scintillation_track_id; }
+        inline static thread_local void AddScintillationAncestorPDG(G4int track_id, G4int scintillation_pdg)
+        { mScintillationAncestorPDG[track_id] = scintillation_pdg; }
 
         inline static thread_local G4int GetParticleTrackID(G4int track_id)          { return mParticleTrackID[track_id]; }
         inline static thread_local G4String GetParticleName(G4int track_id)          { return mParticleName[track_id]; }
         inline static thread_local G4int GetParticlePDG(G4int track_id)              { return mParticlePDG[track_id]; }
         inline static thread_local G4int GetParticleParentTrackID(G4int track_id)    { return mParticleParentTrackID[track_id]; }
         inline static thread_local G4int GetParticleAncestorTrackID(G4int track_id)  { return mParticleAncestorTrackID[track_id]; }
-        inline static thread_local G4int GetScintillationParentTrackID(G4int track_id) { return mScintillationParentTrackID[track_id]; }
+        inline static thread_local G4int GetScintillationAncestorTrackID(G4int track_id) { return mScintillationAncestorTrackID[track_id]; }
+        inline static thread_local G4int GetScintillationAncestorPDG(G4int track_id)     { return mScintillationAncestorPDG[track_id]; }
         //*************************************************************************************************//
 
 
@@ -264,7 +268,7 @@ namespace LArGeant
         static std::mutex sMutex;
 
         inline static std::shared_ptr<PhysicsList> sPhysicsList = {nullptr};
-        inline static G4double sEventMaxTime = 1.e19 * ns;
+        inline static G4double sEventMaxTime = 2.e19 * ns;
 
         inline static std::map<G4int, G4int> sComponentCopyNumber;
         inline static std::vector<std::shared_ptr<DetectorComponent>> sDetectorComponents = {nullptr};
@@ -295,7 +299,8 @@ namespace LArGeant
         inline static thread_local std::map<G4int, G4int>      mParticlePDG;
         inline static thread_local std::map<G4int, G4int>      mParticleParentTrackID;
         inline static thread_local std::map<G4int, G4int>      mParticleAncestorTrackID;
-        inline static thread_local std::map<G4int, G4int>      mScintillationParentTrackID;
+        inline static thread_local std::map<G4int, G4int>      mScintillationAncestorTrackID;
+        inline static thread_local std::map<G4int, G4int>      mScintillationAncestorPDG;
 
         inline static thread_local std::vector<PrimaryData>    mPrimaryData;
         inline static thread_local std::vector<Particle>       mParticles;

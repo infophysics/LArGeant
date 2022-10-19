@@ -154,7 +154,8 @@ namespace LArGeant
             AnalysisManager->CreateNtupleIColumn("pdg");
             AnalysisManager->CreateNtupleIColumn("parent_track_id");
             AnalysisManager->CreateNtupleIColumn("ancestor_track_id");
-            AnalysisManager->CreateNtupleIColumn("scintillation_parent_track_id");
+            AnalysisManager->CreateNtupleIColumn("scintillation_ancestor_track_id");
+            AnalysisManager->CreateNtupleIColumn("scintillation_ancestor_pdg");
             AnalysisManager->FinishNtuple(index);
         }
         if(SavePrimaryInfo())
@@ -294,6 +295,7 @@ namespace LArGeant
             AnalysisManager->CreateNtupleDColumn("pz_particle");
             AnalysisManager->CreateNtupleDColumn("energy");
             AnalysisManager->CreateNtupleIColumn("detected");
+            AnalysisManager->CreateNtupleIColumn("scintillation_ancestor_pdg");
             AnalysisManager->FinishNtuple(index);
         }
         EndFunctionProfile("CreateTuples");
@@ -307,15 +309,16 @@ namespace LArGeant
         }
         auto AnalysisManager = G4AnalysisManager::Instance();
         G4int index = GetIndex("ParticleMaps");
-        for(size_t ii = 0; ii < GetNumberOfParticles(); ii++)
+        for(auto const& [key, val] : mParticleName)
         {
             AnalysisManager->FillNtupleIColumn(index, 0, EventID);
-            AnalysisManager->FillNtupleIColumn(index, 1, ii+1);
-            AnalysisManager->FillNtupleSColumn(index, 2, GetParticleName(ii));
-            AnalysisManager->FillNtupleIColumn(index, 3, GetParticlePDG(ii));
-            AnalysisManager->FillNtupleIColumn(index, 4, GetParticleParentTrackID(ii));
-            AnalysisManager->FillNtupleIColumn(index, 5, GetParticleAncestorTrackID(ii));
-            AnalysisManager->FillNtupleIColumn(index, 6, GetScintillationParentTrackID(ii));
+            AnalysisManager->FillNtupleIColumn(index, 1, key);
+            AnalysisManager->FillNtupleSColumn(index, 2, GetParticleName(key));
+            AnalysisManager->FillNtupleIColumn(index, 3, GetParticlePDG(key));
+            AnalysisManager->FillNtupleIColumn(index, 4, GetParticleParentTrackID(key));
+            AnalysisManager->FillNtupleIColumn(index, 5, GetParticleAncestorTrackID(key));
+            AnalysisManager->FillNtupleIColumn(index, 6, GetScintillationAncestorTrackID(key));
+            AnalysisManager->FillNtupleIColumn(index, 7, GetScintillationAncestorPDG(key));
             AnalysisManager->AddNtupleRow(index);
         }
         EndFunctionProfile("FillParticleMaps");
@@ -496,6 +499,7 @@ namespace LArGeant
             AnalysisManager->FillNtupleDColumn(index, 11,mHits[ii].particle_momentum[2]);
             AnalysisManager->FillNtupleDColumn(index, 12,mHits[ii].energy);
             AnalysisManager->FillNtupleIColumn(index, 13,mHits[ii].detected);
+            AnalysisManager->FillNtupleIColumn(index, 14,mHits[ii].scintillation_ancestor_pdg);
             AnalysisManager->AddNtupleRow(index);
         }
         EndFunctionProfile("FillHits");
@@ -533,17 +537,15 @@ namespace LArGeant
         }
 
         // Add scintillation information
-        if(parent_track_id == 0) {
-            AddScintillationParentTrackID(track_id, 0);
-        }
-        else 
+        if(process == "ScintillationProcess")
         {
-            if(process == "ScintillationProcess" && GetScintillationParentTrackID(parent_track_id) == 0) {
-                AddScintillationParentTrackID(track_id, parent_track_id);
-            }
-            else {
-                AddScintillationParentTrackID(track_id, GetScintillationParentTrackID(parent_track_id));
-            }
+            AddScintillationAncestorTrackID(track_id, parent_track_id);
+            AddScintillationAncestorPDG(track_id, GetParticlePDG(parent_track_id));
+        }
+        else
+        {
+            AddScintillationAncestorTrackID(track_id, -1);
+            AddScintillationAncestorPDG(track_id, -1);
         }
         EndFunctionProfile("AddParticleMapsFromTrack");
     }
@@ -806,7 +808,8 @@ namespace LArGeant
                 copyNo, trackID,
                 parentID, localTime, globalTime,
                 particlePosition, particleMomentum,
-                energy, detected_hit
+                energy, detected_hit,
+                GetScintillationAncestorPDG(trackID)
             )
         );
         EndFunctionProfile("AddHitInfoFromStep");

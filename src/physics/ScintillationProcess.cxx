@@ -108,10 +108,14 @@ namespace LArGeant
             G4Track* track = new G4Track(
                 photon, result.init_time, result.final_position
             );
-            track->SetParentID(result.parent_track_id);
-            EventManager::GetEventManager()->AddScintillationParentTrackID(
-                track->GetTrackID(), result.parent_track_id
-            );
+            // track->SetParentID(result.parent_track_id);
+            // EventManager::GetEventManager()->AddScintillationAncestorTrackID(
+            //     track->GetTrackID(), result.parent_track_id
+            // );
+            // EventManager::GetEventManager()->AddScintillationAncestorPDG(
+            //     track->GetTrackID(), EventManager::GetEventManager()->GetParticlePDG(result.parent_track_id)
+            // );
+            // G4cout << track->GetTrackID() << ", " << result.parent_track_id << ", " << EventManager::GetEventManager()->GetParticlePDG(result.parent_track_id) << G4endl;
             pParticleChange->AddSecondary(track);
         }
     }
@@ -131,7 +135,7 @@ namespace LArGeant
             G4Track* track = new G4Track(
                 electron, result.init_time, result.final_position
             );
-            track->SetParentID(result.parent_track_id);
+            // track->SetParentID(result.parent_track_id);
             pParticleChange->AddSecondary(track);
         }
     }

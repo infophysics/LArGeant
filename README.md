@@ -1,12 +1,12 @@
 # LArGeant
-Code for testing LArNEST models using Geant4.
+*(Code for simulating TPC experiments with custom geometries and sources in Geant4)*
 
-### Argon40 and natural Argon LArNEST Benchmarks
-Here we will conduct a proof of principle simulation in which our "detector" consists of an effectively infinite sphere of LAr, either with pure Argon40 or Argon36/38/40 in their respective abundances.  We will simulate particles one at a time (i.e. one particle per event), with some initial kinetic energy, using the Geant4 framework with some modifications to the physics processes.  We will then analyze the results using some custom software which is used throughout the rest of the calibration framework.  The simulation consists of several steps, 
+### Main Features
 
-1.  Constructing the input file to the generator (HEPevt format)
-2.  Running a Geant4 simulation step
-3.  Various python scripts for analyzing the results and making plots
+  - **Custom Geometry** - Custom geometries can be built by constructing *DetectorComponent* objects which can be built from radiological materials that LArGeant will automatically simulate as backgrounds in events according to certain run-time parameters.  
+  - **Multithreading** - LArGeant is built with multithreading in mind, ... 
+  - **NEST** - Scintillation and ionization is simulated using the [NEST software](https://nest.physics.ucdavis.edu/) package which can operate in both a liquid/gas phase for argon and xenon.
+  - **Data Products** - Several data products are generated at the event level which the user can export to *custom analysis code* and also save to ROOT files.
 
 ### Installation
 -----------------

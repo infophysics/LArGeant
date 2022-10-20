@@ -814,4 +814,12 @@ namespace LArGeant
         );
         EndFunctionProfile("AddHitInfoFromStep");
     }
+
+    void EventManager::EvaluateEvent()
+    {
+        for(size_t ii = 0; ii < mAnalysisFunctions.size(); ii++)
+        {
+            mAnalysisFunctions[ii]();
+        }
+    }
 }

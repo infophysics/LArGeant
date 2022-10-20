@@ -53,7 +53,7 @@ namespace LArGeant
         Manager->FillHits(event->GetEventID());
         
         // Send out tuples to analysis functions
-        
+        Manager->EvaluateEvent();
         Manager->ClearEventData();
     }
 }

@@ -21,6 +21,7 @@
 #include "G4ParticleHPManager.hh"
 
 #include "Argon.hh"
+#include "Analysis.hh"
 #include "ActionInitialization.hh"
 #include "ArgonCubeDetector.hh"
 #include "DetectorConstruction.hh"
@@ -59,6 +60,8 @@ int main(int argc, char** argv)
     auto ActionInitialization = new LArGeant::ActionInitialization(PrimaryGeneratorAction);
     RunManager->SetUserInitialization(ActionInitialization);
 
+    // add analysis functions
+    LArGeant::EventManager::GetEventManager()->AddAnalysisFunction(LArGeant::ExampleAnalysisFunction);
 
     // start the session
     if (argc == 1)

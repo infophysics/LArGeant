@@ -7,7 +7,8 @@
  */
 #pragma once
 
+#include "EventManager.hh"
 namespace LArGeant
 {
-
+    void ExampleAnalysisFunction();
 }

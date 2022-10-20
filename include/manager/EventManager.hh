@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <filesystem>
+#include <functional>
 
 #include "G4RunManager.hh"
 #include "G4MTRunManager.hh"
@@ -83,16 +84,17 @@ namespace LArGeant
                 sCurrentTupleIndex = -1;
 			}return sInstance; 
 		}
+        inline static thread_local G4int EventID() { return G4EventManager::GetEventManager()->GetConstCurrentEvent()->GetEventID(); }
 
         // Tuple related functions
         G4String OutputFileName()           { return sOutputFileName; }
-        G4int GetIndex(G4String);
         void OutputFileName(G4String name)  { sOutputFileName = name; }
         void OpenOutputFile(G4int RunID);
         void CloseOutputFile(G4int RunID);
+        G4int GetIndex(G4String);
 
         // event max time
-        G4double EventMaxTime()             { return sEventMaxTime; }
+        const G4double& EventMaxTime()             { return sEventMaxTime; }
         void EventMaxTime(G4double maxTime) { sEventMaxTime = maxTime; }
         inline static thread_local G4int GetNumberOfParticles()         { return mParticleName.size(); }
         inline static thread_local G4int GetNumberOfSimulatedParticles(){ return mParticleName.size(); }
@@ -148,6 +150,9 @@ namespace LArGeant
         //*************************************************************************************************//
         // Event level maps to keep track of particle ids,
         // parent ids, ancestor ids and pdg codes.
+        // Add Particle info
+        void AddParticleMapsFromTrack(const G4Track* track);
+
         inline static thread_local void AddParticleTrackID(G4int track_id, G4int location)
         { mParticleTrackID[track_id] = location; }
         inline static thread_local void AddParticleName(G4int track_id, G4String name)                 
@@ -163,23 +168,32 @@ namespace LArGeant
         inline static thread_local void AddScintillationAncestorPDG(G4int track_id, G4int scintillation_pdg)
         { mScintillationAncestorPDG[track_id] = scintillation_pdg; }
 
-        inline static thread_local G4int GetParticleTrackID(G4int track_id)          { return mParticleTrackID[track_id]; }
-        inline static thread_local G4String GetParticleName(G4int track_id)          { return mParticleName[track_id]; }
-        inline static thread_local G4int GetParticlePDG(G4int track_id)              { return mParticlePDG[track_id]; }
-        inline static thread_local G4int GetParticleParentTrackID(G4int track_id)    { return mParticleParentTrackID[track_id]; }
-        inline static thread_local G4int GetParticleAncestorTrackID(G4int track_id)  { return mParticleAncestorTrackID[track_id]; }
-        inline static thread_local G4int GetScintillationAncestorTrackID(G4int track_id) { return mScintillationAncestorTrackID[track_id]; }
-        inline static thread_local G4int GetScintillationAncestorPDG(G4int track_id)     { return mScintillationAncestorPDG[track_id]; }
-        //*************************************************************************************************//
+        inline static thread_local const G4int& GetParticleTrackID(G4int track_id)          { return mParticleTrackID[track_id]; }
+        inline static thread_local const G4String& GetParticleName(G4int track_id)          { return mParticleName[track_id]; }
+        inline static thread_local const G4int& GetParticlePDG(G4int track_id)              { return mParticlePDG[track_id]; }
+        inline static thread_local const G4int& GetParticleParentTrackID(G4int track_id)    { return mParticleParentTrackID[track_id]; }
+        inline static thread_local const G4int& GetParticleAncestorTrackID(G4int track_id)  { return mParticleAncestorTrackID[track_id]; }
+        inline static thread_local const G4int& GetScintillationAncestorTrackID(G4int track_id) { return mScintillationAncestorTrackID[track_id]; }
+        inline static thread_local const G4int& GetScintillationAncestorPDG(G4int track_id)     { return mScintillationAncestorPDG[track_id]; }
 
+        // Get the entire map object
+        inline static thread_local const std::map<G4int, G4int>&    GetParticleTrackIDMap()        { return mParticleTrackID; }               
+        inline static thread_local const std::map<G4int, G4String>& GetParticleNameMap()           { return mParticleName; }
+        inline static thread_local const std::map<G4int, G4int>&    GetParticlePDGMap()            { return mParticlePDG; }
+        inline static thread_local const std::map<G4int, G4int>&    GetParticleParentTrackIDMap()  { return mParticleParentTrackID; }
+        inline static thread_local const std::map<G4int, G4int>&    GetParticleAncestorTrackIDMap(){ return mParticleAncestorTrackID; }
+        inline static thread_local const std::map<G4int, G4int>&    GetScintillationAncestorTrackIDMap() { return mScintillationAncestorTrackID; }
+        inline static thread_local const std::map<G4int, G4int>&    GetScintillationAncestorPDGMap()     { return mScintillationAncestorPDG; }
+        //*************************************************************************************************//
 
         //*************************************************************************************************//
         // Event level primary info to keep track of
+        void AddPrimaryInfoFromTrackBegin(const G4Track* track);
+        void AddPrimaryInfoFromTrackEnd(const G4Track* track);
         inline static thread_local void AddPrimaryData(PrimaryData primary) { mPrimaryData.emplace_back(primary); }
         inline static thread_local G4int GetNumberOfPrimaries()             { return mPrimaryData.size(); }
-        inline static thread_local std::vector<PrimaryData> GetPrimaries()  { return mPrimaryData; }
-        inline static thread_local std::vector<Particle> GetParticles()     { return mParticles; }
-        inline static thread_local std::vector<OpticalPhotonData> GetOpticalPhotonData() { return mOpticalPhotonData; }
+        inline static thread_local const std::vector<PrimaryData>& GetPrimaries()  { return mPrimaryData; }
+        
         inline static thread_local PrimaryData& GetPrimaryData(G4int track_id)
         {
             for(size_t ii = 0; ii < mPrimaryData.size(); ii++)
@@ -192,13 +206,53 @@ namespace LArGeant
                 "No PrimaryData object matches track_id: " + std::to_string(track_id)
             );
         }
+        // Generate primaries
+        std::vector<PrimaryGeneration> GeneratePrimaryList();
+        //*************************************************************************************************//
+
+        //*************************************************************************************************//
+        // Particle level info to keep track of
+        void AddParticleInfoFromTrackBegin(const G4Track* track);
+        void AddParticleInfoFromTrackEnd(const G4Track* track);
+        void AddParticleInfoFromStep(const G4Step* step);
+        inline static thread_local const std::vector<Particle>& GetParticles()     { return mParticles; }
+        //*************************************************************************************************//
+
+        //*************************************************************************************************//
+        // Energy deposit level info to keep track of
+        void AddEnergyDepositInfoFromStep(const G4Step* step);
+        inline static thread_local const std::vector<EnergyDeposit>& GetEnergyDeposits() { return mEnergyDeposits; }
+        //*************************************************************************************************//
+
+        //*************************************************************************************************//
+        // Optical photon level info to keep track of
+        void AddOpticalPhotonInfoFromTrackEnd(const G4Track* track);
+        inline static thread_local const std::vector<OpticalPhotonData>& GetOpticalPhotonData() { return mOpticalPhotonData; }
+        //*************************************************************************************************//
+
+        //*************************************************************************************************//
+        // Thermal electron level info to keep track of
+        void AddThermalElectronInfoFromTrackEnd(const G4Track* track);
+        inline static thread_local const std::vector<ThermalElectronData>& GetThermalElectronData() { return mThermalElectronData; }
+        //*************************************************************************************************//
+
+        //*************************************************************************************************//
+        // NEST level info to keep track of
+        void AddNESTResultFromStep(NESTInterfaceResult result);
+        inline static thread_local const std::vector<NESTInterfaceResult>& GetNESTInterfaceResults() { return mNESTInterfaceResults; }
+        //*************************************************************************************************//
+
+        //*************************************************************************************************//
+        // Hit level info to keep track of
+        void AddHitInfoFromStep(G4Step* step, G4TouchableHistory* history);
+        inline static thread_local const std::vector<Hit>& GetHits() { return mHits; }
         //*************************************************************************************************//
 
         //*************************************************************************************************//
         // Scintillation stacking physics
-        G4String NESTBasis()            { return sNESTBasis; }
-        G4bool TrackOpticalPhotons()    { return sTrackOpticalPhotons; }
-        G4bool TrackThermalElectrons()  { return sTrackThermalElectrons; }
+        const G4String& NESTBasis()            { return sNESTBasis; }
+        const G4bool& TrackOpticalPhotons()    { return sTrackOpticalPhotons; }
+        const G4bool& TrackThermalElectrons()  { return sTrackThermalElectrons; }
 
         void NESTBasis(G4String basis)          { sNESTBasis = basis; }
         void TrackOpticalPhotons(G4bool track)  { sTrackOpticalPhotons = track; }
@@ -218,30 +272,13 @@ namespace LArGeant
         {
             return sDetectorComponents[sComponentCopyNumber[index]];
         }
-        // Generate primaries
-        std::vector<PrimaryGeneration> GeneratePrimaryList();
         //*************************************************************************************************//
 
         //*************************************************************************************************//
-        // Add Particle info
-        void AddParticleMapsFromTrack(const G4Track* track);
-
-        void AddPrimaryInfoFromTrackBegin(const G4Track* track);
-        void AddPrimaryInfoFromTrackEnd(const G4Track* track);
-
-        void AddParticleInfoFromTrackBegin(const G4Track* track);
-        void AddParticleInfoFromTrackEnd(const G4Track* track);
-        void AddParticleInfoFromStep(const G4Step* step);
-
-        void AddEnergyDepositInfoFromStep(const G4Step* step);
-
-        void AddOpticalPhotonInfoFromTrackEnd(const G4Track* track);
-        void AddThermalElectronInfoFromTrackEnd(const G4Track* track);
-        void AddNESTResultFromStep(NESTInterfaceResult result);
-
-        void AddHitInfoFromStep(G4Step* step, G4TouchableHistory* history);
+        // Analysis related functions
+        void EvaluateEvent();
+        void AddAnalysisFunction(std::function<void()> func) { mAnalysisFunctions.emplace_back(func); }
         //*************************************************************************************************//
-
 
 #ifdef LARGEANT_PROFILING
         std::map<G4String, Profile> GetFunctionProfiles()     { return sFunctionProfiles; }
@@ -309,6 +346,9 @@ namespace LArGeant
         inline static thread_local std::vector<ThermalElectronData> mThermalElectronData;
         inline static thread_local std::vector<NESTInterfaceResult> mNESTInterfaceResults;
         inline static thread_local std::vector<Hit> mHits;
+
+        // Analysis functions
+        std::vector<std::function<void()>> mAnalysisFunctions;
 
 #ifdef LARGEANT_PROFILING
         inline static thread_local std::map<G4String, Profile> sFunctionProfiles = {};
